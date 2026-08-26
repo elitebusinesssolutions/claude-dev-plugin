@@ -3,5 +3,9 @@
   "description": "Generic dev-workflow skills for git worktrees, GitHub issues, pull requests, and stacked branches",
   "version": "0.1.0",
   "repository": "https://github.com/elitebusinesssolutions/claude-dev-plugin",
+  "author": {
+    "name": "Elite Business Solutions",
+    "email": "john@elitebusinesssolutions.com"
+  },
   "skills": "./skills/"
 }
