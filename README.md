@@ -1,4 +1,4 @@
-# elite-plugin
+# claude-dev-plugin
 
 Generic dev-workflow skills for Claude Code: git worktrees, GitHub issue tracking, pull requests,
 stacked branches, and PR review triage. Works with TypeScript/JavaScript or .NET projects — no
@@ -9,7 +9,7 @@ framework assumptions baked in beyond "this repo uses git and GitHub."
 Add the marketplace:
 
 ```bash
-claude plugin marketplace add elitebusinesssolutions/elite-plugin
+claude plugin marketplace add elitebusinesssolutions/claude-dev-plugin
 ```
 
 Then install the plugin:
@@ -37,7 +37,7 @@ everyone who opens the repo:
     "elite-dev-marketplace": {
       "source": {
         "source": "github",
-        "repo": "elitebusinesssolutions/elite-plugin"
+        "repo": "elitebusinesssolutions/claude-dev-plugin"
       },
       "autoUpdate": true
     }

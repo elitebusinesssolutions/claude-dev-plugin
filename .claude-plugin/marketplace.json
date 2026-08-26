@@ -6,7 +6,7 @@
       "name": "elite-dev",
       "source": {
         "source": "github",
-        "repo": "elitebusinesssolutions/elite-plugin"
+        "repo": "elitebusinesssolutions/claude-dev-plugin"
       }
     }
   ]

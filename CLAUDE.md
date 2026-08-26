@@ -1,11 +1,11 @@
-# elite-plugin — Development Guide
+# claude-dev-plugin — Development Guide
 
 This is the elite-dev Claude Code plugin. It ships generic dev-workflow skills — git worktrees,
 GitHub issue tracking, pull requests, stacked branches, PR review triage — for any TypeScript/JavaScript
 or .NET repo. No hooks, skills only. Install it via:
 
 ```bash
-claude plugin marketplace add elitebusinesssolutions/elite-plugin
+claude plugin marketplace add elitebusinesssolutions/claude-dev-plugin
 claude plugin install elite-dev@elite-dev-marketplace
 ```
 
@@ -21,7 +21,7 @@ Official docs this file enforces:
 ## Directory layout
 
 ```text
-elite-plugin/
+claude-dev-plugin/
 ├── .claude-plugin/
 │   ├── plugin.json          # Plugin identity (name, version, description)
 │   └── marketplace.json     # elite-dev marketplace registration
@@ -53,7 +53,7 @@ Reference: [Plugin manifest schema](https://code.claude.com/docs/en/plugins-refe
   "name": "elite-dev",
   "description": "Generic dev-workflow skills for git worktrees, GitHub issues, pull requests, and stacked branches",
   "version": "0.1.0",
-  "repository": "https://github.com/elitebusinesssolutions/elite-plugin",
+  "repository": "https://github.com/elitebusinesssolutions/claude-dev-plugin",
   "skills": "./skills/"
 }
 ```
@@ -211,7 +211,7 @@ Reference: [Plugin marketplaces](https://code.claude.com/docs/en/plugin-marketpl
       "name": "elite-dev",
       "source": {
         "source": "github",
-        "repo": "elitebusinesssolutions/elite-plugin"
+        "repo": "elitebusinesssolutions/claude-dev-plugin"
       }
     }
   ]
@@ -250,7 +250,7 @@ These are caught by `claude plugin validate` or by reading the official docs:
 
 Reference: [Conventional Commits spec](https://www.conventionalcommits.org/en/v1.0.0/)
 
-This repo (`elite-plugin`) has no `dev` branch — only `main`. Branch from and target `main`.
+This repo (`claude-dev-plugin`) has no `dev` branch — only `main`. Branch from and target `main`.
 
 ### Branch naming
 
