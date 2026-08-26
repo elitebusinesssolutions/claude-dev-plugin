@@ -70,7 +70,12 @@ if (-not [System.IO.Path]::IsPathRooted($SettingsPath)) {
 # Always bring the CLI to the latest available version before plugin operations.
 Write-Host "Ensuring Claude CLI is up to date..." -ForegroundColor Yellow
 [void](Invoke-Claude -CommandArgs @("update"))
-Write-Host "Succeeded: Claude CLI is up to date" -ForegroundColor Green
+if ($DryRun) {
+    Write-Host "[DryRun] Would run: claude update" -ForegroundColor DarkYellow
+}
+else {
+    Write-Host "Succeeded: Claude CLI is up to date" -ForegroundColor Green
+}
 
 if (-not (Test-Path -LiteralPath $SettingsPath)) {
     throw "Settings file not found: $SettingsPath"
