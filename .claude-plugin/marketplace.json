@@ -1,0 +1,13 @@
+{
+  "name": "elite-dev-marketplace",
+  "owner": { "name": "elitebusinesssolutions" },
+  "plugins": [
+    {
+      "name": "elite-dev",
+      "source": {
+        "source": "github",
+        "repo": "elitebusinesssolutions/elite-plugin"
+      }
+    }
+  ]
+}
