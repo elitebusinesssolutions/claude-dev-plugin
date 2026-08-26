@@ -52,6 +52,24 @@ If the project doesn't have a `.claude/settings.json` yet, create it with just t
 already has one, merge `extraKnownMarketplaces` and `enabledPlugins` in as additional top-level
 keys — don't replace the file.
 
+### Syncing plugins with sync-claude-plugins.ps1
+
+[`sync-claude-plugins.ps1`](sync-claude-plugins.ps1) is a standalone PowerShell script you can copy
+into any project that commits its plugin config to `.claude/settings.json` (not specific to this
+plugin). Run it once when a developer starts on that project, and again any time
+`.claude/settings.json` changes (a new plugin, a new marketplace, or after pulling someone else's
+change to it):
+
+```powershell
+./sync-claude-plugins.ps1
+```
+
+It installs the Claude CLI if missing, registers/refreshes every marketplace listed under
+`extraKnownMarketplaces`, and installs/updates every plugin listed under `enabledPlugins` — safe to
+re-run any time, since installing/updating an already-current plugin is a no-op. Pass
+`-SettingsPath` to point at a non-default location, `-Scope user` to install at user scope instead
+of project scope, or `-DryRun` to print the commands it would run without executing them.
+
 ## Developing this plugin
 
 To try a skill from this repo before it's released:
