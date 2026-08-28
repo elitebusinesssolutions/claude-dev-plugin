@@ -51,7 +51,7 @@ Reference: [Plugin manifest schema](https://code.claude.com/docs/en/plugins-refe
 {
   "name": "elite-dev",
   "description": "Generic dev-workflow skills for git worktrees, GitHub issues, and pull requests",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "repository": "https://github.com/elitebusinesssolutions/claude-dev-plugin",
   "skills": "./skills/"
 }
