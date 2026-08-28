@@ -118,6 +118,11 @@ solution, or a mix (a `src/client` + `src/server` monorepo). Never hardcode:
   these belong in the _consuming_ project's own `CLAUDE.md`, looked up once per project. See
   `start-issue/SKILL.md` for the pattern.
 
+  Exception: ETT (this org's time-tracking tool) is elite-only infrastructure, not
+  project-specific — every consuming repo is an elite project with an ETT task per PR. Skills
+  may hardcode ETT directly (see `create-pr/SKILL.md` §1) rather than pushing it to each
+  consuming CLAUDE.md.
+
 ### Writing effective skill bodies
 
 1. **State the goal first.** Open with what Claude is doing, not with rules.
