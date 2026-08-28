@@ -1,23 +1,22 @@
 ---
 name: create-pr
 description: >
-  Opens a pull request following common conventions: an optional external-tracker link as the
-  first line of the body (only for projects that use one), a bulleted summary, unwrapped
-  paragraphs, a footer that references the linked GitHub issue (and closes it on merge when
-  eligible), and labels copied from that issue. Use whenever creating a PR — "open a PR", "create
-  the PR", "let's PR this" — or after `gh stack submit --auto`, which can create several PRs in
-  one call that each need this treatment.
+  Opens a pull request following common conventions: an ETT task link as the first line of the
+  body (skipped only when the developer confirms no ETT task applies), a bulleted summary,
+  unwrapped paragraphs, a footer that references the linked GitHub issue (and closes it on merge
+  when eligible), and labels copied from that issue. Use whenever creating a PR — "open a PR",
+  "create the PR", "let's PR this" — or after `gh stack submit --auto`, which can create several
+  PRs in one call that each need this treatment.
 ---
 
 # Create PR
 
 ## 1. Body conventions
 
-- If this project tracks work in an external system (Jira, Linear, an internal time-tracking
-  tool, etc.), the first line of the PR body is that task's link. Check the linked GitHub issue's
-  body for the link first; if the issue doesn't have one and the project is known to use an
-  external tracker, ask the developer rather than guessing or omitting it. Skip this line
-  entirely for projects that don't use one.
+- This org tracks time in ETT — every dev has an ETT task assigned, so the PR body's first line
+  is that task's link. Check the linked GitHub issue's body for the link first. Not there → ask
+  the developer for it rather than guessing or omitting it. Only skip the line if the developer
+  confirms this PR has no ETT task (rare, but happens).
 - Prefer a bulleted list over one large paragraph in the Summary section once it's covering more
   than one distinct change — a wall of clauses joined by "and"/"also" is harder to scan than the
   same points as separate bullets.
