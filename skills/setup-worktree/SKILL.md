@@ -32,13 +32,15 @@ a worktree** rather than creating one automatically.
     worktree re-prompts for everything.
   - any local env/secret files the project uses (`.env`, `.env.local`, `appsettings.Development.json`,
     etc.) — these are gitignored by design, so a fresh worktree starts without them and the app
-    fails to start or hits missing-config errors until they're copied over.
+    fails to start or hits missing-config errors until they're copied over. Search excludes
+    `node_modules`, `bin`, `obj`, `.git`, and `.claude/worktrees` itself — generated output, repo
+    metadata, or nested worktrees, not secrets.
 
     ```powershell
     $name = "<name>"  # e.g. feat-21-product-entities
     if (Test-Path .claude/settings.local.json) { Copy-Item .claude/settings.local.json ".claude/worktrees/$name/.claude/" -Force }
     Get-ChildItem -Recurse -Filter ".env*" -File -ErrorAction SilentlyContinue |
-      Where-Object { $_.FullName -notmatch '\\node_modules\\' } |
+      Where-Object { $_.FullName -notmatch '[\\/](\.claude[\\/]worktrees|node_modules|bin|obj|\.git)[\\/]' } |
       ForEach-Object {
         $rel = Resolve-Path -Relative $_.FullName
         $dest = Join-Path ".claude/worktrees/$name" (Split-Path $rel -Parent)
