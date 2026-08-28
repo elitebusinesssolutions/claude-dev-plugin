@@ -1,8 +1,13 @@
 # claude-dev-plugin
 
 Generic dev-workflow skills for Claude Code: git worktrees, GitHub issue tracking, pull requests,
-stacked branches, and PR review triage. Works with TypeScript/JavaScript or .NET projects — no
-framework assumptions baked in beyond "this repo uses git and GitHub."
+and PR review triage. Works with TypeScript/JavaScript or .NET projects — no framework assumptions
+baked in beyond "this repo uses git and GitHub."
+
+## Prerequisites
+
+Requires the [GitHub CLI](https://cli.github.com/) (`gh`), authenticated (`gh auth login`) — every
+skill here shells out to it.
 
 ## Install
 
@@ -90,10 +95,16 @@ develop against it.
 | Skill                    | Invoke                              | Purpose                                                                            |
 | ------------------------ | ----------------------------------- | ---------------------------------------------------------------------------------- |
 | `create-pr`              | `/elite-dev:create-pr`              | Open a PR with consistent body conventions and labels copied from the linked issue |
-| `gh-stack`               | `/elite-dev:gh-stack`               | Create, push, rebase, sync, and navigate stacks of dependent PRs                   |
 | `review-fix-pr-comments` | `/elite-dev:review-fix-pr-comments` | Triage and (on approval) fix unresolved PR review comments                         |
 | `setup-worktree`         | `/elite-dev:setup-worktree`         | Set up or clean up a git worktree for a parallel dev session                       |
 | `start-issue`            | `/elite-dev:start-issue`            | Mark a GitHub issue as started: assignee + project board status                    |
+
+## Related
+
+Stacked-PR workflows aren't bundled here — install GitHub's own tooling:
+`gh extension install github/gh-stack` for the `gh stack` commands, and
+`gh skill install github/gh-stack` for agent-native stack guidance
+(docs: <https://github.com/github/gh-stack>).
 
 ## Project-local skills/hooks
 

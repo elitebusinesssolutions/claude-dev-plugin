@@ -59,6 +59,7 @@ a worktree** rather than creating one automatically.
 - A branch can only be checked out in **one** worktree at a time (git enforces this), and a
   `gh-stack` stack lives entirely in one worktree — never rebase/sync the same stack from two
   sessions. Pass `--base <default-branch>` to `gh stack init`/`gh stack link` if the repo's default
-  branch isn't `main`.
+  branch isn't `main`. `gh stack` command not found → `gh extension install github/gh-stack`
+  (add `gh skill install github/gh-stack` too, for agent-native stack guidance).
 - **Cleanup** when the PR merges: `git worktree remove .claude/worktrees/<name>` from the main
   checkout (`git worktree list` / `git worktree prune` to tidy up stale entries).
