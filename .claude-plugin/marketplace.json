@@ -1,11 +1,11 @@
 {
   "name": "elite-dev-marketplace",
-  "description": "Generic dev-workflow skills for git worktrees, GitHub issues, pull requests, and stacked branches",
+  "description": "Generic dev-workflow skills for git worktrees, GitHub issues, and pull requests",
   "owner": { "name": "elitebusinesssolutions" },
   "plugins": [
     {
       "name": "elite-dev",
-      "description": "Generic dev-workflow skills for git worktrees, GitHub issues, pull requests, and stacked branches",
+      "description": "Generic dev-workflow skills for git worktrees, GitHub issues, and pull requests",
       "source": {
         "source": "github",
         "repo": "elitebusinesssolutions/claude-dev-plugin"

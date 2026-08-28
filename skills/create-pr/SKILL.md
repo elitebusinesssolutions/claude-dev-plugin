@@ -73,5 +73,6 @@ those PRs keep the template body indefinitely, with no tracker link, summary, or
 ## Scope
 
 This skill only shapes the PR body and labels; it doesn't decide _whether_ to open a PR, resolve
-merge conflicts, or handle stacked-PR creation mechanics themselves — see the `gh-stack` skill for
-that.
+merge conflicts, or handle stacked-PR creation mechanics themselves — for that, install GitHub's
+own `gh-stack` tooling: `gh extension install github/gh-stack` for the `gh stack` commands, and
+`gh skill install github/gh-stack` for agent-native stack guidance.

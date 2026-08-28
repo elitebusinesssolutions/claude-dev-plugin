@@ -1,8 +1,8 @@
 # claude-dev-plugin — Development Guide
 
 This is the elite-dev Claude Code plugin. It ships generic dev-workflow skills — git worktrees,
-GitHub issue tracking, pull requests, stacked branches, PR review triage — for any TypeScript/JavaScript
-or .NET repo. No hooks, skills only. Install it via:
+GitHub issue tracking, pull requests, PR review triage — for any TypeScript/JavaScript or .NET
+repo. No hooks, skills only. Install it via:
 
 ```bash
 claude plugin marketplace add elitebusinesssolutions/claude-dev-plugin
@@ -27,7 +27,6 @@ claude-dev-plugin/
 │   └── marketplace.json     # elite-dev marketplace registration
 ├── skills/
 │   ├── create-pr/SKILL.md
-│   ├── gh-stack/SKILL.md
 │   ├── review-fix-pr-comments/SKILL.md
 │   ├── setup-worktree/SKILL.md
 │   └── start-issue/SKILL.md
@@ -51,8 +50,8 @@ Reference: [Plugin manifest schema](https://code.claude.com/docs/en/plugins-refe
 ```json
 {
   "name": "elite-dev",
-  "description": "Generic dev-workflow skills for git worktrees, GitHub issues, pull requests, and stacked branches",
-  "version": "0.1.0",
+  "description": "Generic dev-workflow skills for git worktrees, GitHub issues, and pull requests",
+  "version": "0.2.0",
   "repository": "https://github.com/elitebusinesssolutions/claude-dev-plugin",
   "skills": "./skills/"
 }
@@ -270,7 +269,7 @@ git checkout -b feat/your-feature-name
 ```
 
 - **Type**: same values as branch types
-- **Scope**: a skill name (`create-pr`, `gh-stack`, ...) — or omit for cross-cutting changes
+- **Scope**: a skill name (`create-pr`, `start-issue`, ...) — or omit for cross-cutting changes
 - **Description**: imperative, lowercase, ≤72 chars, no trailing period
 
 Examples:
