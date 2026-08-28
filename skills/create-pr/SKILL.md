@@ -1,12 +1,12 @@
 ---
 name: create-pr
 description: >
-  Opens a pull request following common conventions: an optional external-tracker link as the
-  first line of the body (only for projects that use one), a bulleted summary, unwrapped
-  paragraphs, a footer that references the linked GitHub issue (and closes it on merge when
-  eligible), and labels copied from that issue. Use whenever creating a PR — "open a PR", "create
-  the PR", "let's PR this" — or after `gh stack submit --auto`, which can create several PRs in
-  one call that each need this treatment.
+  Opens a pull request following common conventions: an ETT task link as the first line of the
+  body (skipped only when the developer confirms no ETT task applies), a bulleted summary,
+  unwrapped paragraphs, a footer that references the linked GitHub issue (and closes it on merge
+  when eligible), and labels copied from that issue. Use whenever creating a PR — "open a PR",
+  "create the PR", "let's PR this" — or after `gh stack submit --auto`, which can create several
+  PRs in one call that each need this treatment.
 ---
 
 # Create PR
