@@ -1,0 +1,28 @@
+{
+  "skill_name": "start-issue",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Let's start issue 42. Here is this repo's CLAUDE.md: evals/files/repo-with-board/CLAUDE.md. Saved output of `gh issue view 42 --json assignees`: []. Mark the issue started.",
+      "expected_output": "Assigns the issue to @me and sets the board Status field to the In Progress option, using the exact IDs recorded in CLAUDE.md.",
+      "files": ["evals/files/repo-with-board/CLAUDE.md"],
+      "expectations": [
+        "Runs (or states it will run) `gh issue edit 42 --add-assignee \"@me\"`",
+        "Uses the exact project/field/option IDs given in CLAUDE.md (PVT_kwDOAtest1, PVTSSF_test2, 47fc9ee4) rather than inventing new ones",
+        "Sets the Status field to the In Progress option (47fc9ee4), not the Todo or Done option",
+        "States it will verify the result with a follow-up `gh issue view` call"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Let's start issue 7. Here is this repo's CLAUDE.md: evals/files/repo-without-board/CLAUDE.md. Saved output of `gh issue view 7 --json assignees`: []. Mark the issue started.",
+      "expected_output": "Assigns the issue to @me. Does not attempt any Projects-board step, and does not invent board IDs, since this repo has no board.",
+      "files": ["evals/files/repo-without-board/CLAUDE.md"],
+      "expectations": [
+        "Runs (or states it will run) `gh issue edit 7 --add-assignee \"@me\"`",
+        "Does not invent or guess a project/field/option ID for a board step",
+        "States explicitly that this repo has no Projects board, so the board-status step is skipped entirely"
+      ]
+    }
+  ]
+}

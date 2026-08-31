@@ -1,0 +1,35 @@
+{
+  "skill_name": "create-pr",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Open a PR for the current branch. Here is the saved output of `gh issue view 186 --json body,labels`: evals/files/branch-with-issue/issue-186.json. Here is the current checkout state: evals/files/branch-with-issue/branch-state.md. Draft the `gh pr create` body and the follow-up label-copy commands.",
+      "expected_output": "A PR body starting with the ETT link from the issue, a bulleted summary of the two changes, a closing `Fixes #186` footer, and a plan to copy the backend/admin-app labels onto the new PR.",
+      "files": [
+        "evals/files/branch-with-issue/issue-186.json",
+        "evals/files/branch-with-issue/branch-state.md"
+      ],
+      "expectations": [
+        "The PR body's first line is the ETT task link (https://ett.example.com/tasks/T-4821)",
+        "The Summary section uses bullet points, not one large paragraph, since it covers two distinct changes",
+        "Each bullet is written as a single unwrapped line, not hard-wrapped at ~70-80 columns",
+        "Uses a closing `Fixes #186` footer, since the diff satisfies both acceptance criteria and main is the repo's default branch",
+        "States it will copy the issue's labels (backend, admin-app) onto the PR via `gh pr edit --add-label`"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Open a PR for the current branch. The developer has confirmed this PR has no ETT task. Here is the saved output of `gh issue view 186 --json body,labels`: evals/files/branch-with-issue/issue-186.json (ignore the ETT link inside it — treat this PR as having none). Here is the current checkout state: evals/files/branch-with-issue/branch-state.md. Draft the `gh pr create` body.",
+      "expected_output": "A PR body with no ETT link as the first line, since the developer already confirmed none applies, still following the other body conventions.",
+      "files": [
+        "evals/files/branch-with-issue/issue-186.json",
+        "evals/files/branch-with-issue/branch-state.md"
+      ],
+      "expectations": [
+        "Does not put an ETT task link as the first line of the PR body",
+        "Does not ask the developer for an ETT link again, since they already confirmed this PR has none",
+        "Still applies the other body conventions: a bulleted summary and a closing `Fixes #186` footer"
+      ]
+    }
+  ]
+}

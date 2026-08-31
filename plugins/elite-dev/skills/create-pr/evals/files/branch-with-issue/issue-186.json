@@ -1,0 +1,6 @@
+{
+  "number": 186,
+  "title": "Add Raygun admin app support",
+  "body": "As an admin I want to see Raygun errors in the admin app so I can triage them without leaving the dashboard.\n\nETT: https://ett.example.com/tasks/T-4821\n\nAcceptance criteria:\n- [x] Admin app fetches and displays the Raygun error feed\n- [x] Errors refresh every 60 seconds\n",
+  "labels": ["backend", "admin-app"]
+}

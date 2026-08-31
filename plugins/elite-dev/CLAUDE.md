@@ -45,8 +45,8 @@ Every skill in this plugin must work for a plain TypeScript/JavaScript repo, a N
   may hardcode ETT directly (see `create-pr/SKILL.md` §1) rather than pushing it to each
   consuming CLAUDE.md.
 
-This stack-agnostic rule is specific to `elite-dev` — `elite-next` and `elite-ts`, by contrast,
-deliberately target one stack each.
+This stack-agnostic rule is specific to `elite-dev` — `elite-ts`, by contrast, deliberately targets
+one stack.
 
 ---
 
@@ -70,4 +70,6 @@ Skills appear as `/elite-dev:<name>`. Reload after a change without restarting: 
 - [ ] Skill ends with a verification step
 - [ ] Test with `claude --plugin-dir plugins/elite-dev /elite-dev:<name>`
 - [ ] Add row to `README.md` skills table
+- [ ] Add `evals/evals.json` under the skill's own directory — see the root
+      [CLAUDE.md](../../CLAUDE.md#testing-skills-evals)
 - [ ] Bump `PATCH`/`MINOR` version in `plugins/elite-dev/.claude-plugin/plugin.json` as appropriate
