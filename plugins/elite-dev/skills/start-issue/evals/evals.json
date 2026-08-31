@@ -24,6 +24,17 @@
         "Does not invent or guess a project/field/option ID for a board step",
         "States explicitly that this repo has no Projects board, so the board-status step is skipped entirely"
       ]
+    },
+    {
+      "id": 3,
+      "prompt": "Let's start issue 88. Here is this repo's CLAUDE.md: evals/files/repo-with-board/CLAUDE.md. Saved output of `gh issue view 88 --json assignees`: [{\"login\": \"another-dev\"}]. Mark the issue started.",
+      "expected_output": "Stops before assigning, states the issue is already assigned to another-dev, and asks the developer whether to add themselves as an additional assignee rather than doing it unasked.",
+      "files": ["evals/files/repo-with-board/CLAUDE.md"],
+      "expectations": [
+        "Does not run `gh issue edit --add-assignee \"@me\"` without asking first",
+        "States plainly that issue 88 is already assigned to another-dev",
+        "Asks the developer whether to proceed (e.g. add as an additional assignee) rather than silently assigning"
+      ]
     }
   ]
 }

@@ -31,6 +31,23 @@
         "Does not silently drop the finding — still presents it as an item that needs a disposition",
         "Ends by asking the developer how to proceed, without editing, committing, or replying to GitHub"
       ]
+    },
+    {
+      "id": 3,
+      "prompt": "Review the unresolved comments on PR 301. Saved output of the reviewThreads GraphQL query: evals/files/pr-301-suppressed-comments/review-threads.json. Saved output of `gh api repos/<owner>/<repo>/pulls/301/reviews`: evals/files/pr-301-suppressed-comments/reviews.json. Current content of src/services/authService.ts: evals/files/pr-301-suppressed-comments/authService.ts. Present the findings for me to triage.",
+      "expected_output": "Notices reviewThreads is empty but still checks the reviews list for a suppressed-comments block, finds one with two items, verifies each against the current file, and presents one as a confirmed defect (isTokenExpired compares seconds to milliseconds) and one as stale (refreshToken already clears the old token first).",
+      "files": [
+        "evals/files/pr-301-suppressed-comments/review-threads.json",
+        "evals/files/pr-301-suppressed-comments/reviews.json",
+        "evals/files/pr-301-suppressed-comments/authService.ts"
+      ],
+      "expectations": [
+        "Does not stop at the empty reviewThreads result and report there is nothing to review — also inspects the reviews.json content for a suppressed-comments block",
+        "Identifies the <details><summary>Suppressed comments</summary> block in the review body and treats each of its two bulleted items as its own candidate finding",
+        "Confirms the isTokenExpired finding is real: expiresAt is compared directly against Date.now(), a seconds-vs-milliseconds unit mismatch",
+        "States the refreshToken finding is stale, since tokenStore.delete(oldToken) already runs before the new token is stored",
+        "Ends by asking the developer which findings to act on, without editing, committing, or replying to GitHub in the same turn"
+      ]
     }
   ]
 }

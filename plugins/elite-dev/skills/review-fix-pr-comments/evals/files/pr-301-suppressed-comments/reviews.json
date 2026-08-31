@@ -1,0 +1,7 @@
+[
+  {
+    "id": 55012233,
+    "user": { "login": "copilot-pull-request-reviewer[bot]" },
+    "body": "This pull request looks good overall. Copilot reviewed 3 out of 3 changed files.\n\n<details>\n<summary>Suppressed comments (2)</summary>\n\n* **src/services/authService.ts:2** — `isTokenExpired` compares `expiresAt` (a Unix seconds timestamp) against `Date.now()` (milliseconds), so tokens are treated as expired roughly 1000x too early.\n* **src/services/authService.ts:10** — `refreshToken` does not clear the old refresh token from `tokenStore` before storing the new one, potentially leaking a stale valid token.\n\n</details>"
+  }
+]
