@@ -184,16 +184,28 @@ try {
   const messages = [];
 
   // In an npm/yarn/pnpm workspace, ESLint/Prettier are typically hoisted to the
-  // workspace root's node_modules/.bin only — a sub-package's own node_modules
+  // workspace root's node_modules only — a sub-package's own node_modules
   // won't have them. Walk up from cwd (mirroring Node's own module resolution
   // and how npx locates binaries) so the gates below don't misdetect "not
   // installed" just because cwd is a sub-package directory.
-  function findBin(name) {
-    const binName = process.platform === "win32" ? `${name}.cmd` : name;
+  //
+  // Resolve the package's own bin *script* via its package.json "bin" field,
+  // not the node_modules/.bin/<name> shim — on Windows that shim is a `.cmd`
+  // batch file, which only cmd.exe can run. Spawning it would need shell:true,
+  // routing `f` (traced back to a tool call's file_path) through cmd.exe's
+  // metacharacter parsing. Spawning the resolved JS script with node itself
+  // needs no shell, and no shell-metacharacter parsing of `f`, on any platform.
+  function findBinScript(name) {
     let dir = cwd;
     for (;;) {
-      const candidate = path.join(dir, "node_modules", ".bin", binName);
-      if (fs.existsSync(candidate)) return candidate;
+      const pkgDir = path.join(dir, "node_modules", name);
+      const pkgJsonPath = path.join(pkgDir, "package.json");
+      if (fs.existsSync(pkgJsonPath)) {
+        const pkg = JSON.parse(fs.readFileSync(pkgJsonPath, "utf8"));
+        const bin =
+          typeof pkg.bin === "string" ? pkg.bin : (pkg.bin?.[name] ?? Object.values(pkg.bin ?? {})[0]);
+        if (bin) return path.join(pkgDir, bin);
+      }
       const parent = path.dirname(dir);
       if (parent === dir) return null; // reached filesystem root
       dir = parent;
@@ -209,20 +221,16 @@ try {
   // code ESLint itself uses for "ran fine, found lint issues" — so a project
   // that simply doesn't use ESLint would get misreported as having lint errors
   // (or, before this fix, have that failure silently swallowed).
-  const eslintBin = findBin("eslint");
+  const eslintBin = findBinScript("eslint");
   if (/\.(ts|tsx|mts|cts|js|jsx|cjs|mjs)$/.test(f) && eslintBin) {
-    // Spawn the already-resolved binary directly rather than `npx eslint` — npx
-    // re-resolves the package on every invocation, which is a wasted extra
-    // process layer on a hook that fires on nearly every Write/Edit tool call.
-    // `shell: true` is needed only on Windows, where the resolved binary is a
-    // `.cmd` wrapper that requires cmd.exe to run. On POSIX the resolved file
-    // is directly executable, so shell:true would only add unneeded
-    // shell-metacharacter parsing of `f`, a value that traces back to a tool
-    // call's file_path.
-    const eslint = spawnSync(eslintBin, ["--fix", f], {
+    // Spawn the already-resolved script with node directly rather than `npx
+    // eslint` — npx re-resolves the package on every invocation, which is a
+    // wasted extra process layer on a hook that fires on nearly every
+    // Write/Edit tool call. Spawning a JS script with node needs no shell on
+    // any platform, so `f` is passed through as one literal argument.
+    const eslint = spawnSync(process.execPath, [eslintBin, "--fix", f], {
       cwd,
       encoding: "utf8",
-      shell: process.platform === "win32",
       stdio: ["ignore", "pipe", "pipe"]
     });
     // Exit 1 = unfixable lint warnings (expected — ESLint ran fine and found issues).
@@ -244,15 +252,13 @@ try {
   // prettier devDependency triggers `npx prettier`'s package-resolution/install
   // behavior on every single Write/Edit, and any resulting non-zero exit gets
   // misreported below as a formatting failure rather than "prettier isn't set up".
-  const prettierBin = findBin("prettier");
+  const prettierBin = findBinScript("prettier");
   if (prettierBin) {
-    // Same rationale as the ESLint spawn above: use the already-resolved bin
-    // path directly instead of routing through `npx prettier`, and enable
-    // shell only on Windows for the same `.cmd`-wrapper reason.
-    const prettier = spawnSync(prettierBin, ["--write", "--ignore-unknown", f], {
+    // Same rationale as the ESLint spawn above: use the already-resolved
+    // script directly instead of routing through `npx prettier`.
+    const prettier = spawnSync(process.execPath, [prettierBin, "--write", "--ignore-unknown", f], {
       cwd,
       encoding: "utf8",
-      shell: process.platform === "win32",
       stdio: ["ignore", "pipe", "pipe"]
     });
     if (prettier.status !== 0) {

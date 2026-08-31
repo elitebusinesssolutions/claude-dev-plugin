@@ -5,53 +5,52 @@ const os = require("os");
 const path = require("path");
 const { runHook } = require("./helpers/run-hook");
 
-// format.js spawns the resolved eslint/prettier bin path directly (see
-// hooks/format.js), so these fixture bin files must themselves BE the
-// executable eslint/prettier binaries format.js resolves to and runs. Each
-// is a tiny shim (a POSIX shell script, or a Windows batch file) that execs a
-// dedicated per-tool stub script controlled by STUB_ESLINT_*/STUB_PRETTIER_*
-// env vars — one stub script per tool, because a direct-bin spawn's argv is
-// just the tool's own args (e.g. ["--fix", "src/foo.ts"]), not a tool name to
-// switch on.
+// format.js resolves eslint/prettier's bin *script* via package.json's "bin"
+// field (see hooks/format.js) and spawns it with node directly, so a fixture
+// "install" is a node_modules/<name>/package.json plus a bin script. Each
+// stub package's bin script just requires a dedicated per-tool stub script
+// controlled by STUB_ESLINT_*/STUB_PRETTIER_* env vars — one stub script per
+// tool, because a direct-script spawn's argv is just the tool's own args
+// (e.g. ["--fix", "src/foo.ts"]), not a tool name to switch on.
 const STUB_ESLINT_JS = path.join(__dirname, "helpers", "stub-bin", "stub-eslint.js");
 const STUB_PRETTIER_JS = path.join(__dirname, "helpers", "stub-bin", "stub-prettier.js");
 
-function writeStubBin(binPath, stubJsPath) {
-  if (process.platform === "win32") {
-    fs.writeFileSync(binPath, `@echo off\r\nnode "${stubJsPath}" %*\r\n`);
-  } else {
-    fs.writeFileSync(binPath, `#!/bin/sh\nexec node "${stubJsPath}" "$@"\n`);
-    fs.chmodSync(binPath, 0o755);
-  }
+function writeStubPackage(pkgDir, name, stubJsPath) {
+  fs.mkdirSync(pkgDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(pkgDir, "package.json"),
+    JSON.stringify({ name, bin: { [name]: "bin.js" } })
+  );
+  fs.writeFileSync(path.join(pkgDir, "bin.js"), `require(${JSON.stringify(stubJsPath)});\n`);
 }
 
-// format.js only invokes eslint/prettier if node_modules/.bin/<tool> exists in
-// cwd (or a parent of cwd — see the monorepo fixture below) — this fixture
-// simulates either or both being a project devDependency. When `nested` is
-// set, node_modules/.bin lives at the fixture root but `fn` is invoked with a
-// sub-package directory (no node_modules of its own) as cwd, simulating an
-// npm/yarn/pnpm workspace where eslint/prettier are hoisted to the root.
-// `brokenPrettier` simulates a resolved-but-non-executable bin (e.g. a
-// corrupt install) instead of a working stub.
+// format.js only invokes eslint/prettier if node_modules/<tool>/package.json
+// resolves to a bin script in cwd (or a parent of cwd — see the monorepo
+// fixture below) — this fixture simulates either or both being a project
+// devDependency. When `nested` is set, node_modules lives at the fixture root
+// but `fn` is invoked with a sub-package directory (no node_modules of its
+// own) as cwd, simulating an npm/yarn/pnpm workspace where eslint/prettier
+// are hoisted to the root. `brokenPrettier` simulates a package.json whose
+// bin field points at a missing script (e.g. a corrupt install) instead of a
+// working stub.
 function withProject(
   { eslint = false, prettier = false, brokenPrettier = false, nested = false } = {},
   fn
 ) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "elite-ts-hook-test-"));
-  const binDir = path.join(dir, "node_modules", ".bin");
-  fs.mkdirSync(binDir, { recursive: true });
-  const binPath = (name) => path.join(binDir, process.platform === "win32" ? `${name}.cmd` : name);
-  if (eslint) writeStubBin(binPath("eslint"), STUB_ESLINT_JS);
-  if (prettier) writeStubBin(binPath("prettier"), STUB_PRETTIER_JS);
+  const nodeModules = path.join(dir, "node_modules");
+  fs.mkdirSync(nodeModules, { recursive: true });
+  if (eslint) writeStubPackage(path.join(nodeModules, "eslint"), "eslint", STUB_ESLINT_JS);
+  if (prettier) writeStubPackage(path.join(nodeModules, "prettier"), "prettier", STUB_PRETTIER_JS);
   if (brokenPrettier) {
-    if (process.platform === "win32") {
-      // An empty .cmd is a harmless no-op on Windows — cmd.exe runs it and exits
-      // 0, which wouldn't exercise the "broken bin" failure path at all. Write
-      // one that actually exits non-zero to simulate a corrupt/broken binary.
-      fs.writeFileSync(binPath("prettier"), "@echo off\r\nexit /b 1\r\n");
-    } else {
-      fs.writeFileSync(binPath("prettier"), ""); // exists but not executable
-    }
+    // package.json exists and names a bin script, but the script itself was
+    // never written — simulates a corrupt/incomplete install.
+    const pkgDir = path.join(nodeModules, "prettier");
+    fs.mkdirSync(pkgDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(pkgDir, "package.json"),
+      JSON.stringify({ name: "prettier", bin: { prettier: "bin.js" } })
+    );
   }
   let cwd = dir;
   if (nested) {
@@ -158,7 +157,7 @@ test(".mts and .cts files DO trigger eslint (Node ESM/CJS TS entrypoints)", () =
 });
 
 test("project without eslint installed skips eslint silently (no false failure)", () => {
-  // No node_modules/.bin/eslint fixture here — simulates a project that just
+  // No node_modules/eslint fixture here — simulates a project that just
   // doesn't use ESLint. Even though the stub is configured to "fail", it must
   // never be invoked, so there must be no eslint message.
   const r = run(
@@ -185,7 +184,7 @@ test("prettier failure is reported", () => {
 });
 
 test("project without prettier installed skips prettier silently (no false failure)", () => {
-  // No node_modules/.bin/prettier fixture here — simulates a project that just
+  // No node_modules/prettier fixture here — simulates a project that just
   // doesn't use prettier. Even though the stub is configured to "fail", it must
   // never be invoked, so there must be no prettier message.
   const r = run(
@@ -237,7 +236,7 @@ test("eslint failing with a non-standard exit code is still reported", () => {
 // entirely missing from PATH still surfaces a prettier failure" — that
 // scenario no longer applies now that format.js spawns the resolved bin path
 // directly instead of `npx prettier`, so PATH contents don't matter anymore).
-// What still matters: if node_modules/.bin/prettier exists but isn't a valid,
+// What still matters: if node_modules/prettier resolves via package.json but isn't a valid,
 // executable binary (e.g. a corrupt install), the hook must still report a
 // failure rather than silently doing nothing.
 test("prettierBin exists but is broken (non-executable) -> still surfaces a failure", () => {
@@ -261,7 +260,7 @@ test("malformed JSON on stdin does not crash the hook", () => {
 });
 
 // Regression test for issue #5: in an npm/yarn/pnpm workspace, eslint/prettier
-// are typically hoisted to the workspace root's node_modules/.bin only. If the
+// are typically hoisted to the workspace root's node_modules only. If the
 // hook's cwd is a sub-package directory with no node_modules of its own, the
 // bin-existence gate must still find them by walking up to the workspace root
 // — otherwise linting/formatting is silently skipped for the whole sub-package.
@@ -301,7 +300,7 @@ test("monorepo: prettier hoisted to workspace root is still found from a nested 
 });
 
 // Don't regress the simple (non-monorepo) case: a cwd with its own
-// node_modules/.bin/eslint must keep working exactly as before.
+// node_modules/eslint must keep working exactly as before.
 test("monorepo fix does not regress a project with its own local node_modules", () => {
   withEslintProject((cwd) => {
     const r = run(
@@ -315,24 +314,23 @@ test("monorepo fix does not regress a project with its own local node_modules", 
 
 // Regression test: format.js used to pass shell: true unconditionally to both
 // spawnSync calls, so a file_path containing shell metacharacters was parsed
-// by a shell on POSIX instead of passed through as one literal argument.
-// shell:true is now gated to Windows only (see hooks/format.js) — on POSIX, a
-// metacharacter in file_path must not run a second command.
-if (process.platform !== "win32") {
-  test("a shell metacharacter in file_path is not interpreted by a shell on POSIX", () => {
-    withEslintProject((cwd) => {
-      const injectedMarker = path.join(cwd, "injected");
-      const maliciousPath = `src/foo.ts; touch ${injectedMarker} #.ts`;
-      run(
-        { tool_name: "Write", tool_input: { file_path: maliciousPath } },
-        { STUB_ESLINT_STATUS: "0", STUB_PRETTIER_STATUS: "0" },
-        cwd
-      );
-      assert.equal(
-        fs.existsSync(injectedMarker),
-        false,
-        "file_path's shell metacharacters must not run a second command"
-      );
-    });
+// by a shell instead of passed through as one literal argument (on Windows,
+// by cmd.exe). It now spawns each tool's resolved bin script directly with
+// node (see hooks/format.js), which needs no shell on any platform — so a
+// metacharacter in file_path must not run a second command anywhere.
+test("a shell metacharacter in file_path is not interpreted by a shell", () => {
+  withEslintProject((cwd) => {
+    const injectedMarker = path.join(cwd, "injected");
+    const maliciousPath = `src/foo.ts; touch ${injectedMarker} #.ts`;
+    run(
+      { tool_name: "Write", tool_input: { file_path: maliciousPath } },
+      { STUB_ESLINT_STATUS: "0", STUB_PRETTIER_STATUS: "0" },
+      cwd
+    );
+    assert.equal(
+      fs.existsSync(injectedMarker),
+      false,
+      "file_path's shell metacharacters must not run a second command"
+    );
   });
-}
+});

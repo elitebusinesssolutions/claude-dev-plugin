@@ -28,7 +28,7 @@ Skipping a check below because its precondition isn't met is correct behavior, n
 
 If none of the four apply, say so plainly and stop — there is nothing to verify.
 
-For lint and format, also confirm the tool is actually installed locally (`node_modules/.bin/eslint` / `node_modules/.bin/prettier`, walking up to a workspace root if this is a sub-package) before running it through the package manager's exec form. `npx <bin>` (and the pnpm/Yarn equivalents) fetches an unpinned package from the registry when no local binary exists — report the tool as missing instead of letting that fetch happen.
+For lint, format, and type-check, also confirm the tool is actually installed locally (`node_modules/.bin/eslint` / `node_modules/.bin/prettier` / `node_modules/.bin/tsc`, walking up to a workspace root if this is a sub-package) before running it through the package manager's exec form. `npx <bin>` (and the pnpm/Yarn equivalents) fetches an unpinned package from the registry when no local binary exists — report the tool as missing instead of letting that fetch happen.
 
 ## 3. Lint
 
@@ -42,7 +42,7 @@ If format applies, run the project's `format` script if one exists (`npm run for
 
 ## 5. Type-check
 
-If type-check applies, run `npx tsc --noEmit`. Report every error with its file and line — do not truncate the list or paraphrase it away.
+If type-check applies, run `npx tsc --noEmit` (per step 2's local-binary check). Report every error with its file and line — do not truncate the list or paraphrase it away.
 
 ## 6. Test
 
