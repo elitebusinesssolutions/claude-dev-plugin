@@ -83,24 +83,42 @@ dogfooding its own hook until someone noticed by hand.
 
 ## Exit codes — the contract
 
+This table describes `PreToolUse`, `PostToolUse`, `Stop`, and `UserPromptSubmit` — the events a
+hook in this repo actually uses. Not every event follows it:
+
 | Exit code     | Meaning            | Effect                                                  |
 | ------------- | ------------------ | ------------------------------------------------------- |
 | `0`           | Success            | Parse stdout for optional JSON control output           |
 | `2`           | Blocking error     | Prevent the action; send stderr to Claude as the reason |
 | Anything else | Non-blocking error | Log the error, continue normally                        |
 
-Exit 2 is the correct code to block a tool call. Never exit 1 to block — that's a non-blocking
-error that logs and continues.
+Exit 2 is the correct code to block a tool call on these events. Never exit 1 to block — that's a
+non-blocking error that logs and continues.
+
+Two events break this contract, and matter if you ever add a hook for either:
+
+- `WorktreeCreate` fails on **any** non-zero exit code, not just 2.
+- `PermissionRequest` does not honor exit code 2 at all — deny through the JSON `decision` object
+  in the hook's stdout instead.
 
 ## Stdin protocol
 
 Every hook receives the full event payload as JSON on stdin. Parse it with
-`fs.readFileSync(0, 'utf8')` (synchronous) or the async equivalent. Key fields always present:
+`fs.readFileSync(0, 'utf8')` (synchronous) or the async equivalent. Fields present on every event:
 
 ```json
 {
   "session_id": "...",
   "cwd": "/path/to/project",
+  "hook_event_name": "PostToolUse"
+}
+```
+
+`tool_name` and `tool_input` are present only on a tool-related event (`PreToolUse`,
+`PostToolUse`), not on every event:
+
+```json
+{
   "hook_event_name": "PostToolUse",
   "tool_name": "Write",
   "tool_input": { "file_path": "...", "content": "..." }
