@@ -1,4 +1,4 @@
-# claude-next-plugin
+# elite-next
 
 Shared Claude Code skills and hooks for Next.js / TypeScript / .NET API projects.
 
@@ -9,29 +9,29 @@ This is the personal, one-machine install path. It works the same way whether or
 Add the marketplace:
 
 ```bash
-claude plugin marketplace add elitebusinesssolutions/claude-next-plugin
+claude plugin marketplace add elitebusinesssolutions/claude-dev-plugin
 ```
 
 Then install the plugin:
 
 ```bash
-claude plugin install elite-next@elite-next-marketplace
+claude plugin install elite-next@elitebusinesssolutions
 ```
 
 This plugin can also be used with [copilot](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-finding-installing) by replacing `claude` with `copilot`. E.g.
 
 ```bash
-copilot plugin marketplace add elitebusinesssolutions/claude-next-plugin
-copilot plugin install elite-next@elite-next-marketplace
+copilot plugin marketplace add elitebusinesssolutions/claude-dev-plugin
+copilot plugin install elite-next@elitebusinesssolutions
 ```
 
 ## Update
 
 ```bash
-claude plugin marketplace update elite-next-marketplace
+claude plugin marketplace update elitebusinesssolutions
 ```
 
-This refreshes the marketplace catalog only — follow it with `claude plugin update elite-next@elite-next-marketplace` to actually pull the new version. This manual pair always works regardless of whether `autoUpdate` is set anywhere; use it any time you don't want to wait for the next automatic startup check, or to confirm an update actually landed. See `/elite-next:update-plugin`, which automates this end-to-end including the project-scope case.
+This refreshes the marketplace catalog only — follow it with `claude plugin update elite-next@elitebusinesssolutions` to actually pull the new version. This manual pair always works regardless of whether `autoUpdate` is set anywhere; use it any time you don't want to wait for the next automatic startup check, or to confirm an update actually landed. See `/elite-next:update-plugin`, which automates this end-to-end including the project-scope case.
 
 ## Consumer project setup (recommended)
 
@@ -40,16 +40,16 @@ Running `claude plugin install` locally only configures your own machine — it 
 ```json
 {
   "extraKnownMarketplaces": {
-    "elite-next-marketplace": {
+    "elitebusinesssolutions": {
       "source": {
         "source": "github",
-        "repo": "elitebusinesssolutions/claude-next-plugin"
+        "repo": "elitebusinesssolutions/claude-dev-plugin"
       },
       "autoUpdate": true
     }
   },
   "enabledPlugins": {
-    "elite-next@elite-next-marketplace": true
+    "elite-next@elitebusinesssolutions": true
   }
 }
 ```
@@ -65,12 +65,12 @@ Also add this to the project's own `CLAUDE.md`. This is what actually closes the
 ```markdown
 ## elite-next Claude Plugin
 
-This project uses the `elite-next@elite-next-marketplace` Claude Code plugin for shared skills (`/elite-next:codebase-review`, `/elite-next:new-feature`, etc.) and hooks. It's declared in `.claude/settings.json`, but Claude Code does not auto-install a plugin from settings alone — it only reports the plugin as not installed and shows the install command. No one should need to notice that message or run install commands themselves.
+This project uses the `elite-next@elitebusinesssolutions` Claude Code plugin for shared skills (`/elite-next:codebase-review`, `/elite-next:new-feature`, etc.) and hooks. It's declared in `.claude/settings.json`, but Claude Code does not auto-install a plugin from settings alone — it only reports the plugin as not installed and shows the install command. No one should need to notice that message or run install commands themselves.
 
 If a user describes something an elite-next skill would normally handle (e.g. "review this codebase," "scaffold a new feature," "write tests for this function") and the matching skill isn't available or the `elite-next` plugin isn't installed:
 
 - Don't just report the plugin as missing and stop — that leaves the user to notice the message and copy the command themselves, which is the exact gap this fallback exists to close.
-- Tell them in plain language what's missing and offer to install it (`claude plugin marketplace add elitebusinesssolutions/claude-next-plugin` and `claude plugin install elite-next@elite-next-marketplace`) — then, if they agree, run those commands yourself rather than making them type it.
+- Tell them in plain language what's missing and offer to install it (`claude plugin marketplace add elitebusinesssolutions/claude-dev-plugin` and `claude plugin install elite-next@elitebusinesssolutions`) — then, if they agree, run those commands yourself rather than making them type it.
 - This changes machine-wide Claude Code state, not just this project, so treat it like any other consequential action: propose it, don't do it silently.
 
 Don't rely on the user typing `/elite-next:<skill-name>` directly. If that skill doesn't resolve, the client rejects the slash command before it ever reaches you, so this fallback never gets a chance to run — it only helps when they describe what they want in plain English.
@@ -119,7 +119,7 @@ Automatically wired when the plugin is enabled:
 | `protect-generated.js` | PreToolUse Write/Edit  | Blocks edits to the auto-generated OpenAPI client/types; warns before editing a locally-synced OpenAPI spec file                                            |
 | `post-write-checks.js` | PostToolUse Write/Edit | Flags `as any`, `window.confirm()`, silent `.catch`, inline `style={{}}`, direct API client use in pages/routes, hardcoded secrets; notes related importers |
 
-Lint/format (ESLint + Prettier) and type-check/test-on-Stop hooks moved to the separate [claude-typescript-plugin](https://github.com/elitebusinesssolutions/claude-typescript-plugin) — install it alongside this plugin if you want that coverage; it isn't a dependency of this one.
+Lint/format (ESLint + Prettier) and type-check/test-on-Stop hooks live in the separate [elite-ts](../elite-ts) plugin — install it alongside this plugin if you want that coverage; it isn't a dependency of this one.
 
 ## Testing skills (evals)
 

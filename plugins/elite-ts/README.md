@@ -1,4 +1,4 @@
-# claude-typescript-plugin
+# elite-ts
 
 Shared Claude Code lint/format hooks and formatting-setup/verification skills for TypeScript/JavaScript projects. Framework-agnostic — no Next.js or .NET assumptions.
 
@@ -9,29 +9,29 @@ This is the personal, one-machine install path. It works the same way whether or
 Add the marketplace:
 
 ```bash
-claude plugin marketplace add elitebusinesssolutions/claude-typescript-plugin
+claude plugin marketplace add elitebusinesssolutions/claude-dev-plugin
 ```
 
 Then install the plugin:
 
 ```bash
-claude plugin install elite-ts@elite-ts-marketplace
+claude plugin install elite-ts@elitebusinesssolutions
 ```
 
 This plugin can also be used with [copilot](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-finding-installing) by replacing `claude` with `copilot`. E.g.
 
 ```bash
-copilot plugin marketplace add elitebusinesssolutions/claude-typescript-plugin
-copilot plugin install elite-ts@elite-ts-marketplace
+copilot plugin marketplace add elitebusinesssolutions/claude-dev-plugin
+copilot plugin install elite-ts@elitebusinesssolutions
 ```
 
 ## Update
 
 ```bash
-claude plugin marketplace update elite-ts-marketplace
+claude plugin marketplace update elitebusinesssolutions
 ```
 
-This refreshes the marketplace catalog only — follow it with `claude plugin update elite-ts@elite-ts-marketplace` to actually pull the new version. This manual pair always works regardless of whether `autoUpdate` is set anywhere; use it any time you don't want to wait for the next automatic startup check, or to confirm an update actually landed.
+This refreshes the marketplace catalog only — follow it with `claude plugin update elite-ts@elitebusinesssolutions` to actually pull the new version. This manual pair always works regardless of whether `autoUpdate` is set anywhere; use it any time you don't want to wait for the next automatic startup check, or to confirm an update actually landed.
 
 ## Consumer project setup (recommended)
 
@@ -40,16 +40,16 @@ Running `claude plugin install` locally only configures your own machine — it 
 ```json
 {
   "extraKnownMarketplaces": {
-    "elite-ts-marketplace": {
+    "elitebusinesssolutions": {
       "source": {
         "source": "github",
-        "repo": "elitebusinesssolutions/claude-typescript-plugin"
+        "repo": "elitebusinesssolutions/claude-dev-plugin"
       },
       "autoUpdate": true
     }
   },
   "enabledPlugins": {
-    "elite-ts@elite-ts-marketplace": true
+    "elite-ts@elitebusinesssolutions": true
   }
 }
 ```

@@ -1,10 +1,10 @@
-# claude-typescript-plugin — Development Guide
+# elite-ts — Development Guide
 
 This is the elite-ts Claude Code plugin. It ships shared formatting-setup/verification skills and lint/format hooks for any TypeScript or JavaScript project — no Next.js or .NET assumptions. Install it via:
 
 ```bash
-claude plugin marketplace add elitebusinesssolutions/claude-typescript-plugin
-claude plugin install elite-ts@elite-ts-marketplace
+claude plugin marketplace add elitebusinesssolutions/claude-dev-plugin
+claude plugin install elite-ts@elitebusinesssolutions
 ```
 
 Official docs this file enforces:
@@ -20,7 +20,7 @@ Official docs this file enforces:
 ## Directory layout
 
 ```text
-claude-typescript-plugin/
+claude-dev-plugin/
 ├── .claude-plugin/
 │   ├── plugin.json          # Plugin identity (name, version, description)
 │   └── marketplace.json     # elite-ts marketplace registration
@@ -55,7 +55,7 @@ Reference: [Plugin manifest schema](https://code.claude.com/docs/en/plugins-refe
   "name": "elite-ts",
   "description": "Shared lint/format hooks and a formatting-setup skill for TypeScript projects",
   "version": "0.1.0",
-  "repository": "https://github.com/elitebusinesssolutions/claude-typescript-plugin",
+  "repository": "https://github.com/elitebusinesssolutions/claude-dev-plugin",
   "skills": "./skills/"
 }
 ```
@@ -348,12 +348,12 @@ Reference: [Plugin marketplaces](https://code.claude.com/docs/en/plugin-marketpl
 
 ```json
 {
-  "name": "elite-ts-marketplace",
+  "name": "elitebusinesssolutions",
   "owner": { "name": "elitebusinesssolutions" },
   "plugins": [
     {
       "name": "elite-ts",
-      "source": { "source": "github", "repo": "elitebusinesssolutions/claude-typescript-plugin" }
+      "source": { "source": "github", "repo": "elitebusinesssolutions/claude-dev-plugin" }
     }
   ]
 }
@@ -362,21 +362,21 @@ Reference: [Plugin marketplaces](https://code.claude.com/docs/en/plugin-marketpl
 This file registers the elite-ts marketplace. Users add it and install the plugin with:
 
 ```bash
-claude plugin marketplace add elitebusinesssolutions/claude-typescript-plugin
-claude plugin install elite-ts@elite-ts-marketplace
+claude plugin marketplace add elitebusinesssolutions/claude-dev-plugin
+claude plugin install elite-ts@elitebusinesssolutions
 ```
 
 To update the local marketplace catalog:
 
 ```bash
-claude plugin marketplace update elite-ts-marketplace
+claude plugin marketplace update elitebusinesssolutions
 ```
 
 Rules:
 
 - Do not add `version` to `marketplace.json` — the marketplace always points to the current default branch.
 - The `name` in `marketplace.json → plugins[].name` must match the `name` field in `plugin.json` exactly (`"elite-ts"`).
-- The top-level `name` (`"elite-ts-marketplace"`) is the marketplace identifier used in `claude plugin install elite-ts@elite-ts-marketplace`.
+- The top-level `name` (`"elitebusinesssolutions"`) is the marketplace identifier used in `claude plugin install elite-ts@elitebusinesssolutions`.
 - Plugin install syntax is `<plugin-name>@<marketplace-name>`, not `<marketplace>/<plugin>`.
 
 ---
@@ -396,7 +396,7 @@ These are caught by `claude plugin validate` or by reading the official docs:
 | Not bumping `version` after a change                             | Bump version for every release                                                                                               |
 | Committing secrets in hook scripts or skill bodies               | Use env vars                                                                                                                 |
 | Assuming every consumer project has TypeScript/ESLint installed  | Guard hooks on `tsconfig.json` / `node_modules/.bin/eslint` presence — see [Hook script guidelines](#hook-script-guidelines) |
-| Install syntax `elite-ts-marketplace/elite-ts`                   | Correct syntax is `elite-ts@elite-ts-marketplace` (`<plugin>@<marketplace>`)                                                 |
+| Install syntax `elitebusinesssolutions/elite-ts`                 | Correct syntax is `elite-ts@elitebusinesssolutions` (`<plugin>@<marketplace>`)                                               |
 | `plugin.json`'s `hooks` field pointing at `./hooks/hooks.json`   | Omit it — see the `hooks` field rule in [plugin.json](#pluginjson)                                                           |
 
 ---
@@ -405,7 +405,7 @@ These are caught by `claude plugin validate` or by reading the official docs:
 
 Reference: [Conventional Commits spec](https://www.conventionalcommits.org/en/v1.0.0/)
 
-This repo (`claude-typescript-plugin`) has no `dev` branch — only `main`. Branch from and target `main`.
+This repo (`claude-dev-plugin`) has no `dev` branch — only `main`. Branch from and target `main`.
 
 ### Branch naming
 

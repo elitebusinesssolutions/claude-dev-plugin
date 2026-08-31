@@ -20,14 +20,14 @@ claude plugin marketplace add elitebusinesssolutions/claude-dev-plugin
 Then install the plugin:
 
 ```bash
-claude plugin install elite-dev@elite-dev-marketplace
+claude plugin install elite-dev@elitebusinesssolutions
 ```
 
 ## Update
 
 ```bash
-claude plugin marketplace update elite-dev-marketplace
-claude plugin update elite-dev@elite-dev-marketplace
+claude plugin marketplace update elitebusinesssolutions
+claude plugin update elite-dev@elitebusinesssolutions
 ```
 
 ## Consumer project setup (recommended)
@@ -39,7 +39,7 @@ everyone who opens the repo:
 ```json
 {
   "extraKnownMarketplaces": {
-    "elite-dev-marketplace": {
+    "elitebusinesssolutions": {
       "source": {
         "source": "github",
         "repo": "elitebusinesssolutions/claude-dev-plugin"
@@ -48,7 +48,7 @@ everyone who opens the repo:
     }
   },
   "enabledPlugins": {
-    "elite-dev@elite-dev-marketplace": true
+    "elite-dev@elitebusinesssolutions": true
   }
 }
 ```

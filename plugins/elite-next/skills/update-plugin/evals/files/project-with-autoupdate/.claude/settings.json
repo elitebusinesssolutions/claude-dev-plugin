@@ -1,14 +1,14 @@
 {
   "extraKnownMarketplaces": {
-    "elite-next-marketplace": {
+    "elitebusinesssolutions": {
       "source": {
         "source": "github",
-        "repo": "elitebusinesssolutions/claude-next-plugin"
+        "repo": "elitebusinesssolutions/claude-dev-plugin"
       },
       "autoUpdate": true
     }
   },
   "enabledPlugins": {
-    "elite-next@elite-next-marketplace": true
+    "elite-next@elitebusinesssolutions": true
   }
 }

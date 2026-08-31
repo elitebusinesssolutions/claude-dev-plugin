@@ -1,10 +1,10 @@
-# claude-next-plugin — Development Guide
+# elite-next — Development Guide
 
 This is the elite-next Claude Code plugin. It ships shared skills and hooks for Next.js/TypeScript projects backed by a .NET API. Install it via:
 
 ```bash
-claude plugin marketplace add elitebusinesssolutions/claude-next-plugin
-claude plugin install elite-next@elite-next-marketplace
+claude plugin marketplace add elitebusinesssolutions/claude-dev-plugin
+claude plugin install elite-next@elitebusinesssolutions
 ```
 
 Official docs this file enforces:
@@ -20,7 +20,7 @@ Official docs this file enforces:
 ## Directory layout
 
 ```text
-claude-next-plugin/
+claude-dev-plugin/
 ├── .claude-plugin/
 │   ├── plugin.json          # Plugin identity (name, version, description)
 │   └── marketplace.json     # elite-next marketplace registration
@@ -39,7 +39,7 @@ claude-next-plugin/
 
 `.claude/settings.json` wires this repo's own `hooks/*.js` scripts up via `${CLAUDE_PROJECT_DIR}` so working on this plugin exercises the same hooks a consumer project gets. It intentionally duplicates the hook entries from `hooks/hooks.json` (which uses `${CLAUDE_PLUGIN_ROOT}`, only resolved when the plugin is actually installed) rather than self-installing via a local marketplace path — marketplace-installed plugins are copied into `~/.claude/plugins/cache`, so hook script edits wouldn't take effect without a reinstall. Keep both files in sync when adding or changing a hook.
 
-Lint/format and type-check/test-on-Stop hooks live in the separate [claude-typescript-plugin](https://github.com/elitebusinesssolutions/claude-typescript-plugin) repo, not here — this repo has no dependency on it and doesn't duplicate its code.
+Lint/format and type-check/test-on-Stop hooks live in the separate [elite-ts](../elite-ts) plugin, not here — this plugin has no dependency on it and doesn't duplicate its code.
 
 **Rules enforced by the official spec:**
 
@@ -58,7 +58,7 @@ Reference: [Plugin manifest schema](https://code.claude.com/docs/en/plugins-refe
   "name": "elite-next",
   "description": "Shared skills and hooks for Next.js / TypeScript / .NET API projects",
   "version": "1.0.0",
-  "repository": "https://github.com/elitebusinesssolutions/claude-next-plugin",
+  "repository": "https://github.com/elitebusinesssolutions/claude-dev-plugin",
   "skills": "./skills/",
   "hooks": "./hooks/hooks.json"
 }
@@ -358,12 +358,12 @@ Reference: [Plugin marketplaces](https://code.claude.com/docs/en/plugin-marketpl
 
 ```json
 {
-  "name": "elite-next-marketplace",
+  "name": "elitebusinesssolutions",
   "owner": { "name": "elitebusinesssolutions" },
   "plugins": [
     {
       "name": "elite-next",
-      "source": { "source": "github", "repo": "elitebusinesssolutions/claude-next-plugin" }
+      "source": { "source": "github", "repo": "elitebusinesssolutions/claude-dev-plugin" }
     }
   ]
 }
@@ -372,21 +372,21 @@ Reference: [Plugin marketplaces](https://code.claude.com/docs/en/plugin-marketpl
 This file registers the elite-next marketplace. Users add it and install the plugin with:
 
 ```bash
-claude plugin marketplace add elitebusinesssolutions/claude-next-plugin
-claude plugin install elite-next@elite-next-marketplace
+claude plugin marketplace add elitebusinesssolutions/claude-dev-plugin
+claude plugin install elite-next@elitebusinesssolutions
 ```
 
 To update the local marketplace catalog:
 
 ```bash
-claude plugin marketplace update elite-next-marketplace
+claude plugin marketplace update elitebusinesssolutions
 ```
 
 Rules:
 
 - Do not add `version` to `marketplace.json` — the marketplace always points to the current default branch.
 - The `name` in `marketplace.json → plugins[].name` must match the `name` field in `plugin.json` exactly (`"elite-next"`).
-- The top-level `name` (`"elite-next-marketplace"`) is the marketplace identifier used in `claude plugin install elite-next@elite-next-marketplace`.
+- The top-level `name` (`"elitebusinesssolutions"`) is the marketplace identifier used in `claude plugin install elite-next@elitebusinesssolutions`.
 - Plugin install syntax is `<plugin-name>@<marketplace-name>`, not `<marketplace>/<plugin>`.
 
 ---
@@ -406,7 +406,7 @@ These are caught by `claude plugin validate` or by reading the official docs:
 | Not bumping `version` after a change                             | Bump version for every release                                                   |
 | Committing secrets in hook scripts or skill bodies               | Use env vars; hooks receive `cwd` — read project `.env` at runtime if needed     |
 | Hand-editing files under `src/lib/api/generated/`                | Regenerate from the .NET API's OpenAPI spec — never edit generated output        |
-| Install syntax `elite-next-marketplace/elite-next`               | Correct syntax is `elite-next@elite-next-marketplace` (`<plugin>@<marketplace>`) |
+| Install syntax `elitebusinesssolutions/elite-next`               | Correct syntax is `elite-next@elitebusinesssolutions` (`<plugin>@<marketplace>`) |
 
 ---
 
@@ -416,7 +416,7 @@ Reference: [Conventional Commits spec](https://www.conventionalcommits.org/en/v1
 
 Consumer projects use the `/elite-next:git-workflow` skill to enforce these rules. The official `commit-commands` plugin (from the Anthropic marketplace) provides generic git scaffolding, but does not know this project's branch naming, base branch, or scope taxonomy — so this skill is the authoritative source.
 
-This repo (`claude-next-plugin`) has no `dev` branch — only `main`. Branch from and target `main` here, unlike consumer projects (Next.js/.NET apps), which do have a `dev` branch and are the intended target of the `/elite-next:git-workflow` skill's `dev`-based conventions described below.
+This repo (`claude-dev-plugin`) has no `dev` branch — only `main`. Branch from and target `main` here, unlike consumer projects (Next.js/.NET apps), which do have a `dev` branch and are the intended target of the `/elite-next:git-workflow` skill's `dev`-based conventions described below.
 
 Install the companion plugin for generic git scaffolding (optional, user scope):
 

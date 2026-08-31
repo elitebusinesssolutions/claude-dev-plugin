@@ -21,9 +21,10 @@ jobs:
           node-version: 24
 
       - run: npm ci
-      - run: npm run lint
-      - run: npm test
-      - run: npm run validate-skill-evals -- origin/${{ github.base_ref }}
+      - run: npm run lint --workspaces --if-present
+      - run: npm test --workspaces --if-present
+      - run: npm run validate-skill-evals --workspace=plugins/elite-next -- origin/${{ github.base_ref }}
+      - run: npm run validate-skill-evals --workspace=plugins/elite-ts -- origin/${{ github.base_ref }}
 
       - run: |
           curl -fsSL https://claude.ai/install.sh | bash
@@ -32,4 +33,3 @@ jobs:
           claude plugin validate .
         if: matrix.os == 'ubuntu-latest'
         name: claude plugin validate (ubuntu)
-
