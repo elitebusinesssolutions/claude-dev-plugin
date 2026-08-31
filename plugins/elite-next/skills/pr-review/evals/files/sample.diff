@@ -1,0 +1,44 @@
+diff --git a/src/app/billing/page.tsx b/src/app/billing/page.tsx
+index 1111111..2222222 100644
+--- a/src/app/billing/page.tsx
++++ b/src/app/billing/page.tsx
+@@ -1,10 +1,28 @@
+ import { useEffect, useState } from "react";
++import { apiClient } from "@/lib/api/client";
+
+ export function Billing() {
+   const [invoices, setInvoices] = useState([]);
++
++  useEffect(() => {
++    apiClient.GET("/api/invoices").then(({ data }) => setInvoices(data ?? []));
++  }, []);
++
++  function handleDelete(id: string) {
++    if (window.confirm("Delete this invoice?")) {
++      apiClient.DELETE("/api/invoices/{id}", { params: { path: { id } } });
++    }
++  }
+
+   return (
+     <div>
++      <div style={{ marginTop: "12px" }}>
++        {invoices.map((inv: any) => (
++          <div key={inv.id} onClick={() => handleDelete(inv.id)}>
++            {inv.total_cents}
++          </div>
++        ))}
++      </div>
+     </div>
+   );
+ }
+diff --git a/package.json b/package.json
+index 3333333..4444444 100644
+--- a/package.json
++++ b/package.json
+@@ -5,6 +5,7 @@
+   "scripts": {
+     "dev": "next dev",
+     "build": "next build",
++    "export-report": "node scripts/export-report.js"
+   }
+ }

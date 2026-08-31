@@ -1,0 +1,29 @@
+{
+  "skill_name": "unit-tests",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write unit tests for invoiceUtils.ts.",
+      "expected_output": "Tests calculateInvoiceTotal's happy path, edge cases, and tax override; explicitly skips fetchInvoice since it requires the API client.",
+      "files": ["evals/files/invoiceUtils.ts"],
+      "expectations": [
+        "Writes tests for calculateInvoiceTotal covering the happy path, an empty items array, and the taxRate override",
+        "Uses toBeCloseTo (not toBe) for any assertion involving the tax-rate multiplication, since it's a floating-point calculation",
+        "Explicitly states it is skipping fetchInvoice because it requires the API client, rather than silently ignoring it or trying to mock the client",
+        "Imports describe/it/expect explicitly from vitest",
+        "Places the test file adjacent to the source (invoiceUtils.test.ts)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Write unit tests for invoiceUtils.ts — there's already a test file for it, please check first.",
+      "expected_output": "Reads the existing invoiceUtils.test.ts, sees the happy-path case is already covered, and adds new describe/it blocks for edge cases rather than duplicating or overwriting the existing test.",
+      "files": ["evals/files/invoiceUtils.ts", "evals/files/invoiceUtils.test.ts"],
+      "expectations": [
+        "Reads the existing invoiceUtils.test.ts before writing anything new",
+        "Does not duplicate the already-covered happy-path case for calculateInvoiceTotal with no tax",
+        "Adds new test cases (e.g. empty array, tax override) to the existing file rather than creating a second test file"
+      ]
+    }
+  ]
+}

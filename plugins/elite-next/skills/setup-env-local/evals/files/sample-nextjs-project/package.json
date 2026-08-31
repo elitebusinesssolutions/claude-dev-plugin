@@ -1,0 +1,10 @@
+{
+  "name": "sample-nextjs-project",
+  "private": true,
+  "scripts": {
+    "dev": "next dev"
+  },
+  "dependencies": {
+    "next": "^15.0.0"
+  }
+}

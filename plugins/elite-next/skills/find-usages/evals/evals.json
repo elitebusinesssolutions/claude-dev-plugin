@@ -1,0 +1,29 @@
+{
+  "skill_name": "find-usages",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "/elite-next:find-usages ApprovalBadge",
+      "expected_output": "Finds the defining file and both real usages, correctly excludes the unrelated look-alike StatusChip, and ends with the 2-5 files follow-up prompt.",
+      "files": ["evals/files/sample-src/"],
+      "expectations": [
+        "Lists ApprovalBadge.tsx as the defining file",
+        "Lists Dashboard.tsx and PendingApprovalsCard.tsx as usages",
+        "Does not list StatusChip.tsx as a usage of ApprovalBadge",
+        "Uses the table output format from the skill",
+        "Ends with the 2-5 files follow-up prompt offering to run /elite-next:ui-update"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "/elite-next:find-usages InvoiceLineItemSummaryWidget",
+      "expected_output": "Reports clearly that nothing was found and suggests alternative search terms, rather than fabricating results.",
+      "files": ["evals/files/sample-src/"],
+      "expectations": [
+        "States clearly that no usages of InvoiceLineItemSummaryWidget were found",
+        "Suggests alternative search terms or asks for clarification",
+        "Does not invent or hallucinate any file as a usage"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "skill_name": "extract-component",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Extract the approvals list section from SamplePage.tsx into its own component.",
+      "expected_output": "A new ApprovalsList component under src/features/.../components/ that owns its own local state and data fetching, with SamplePage.tsx reduced in size and no shared props needed since the section is fully self-contained.",
+      "files": ["evals/files/SamplePage.tsx"],
+      "expectations": [
+        "Reads the entire source file before making changes",
+        "Creates the new component at a src/features/<name>/components/ path",
+        "Moves the approvals state and data fetching into the new component rather than leaving it split between the page and the component",
+        "Does not pass selectedCustomerId or its setter into the new component, since the approvals section never uses it",
+        "Replaces the extracted JSX in SamplePage.tsx with a reference to the new component",
+        "Reports the new file path and the resulting prop interface"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Extract the customer picker section from SamplePage.tsx into its own component, but make it also read and write selectedCustomerId, selectedRegion, selectedBranch, selectedTechnicianId, dateRange, filterStatus, sortOrder, and pageSize from the parent.",
+      "expected_output": "Recognizes this section has too many shared dependencies to extract cleanly right now and says so, rather than forcing a 9-prop component into existence.",
+      "files": ["evals/files/SamplePage.tsx"],
+      "expectations": [
+        "Notices that the requested prop list exceeds ~8 props",
+        "Reports to the user that the section isn't ready to extract yet rather than silently creating a component with 9 props",
+        "Suggests extracting shared data/state (e.g. into a service or shared hook) first, as the skill instructs"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "skill_name": "pr-review",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Review this PR diff (evals/files/sample.diff) as if it were the output of `git diff dev...HEAD`.",
+      "expected_output": "Catches the planted violations — direct apiClient call in a page, window.confirm(), inline style, array of any[], a new npm script not documented in the README — with file:line and an exact fix, using the report structure.",
+      "files": ["evals/files/sample.diff"],
+      "expectations": [
+        "Flags the direct apiClient.GET()/apiClient.DELETE() calls inside the Billing page as belonging in a service function instead",
+        "Flags window.confirm() and says it should be an AlertDialog instead",
+        "Flags the inline style={{ marginTop: ... }} attribute",
+        "Flags the new export-report npm script as something the README's Other Scripts section should document",
+        "Uses the report structure (Summary / High / Medium / Low / Looks good) with severity icons",
+        "Ends by asking whether the user wants a deeper /code-review pass"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Review this PR diff (evals/files/sample-readme-only.diff) as if it were the output of `git diff dev...HEAD`.",
+      "expected_output": "Correctly reports few or no findings for a README-only change rather than inventing issues to fill out every category.",
+      "files": ["evals/files/sample-readme-only.diff"],
+      "expectations": [
+        "Reports 'None' (or equivalent) for High and Medium severity, since the diff only touches README.md prose",
+        "Does not fabricate security, architecture, or code-quality findings against a documentation-only change",
+        "Still produces the full report structure rather than skipping sections"
+      ]
+    }
+  ]
+}

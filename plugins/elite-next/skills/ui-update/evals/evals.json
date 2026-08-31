@@ -1,0 +1,29 @@
+{
+  "skill_name": "ui-update",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "/elite-next:ui-update \"bg-amber-500/20 text-amber-700\" — change this to bg-emerald-500/20 text-emerald-700",
+      "expected_output": "Finds all 3 usages, proposes centralizing into a shared styles.ts constant since it appears in 3+ places with no constant yet, shows a plan, and waits for confirmation before editing.",
+      "files": ["evals/files/sample-src/"],
+      "expectations": [
+        "Finds the pattern in all three files: ApprovalBadge.tsx, NotificationBell.tsx (inside colorFor), and ShippingCostsCard.tsx",
+        "Since there is no shared styles.ts constant yet and the pattern appears 3+ times, proposes adding one before editing individual files",
+        "Shows a plan (## UI Update Plan) listing the files to update",
+        "Asks 'Does this plan look right? Shall I proceed?' and waits rather than editing immediately",
+        "Does not stop after Step 1 without ever proposing centralization"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "/elite-next:ui-update \"rounded px-2\" — remove this, we don't need rounded corners on these badges anymore",
+      "expected_output": "Finds usages of a much more generic-looking string and correctly handles the ambiguity/scope rather than blindly stripping it from unrelated elements.",
+      "files": ["evals/files/sample-src/"],
+      "expectations": [
+        "Finds the occurrences of 'rounded px-2' across the fixture files",
+        "Shows a plan before editing and asks for confirmation",
+        "Does not silently skip verifying afterward — the skill's Step 5 requires a final search for the old pattern before declaring completion"
+      ]
+    }
+  ]
+}

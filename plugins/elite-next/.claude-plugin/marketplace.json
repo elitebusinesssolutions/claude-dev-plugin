@@ -1,0 +1,17 @@
+{
+  "name": "elite-next-marketplace",
+  "description": "Shared Claude Code skills and hooks for Next.js/TypeScript/.NET API projects",
+  "owner": {
+    "name": "elitebusinesssolutions"
+  },
+  "plugins": [
+    {
+      "name": "elite-next",
+      "description": "Shared skills and hooks for Next.js / TypeScript / .NET API projects",
+      "source": {
+        "source": "github",
+        "repo": "elitebusinesssolutions/claude-next-plugin"
+      }
+    }
+  ]
+}

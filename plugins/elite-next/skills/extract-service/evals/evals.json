@@ -1,0 +1,30 @@
+{
+  "skill_name": "extract-service",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Extract the API calls out of SampleComponent.tsx into a service.",
+      "expected_output": "A crewService.ts with explicit typed return values that throws on error, and SampleComponent.tsx updated to call it (via a Server Action, since it's a Client Component) and surface errors via toast.error instead of swallowing them.",
+      "files": ["evals/files/SampleComponent.tsx"],
+      "expectations": [
+        "Creates a service file such as src/features/<domain>/crewService.ts (or shared/lib equivalent) rather than leaving the API calls inline",
+        "Service functions have explicit return types derived from the generated schema, not raw/untyped responses",
+        "Service functions throw the API error rather than returning null/undefined on failure",
+        "The component's silent .catch(() => {}) is replaced with a toast.error(...) call, not carried forward unchanged",
+        "Both the fetch (crew list) and the mutation (deactivate) are extracted, as two separate functions rather than one bundled function",
+        "Since SampleComponent is a Client Component, the mutation is wired through a Server Action rather than the Client Component importing the service file directly",
+        "Reports which service file was created/updated and confirms the previously-silent error is now surfaced"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "SampleComponent.tsx now also has this call in it: `await apiClient.POST(\"/api/auth/logout\")` triggered from a logout button. Should that move into the service too?",
+      "expected_output": "Correctly reasons about whether an auth call belongs in the same service file/pattern, rather than either ignoring it or mechanically dumping it into crewService.ts as if it were a crew endpoint.",
+      "files": ["evals/files/SampleComponent.tsx"],
+      "expectations": [
+        "Recognizes the logout call is an auth operation, not a crew-domain operation, and addresses it as a distinct case rather than silently folding it into crewService.ts",
+        "Gives a clear, reasoned recommendation (e.g. a small auth service/helper, or leaving trivial auth calls as-is) instead of a one-line non-answer"
+      ]
+    }
+  ]
+}

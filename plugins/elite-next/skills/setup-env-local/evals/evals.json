@@ -1,0 +1,35 @@
+{
+  "skill_name": "setup-env-local",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I can't connect to the .NET API from my Next.js app locally — not sure what to put in .env.local.",
+      "expected_output": "Finds the Next.js project, asks what URL the local .NET API runs on (suggesting launchSettings.json as a source), and writes API_BASE_URL to .env.local rather than .env.",
+      "files": [
+        "evals/files/sample-nextjs-project/package.json",
+        "evals/files/sample-nextjs-project/next.config.ts"
+      ],
+      "expectations": [
+        "Locates the Next.js project via package.json + next.config",
+        "Asks the user for the local .NET API's URL rather than guessing one",
+        "Mentions launchSettings.json (or running the API) as a way to find the URL if the user doesn't know it",
+        "Writes the value to .env.local, not .env",
+        "Reminds the user to restart the dev server after writing the value"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "After setting API_BASE_URL to https://localhost:5001, I'm getting a self-signed certificate error when Next.js calls the API.",
+      "expected_output": "Recognizes this as the .NET dev HTTPS certificate, and offers NODE_TLS_REJECT_UNAUTHORIZED=0 as a local-only workaround without suggesting it for anything beyond a developer machine.",
+      "files": [
+        "evals/files/sample-nextjs-project/package.json",
+        "evals/files/sample-nextjs-project/next.config.ts"
+      ],
+      "expectations": [
+        "Identifies the self-signed dev certificate as the likely cause",
+        "Suggests NODE_TLS_REJECT_UNAUTHORIZED=0 as a local-only workaround",
+        "Explicitly warns this is not appropriate beyond a local dev machine (not for production/shared environments)"
+      ]
+    }
+  ]
+}

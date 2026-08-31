@@ -1,0 +1,9 @@
+diff --git a/README.md b/README.md
+index 5555555..6666666 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,4 @@
+ # Sample App
+
++A small internal billing tool.
+ Run `npm run dev` to start.

@@ -1,0 +1,12 @@
+{
+  "name": "sample-app",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build"
+  },
+  "dependencies": {
+    "react": "^18.3.0",
+    "next": "^15.0.0"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "skill_name": "codebase-review",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Do a full codebase review of this project.",
+      "expected_output": "A prioritized, plain-language report that catches the deliberate issues planted in the fixture app: a hardcoded API service token, a Route Handler with no session check that proxies to the .NET API with a shared token, a client-only admin check, an unbounded/unpaginated list fetch, and a silent catch.",
+      "files": ["evals/files/sample-app/"],
+      "expectations": [
+        "Flags the hardcoded token-shaped string in src/lib/config.ts as a critical/high-severity finding",
+        "Flags that src/app/api/quotes/route.ts has no session check before proxying to the .NET API with a shared token",
+        "Flags the isAdmin-only client-side check as insufficient access control",
+        "Flags the apiClient.GET('/api/quotes') call for having no pagination",
+        "Flags the silent .catch(() => {}) in the dashboard page",
+        "Uses the report structure with a Scorecard and Critical/Important/Improvements sections, not a raw list",
+        "Explains findings in plain business-impact language, not just rule names"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Review this codebase, but I only care about the security section right now: security",
+      "expected_output": "Runs only the security section, scoped by the $ARGUMENTS convention, and skips performance/best-practices output.",
+      "files": ["evals/files/sample-app/"],
+      "expectations": [
+        "Restricts the review to the security dimension only, per the $ARGUMENTS convention described in the skill",
+        "Does not produce a performance or best-practices section",
+        "Still flags the hardcoded token and the unauthenticated Route Handler from the fixture"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "skill_name": "new-feature",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Scaffold a new 'invoices' feature. It should read from and write to the .NET API's invoices endpoint.",
+      "expected_output": "A src/features/invoices/ folder matching the existing project's conventions (see the quotes feature), with a service that has explicit typed return values and a component with visible loading/error states.",
+      "files": [
+        "evals/files/sample-project/src/features/quotes/QuotesService.ts",
+        "evals/files/sample-project/src/shared/lib/styles.ts"
+      ],
+      "expectations": [
+        "Creates src/features/invoices/InvoicesService.ts and at least one component under src/features/invoices/components/",
+        "The service function's return type is explicit, derived from the generated schema, not untyped/any",
+        "Service functions throw the API error rather than returning null on failure, matching the existing QuotesService.ts pattern",
+        "The new component visibly handles a loading state and an error state, not a blank screen",
+        "Does not add any direct apiClient calls inside the component"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I need a date formatting helper (e.g. 'Jan 5, 2026') that both the quotes feature and a new invoices feature will use. Set that up.",
+      "expected_output": "Correctly declines to create a new feature folder for a cross-feature utility and places it in src/shared/lib/ instead.",
+      "files": [
+        "evals/files/sample-project/src/features/quotes/QuotesService.ts",
+        "evals/files/sample-project/src/shared/lib/styles.ts"
+      ],
+      "expectations": [
+        "Does not create a new src/features/<name>/ folder for this helper",
+        "Places the helper in src/shared/lib/ instead, per the skill's explicit guidance that cross-feature utilities belong there",
+        "Explains why a feature folder isn't the right home for this (it's a utility used across multiple features, not a feature with its own data/UI)"
+      ]
+    }
+  ]
+}

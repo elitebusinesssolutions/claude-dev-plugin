@@ -1,0 +1,52 @@
+{
+  "skill_name": "update-plugin",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "How do I get the newest version of the elite-next plugin? I heard there's a new skill I want to try out.",
+      "expected_output": "Walks through refreshing the marketplace catalog, asks (or infers) update scope, runs the update command, and verifies the new version.",
+      "files": [],
+      "expectations": [
+        "Runs or instructs `claude plugin marketplace update elite-next-marketplace` before attempting the update",
+        "Either asks which scope (`user` or `project`) to update, or explicitly states which scope it's assuming and offers to switch — doesn't silently pick a scope without flagging the assumption, since the prompt doesn't specify",
+        "Runs or instructs `claude plugin update elite-next@elite-next-marketplace` (with `--scope project` if that's the resolved scope)",
+        "Suggests verifying the result with `claude plugin list`"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "We just merged a PR that bumps the elite-next plugin to 1.6.0 on main. Update it for the whole team on this project, not just for me.",
+      "expected_output": "Infers project scope from 'whole team' without re-asking, and updates + verifies against version 1.6.0.",
+      "files": [],
+      "expectations": [
+        "Infers project scope from the 'whole team' phrasing instead of asking a redundant scope question",
+        "Runs or instructs `claude plugin update elite-next@elite-next-marketplace --scope project`",
+        "Confirms the installed version now matches 1.6.0, e.g. via `claude plugin list`",
+        "Explains that project scope alone doesn't push the update to teammates' machines unless the marketplace entry has `autoUpdate: true` — recommends checking for or adding that setting so teammates don't need to manually refresh"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I ran `claude plugin update elite-next@elite-next-marketplace` but it says no update is available. Did I do something wrong?",
+      "expected_output": "Troubleshoots the stale-catalog and not-yet-merged-version cases before assuming the command itself is broken.",
+      "files": [],
+      "expectations": [
+        "Suggests re-running `claude plugin marketplace update elite-next-marketplace` to refresh the local catalog",
+        "Suggests checking whether the version bump in `plugin.json` has actually been merged to `main` yet",
+        "Does not conclude the update command is broken without first ruling out these two causes"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "We just merged the PR that bumps the elite-next plugin to 1.6.0. This project's .claude/settings.json already has autoUpdate set for the elite-next-marketplace marketplace — do I need to do anything for the team to pick it up?",
+      "expected_output": "Recognizes autoUpdate is already configured, so no manual per-teammate refresh is needed once they pull and next start Claude Code — offers the manual commands only as a way to force it immediately, not as a required step.",
+      "files": ["evals/files/project-with-autoupdate/"],
+      "expectations": [
+        "Reads .claude/settings.json and recognizes autoUpdate: true is already set for the elite-next-marketplace marketplace",
+        "States that teammates will get the update automatically at their next Claude Code startup once they pull the merged change, without needing to run claude plugin marketplace update themselves",
+        "Offers the manual `claude plugin marketplace update`/`claude plugin update` commands only as an optional way to force the update immediately, not as a required step",
+        "Notes that autoUpdate only takes effect once the version bump has actually reached the branch the marketplace tracks (main) — doesn't assume the merge already reached main just because the user said 'we merged the PR', since the prompt never states which branch"
+      ]
+    }
+  ]
+}

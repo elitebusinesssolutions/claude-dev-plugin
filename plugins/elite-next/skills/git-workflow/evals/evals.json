@@ -1,0 +1,29 @@
+{
+  "skill_name": "git-workflow",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I finished building the dark mode toggle in settings. Can you commit this and open a PR?",
+      "expected_output": "Confirms type/scope, shows the diff/status before staging, stages named files (not `git add .`), writes a conventional commit message, and opens a PR against dev rather than main.",
+      "files": [],
+      "expectations": [
+        "Shows `git diff --staged --stat` and/or `git status` before staging anything",
+        "Stages specific files by name rather than `git add .` or `git add -A`",
+        "Composes a conventional commit message in the form `feat(<scope>): <description>` with a lowercase, imperative, no-trailing-period description",
+        "States the PR should target `dev`, not `main`",
+        "Reminds the user to run npm test (and tsc --noEmit, if applicable) before pushing"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Oops, I think I already ran `git commit` and `git push` directly on main for this fix. What now?",
+      "expected_output": "Recognizes this violates the never-commit-to-main convention and gives recovery guidance, rather than treating it as a normal commit-and-PR flow.",
+      "files": [],
+      "expectations": [
+        "Explicitly flags that committing/pushing directly to main violates this project's convention",
+        "Gives concrete recovery guidance (e.g. revert on main and redo the work on a fix/ branch against dev, or coordinate with the team before force-pushing) rather than just restating the normal new-branch steps",
+        "Does not suggest force-pushing over main or otherwise rewriting shared history without flagging the risk"
+      ]
+    }
+  ]
+}
