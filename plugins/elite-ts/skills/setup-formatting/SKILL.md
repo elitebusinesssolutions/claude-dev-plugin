@@ -5,6 +5,18 @@ description: Set up Prettier, ESLint auto-fix, EditorConfig, and VS Code format-
 
 Set up Prettier, ESLint auto-fix, EditorConfig, and VS Code format-on-save for this project. Perform each step below in order.
 
+## 0. Detect the package manager
+
+Check the project root for a lockfile, in this order, and use the matching package manager for every install/run/exec command below:
+
+| Lockfile present            | Package manager | Install a dev dependency       | Run a script      | Exec a local binary |
+| --------------------------- | --------------- | ------------------------------ | ----------------- | ------------------- |
+| `pnpm-lock.yaml`            | pnpm            | `pnpm add -D <pkg>`            | `pnpm run <name>` | `pnpm exec <bin>`   |
+| `yarn.lock`                 | Yarn            | `yarn add -D <pkg>`            | `yarn <name>`     | `yarn <bin>`        |
+| `package-lock.json` or none | npm             | `npm install --save-dev <pkg>` | `npm run <name>`  | `npx <bin>`         |
+
+The steps below show the npm form as the concrete example — substitute the detected manager's equivalent from this table everywhere an `npm install`, `npm run`, or `npx` command appears. No lockfile and no other signal (e.g. `package.json`'s `packageManager` field) defaults to npm.
+
 ## 1. Ensure an ESLint config file exists
 
 Check for a flat config (`eslint.config.js`/`.mjs`/`.cjs`/`.ts`) or a legacy config (`.eslintrc.*`, or an `eslintConfig` key in `package.json`). If one already exists, leave it as-is and move to step 2.
