@@ -1,8 +1,0 @@
-{
-  "name": "elite-next",
-  "description": "Shared skills and hooks for Next.js / TypeScript / .NET API projects",
-  "version": "1.0.0",
-  "repository": "https://github.com/elitebusinesssolutions/claude-dev-plugin",
-  "skills": "./skills/",
-  "hooks": "./hooks/hooks.json"
-}

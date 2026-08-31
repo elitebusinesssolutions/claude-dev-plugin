@@ -23,8 +23,7 @@ jobs:
       - run: npm ci
       - run: npm run lint --workspaces --if-present
       - run: npm test --workspaces --if-present
-      - run: npm run validate-skill-evals --workspace=plugins/elite-next -- origin/${{ github.base_ref }}
-      - run: npm run validate-skill-evals --workspace=plugins/elite-ts -- origin/${{ github.base_ref }}
+      - run: npm run validate-skill-evals -- origin/${{ github.base_ref }}
 
       - run: |
           curl -fsSL https://claude.ai/install.sh | bash

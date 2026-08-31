@@ -9,11 +9,6 @@
       "source": "./plugins/elite-dev"
     },
     {
-      "name": "elite-next",
-      "description": "Shared skills and hooks for Next.js / TypeScript / .NET API projects",
-      "source": "./plugins/elite-next"
-    },
-    {
       "name": "elite-ts",
       "description": "Shared lint/format hooks and formatting-setup/verification skills for TypeScript projects",
       "source": "./plugins/elite-ts"
