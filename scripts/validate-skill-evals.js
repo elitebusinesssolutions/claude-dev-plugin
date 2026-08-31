@@ -89,6 +89,13 @@ function validateEvalsJson(data, skillName) {
       errors.push(`${label}.prompt must be a non-empty string`);
     }
 
+    if (
+      typeof evalCase.expected_output !== "string" ||
+      evalCase.expected_output.trim().length === 0
+    ) {
+      errors.push(`${label}.expected_output must be a non-empty string`);
+    }
+
     if (!Array.isArray(evalCase.expectations) || evalCase.expectations.length === 0) {
       errors.push(`${label}.expectations must be a non-empty array`);
     } else if (evalCase.expectations.some((e) => typeof e !== "string" || e.trim().length === 0)) {

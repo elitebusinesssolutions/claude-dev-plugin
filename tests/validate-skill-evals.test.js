@@ -91,6 +91,20 @@ test("eval with blank prompt is flagged", () => {
   assert.ok(errors.some((e) => /prompt must be a non-empty string/.test(e)));
 });
 
+test("eval missing expected_output is flagged", () => {
+  const data = validEvals();
+  delete data.evals[0].expected_output;
+  const errors = validateEvalsJson(data, "example-skill");
+  assert.ok(errors.some((e) => /expected_output must be a non-empty string/.test(e)));
+});
+
+test("eval with blank expected_output is flagged", () => {
+  const data = validEvals();
+  data.evals[0].expected_output = "   ";
+  const errors = validateEvalsJson(data, "example-skill");
+  assert.ok(errors.some((e) => /expected_output must be a non-empty string/.test(e)));
+});
+
 test("duplicate eval ids are flagged", () => {
   const data = validEvals();
   data.evals.push({ id: 1, prompt: "Another prompt" });
