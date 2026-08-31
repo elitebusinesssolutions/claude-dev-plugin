@@ -17,12 +17,12 @@ export default defineConfig([
         setTimeout: "readonly",
         clearTimeout: "readonly",
         setInterval: "readonly",
-        clearInterval: "readonly",
-      },
+        clearInterval: "readonly"
+      }
     },
     rules: {
-      "no-empty": ["error", { allowEmptyCatch: true }],
-    },
+      "no-empty": ["error", { allowEmptyCatch: true }]
+    }
   },
   {
     files: ["tests/**/*.js"],
@@ -34,8 +34,8 @@ export default defineConfig([
         before: "readonly",
         after: "readonly",
         beforeEach: "readonly",
-        afterEach: "readonly",
-      },
-    },
-  },
+        afterEach: "readonly"
+      }
+    }
+  }
 ]);
