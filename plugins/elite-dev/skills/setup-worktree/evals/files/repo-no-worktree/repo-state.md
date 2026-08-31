@@ -4,8 +4,8 @@
 - Saved output of `git status --porcelain --ignored`:
 
   ```text
-  ?? .claude/settings.local.json
-  ?? .env.local
+  !! .claude/settings.local.json
+  !! .env.local
   ```
 
   Both files are untracked (gitignored, never committed) — `git worktree add` will not carry
