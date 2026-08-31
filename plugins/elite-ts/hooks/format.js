@@ -58,7 +58,11 @@ try {
     // Anything else (2 = fatal config/parse error, non-standard codes, null = killed)
     // means linting silently never happened even though eslint is installed — report it.
     if (eslint.status !== 0 && eslint.status !== 1) {
-      const detail = truncatedOutput(eslint.stdout, eslint.stderr, { head: 10 });
+      // A null status/signal means spawnSync could not even start the binary
+      // (e.g. EACCES) — the only diagnostic for that case lives in `.error`.
+      const detail = eslint.error
+        ? `could not spawn eslint: ${eslint.error.message}`
+        : truncatedOutput(eslint.stdout, eslint.stderr, { head: 10 });
       messages.push(
         `ESLint did not run on ${path.basename(f)} (exit ${eslint.status ?? `signal ${eslint.signal}`}) — linting was not applied:\n${detail}`
       );
@@ -81,7 +85,11 @@ try {
       stdio: ["ignore", "pipe", "pipe"]
     });
     if (prettier.status !== 0) {
-      const detail = truncatedOutput(prettier.stdout, prettier.stderr, { head: 10 });
+      // Same rationale as the ESLint block above: a null status/signal means
+      // spawnSync could not start the binary, and `.error` has the real cause.
+      const detail = prettier.error
+        ? `could not spawn prettier: ${prettier.error.message}`
+        : truncatedOutput(prettier.stdout, prettier.stderr, { head: 10 });
       messages.push(
         `Prettier error on ${path.basename(f)} (exit ${prettier.status ?? `signal ${prettier.signal}`}) — formatting was not applied:\n${detail}`
       );

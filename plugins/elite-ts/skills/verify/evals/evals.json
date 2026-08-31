@@ -1,0 +1,39 @@
+{
+  "skill_name": "verify",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Verify this project is ready to ship. It has tsconfig.json, eslint.config.mjs, prettier as a devDependency, and a `test` script in package.json.",
+      "expected_output": "Runs lint, format, type-check, and test in order, auto-fixing what it can, and reports a plain verdict on whether the project is clean.",
+      "files": [],
+      "expectations": [
+        "Runs `npx eslint --fix .` since a flat config is present (not the legacy-config version check)",
+        "Runs the project's `format` script or `npx prettier --write --ignore-unknown .`",
+        "Runs `npx tsc --noEmit` since tsconfig.json is present",
+        "Runs `npm test` since a test script is present",
+        "States a plain verdict on whether the project is clean, not just a raw command output dump"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Verify this project. It is a plain JavaScript project: no tsconfig.json, no ESLint config file, no prettier devDependency or config, and no `test` script in package.json.",
+      "expected_output": "Says plainly that none of the four checks apply and stops, without treating the absence of tooling as a failure.",
+      "files": [],
+      "expectations": [
+        "Does not run eslint, prettier, tsc, or npm test",
+        "States plainly that there is nothing to verify, rather than reporting an error or a failed check"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Verify this project. It has a legacy .eslintrc.json (no flat eslint.config.*), and package.json lists `eslint: ^9.5.0` as a devDependency.",
+      "expected_output": "Detects the legacy-config/incompatible-ESLint-version mismatch and reports it plainly instead of running ESLint and treating its output as a real lint result.",
+      "files": [],
+      "expectations": [
+        "Checks the installed ESLint version before running it, since the config is legacy",
+        "Reports the legacy-config/ESLint-9+ mismatch plainly instead of running `eslint` against the legacy config",
+        "Does not report ESLint's actual exit/output as if it were a normal lint result"
+      ]
+    }
+  ]
+}

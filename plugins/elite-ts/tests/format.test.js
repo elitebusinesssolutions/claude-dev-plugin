@@ -322,7 +322,7 @@ if (process.platform !== "win32") {
   test("a shell metacharacter in file_path is not interpreted by a shell on POSIX", () => {
     withEslintProject((cwd) => {
       const injectedMarker = path.join(cwd, "injected");
-      const maliciousPath = `src/foo.ts; touch ${injectedMarker} #`;
+      const maliciousPath = `src/foo.ts; touch ${injectedMarker} #.ts`;
       run(
         { tool_name: "Write", tool_input: { file_path: maliciousPath } },
         { STUB_ESLINT_STATUS: "0", STUB_PRETTIER_STATUS: "0" },

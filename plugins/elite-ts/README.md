@@ -9,10 +9,10 @@ claude plugin install elite-ts@elitebusinesssolutions
 
 ## Skills
 
-| Skill              | Invoke                       | Purpose                                                                    |
-| ------------------ | ---------------------------- | -------------------------------------------------------------------------- |
-| `setup-formatting` | `/elite-ts:setup-formatting` | Set up Prettier, ESLint auto-fix, EditorConfig, and VS Code format-on-save |
-| `verify`           | `/elite-ts:verify`           | Type-check, lint, format-check, and run tests before declaring work done   |
+| Skill              | Invoke                       | Purpose                                                                                       |
+| ------------------ | ---------------------------- | --------------------------------------------------------------------------------------------- |
+| `setup-formatting` | `/elite-ts:setup-formatting` | Set up Prettier, ESLint auto-fix, EditorConfig, and VS Code format-on-save                    |
+| `verify`           | `/elite-ts:verify`           | Type-check, lint (auto-fix) and format (auto-write), and run tests before declaring work done |
 
 ## Hooks
 

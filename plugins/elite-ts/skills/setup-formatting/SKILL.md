@@ -19,11 +19,18 @@ The steps below show the npm form as the concrete example — substitute the det
 
 ## 1. Ensure an ESLint config file exists
 
-Check for a flat config (`eslint.config.js`/`.mjs`/`.cjs`/`.ts`) or a legacy config (`.eslintrc.*`, or an `eslintConfig` key in `package.json`). If one already exists, leave it as-is and move to step 2.
+Check for a flat config (`eslint.config.js`/`.mjs`/`.cjs`/`.ts`) or a legacy config (`.eslintrc.*`, or an `eslintConfig` key in `package.json`).
 
-If none exists, create a flat config baseline appropriate to the project:
+If a flat config already exists, leave it as-is and move to step 2.
 
-- **Next.js project** (`next` listed in `package.json` dependencies): run `npm install --save-dev eslint @next/eslint-plugin-next` if either is missing, then create `eslint.config.mjs`:
+If a legacy config exists, read the `eslint` devDependency version in `package.json`:
+
+- Pinned below version 9: leave the legacy config as-is and move to step 2. This ESLint version still loads it.
+- Not pinned, or pinned to 9 or higher: migrate the legacy config to flat format before moving to step 2. Step 2's install resolves the current ESLint major version. ESLint 9 stops loading legacy config by default, and ESLint 10 removes it entirely, so leaving the legacy file in place would break linting the moment step 2 installs. Read the legacy config's `extends`, `rules`, `env`, and `parserOptions`, and translate each into the equivalent flat-config `eslint.config.mjs` shape shown below (`@eslint/js` for `eslint:recommended`, `typescript-eslint` for TypeScript rules, `globals` for `env` entries like `node`/`browser`). Then delete the legacy file (or remove the `eslintConfig` key from `package.json`) — ESLint treats a project with both a flat and a legacy config as an error.
+
+If neither exists, create a flat config baseline appropriate to the project:
+
+- **Next.js project** (`next` listed in `package.json` dependencies): run `npm install --save-dev eslint @next/eslint-plugin-next` if either is missing (add `typescript-eslint` too if a `tsconfig.json` is present), then create `eslint.config.mjs`:
 
   ```js
   import next from "@next/eslint-plugin-next";
@@ -39,16 +46,19 @@ If none exists, create a flat config baseline appropriate to the project:
   ];
   ```
 
-(If the project has no `tsconfig.json`, skip any TypeScript-specific ESLint config additions.)
+  If the project has a `tsconfig.json`, also add `import tseslint from "typescript-eslint";` and spread `...tseslint.configs.recommended` into the array — the same TypeScript addition the "any other Node/TS project" branch below makes — otherwise `.ts`/`.tsx` files have no parser and are skipped or fail to parse. If there is no `tsconfig.json`, skip this addition.
 
-- **Any other Node/TS project**: run `npm install --save-dev eslint @eslint/js` (add `typescript-eslint` too if a `tsconfig.json` is present), then create `eslint.config.mjs`:
+- **Any other Node/TS project**: run `npm install --save-dev eslint @eslint/js globals` (add `typescript-eslint` too if a `tsconfig.json` is present), then create `eslint.config.mjs`:
 
   ```js
   import js from "@eslint/js";
+  import globals from "globals";
   import { defineConfig } from "eslint/config";
 
-  export default defineConfig([js.configs.recommended]);
+  export default defineConfig([js.configs.recommended, { languageOptions: { globals: globals.node } }]);
   ```
+
+  `js.configs.recommended` enables `no-undef` but does not define any runtime globals on its own — without the `languageOptions` block above, ordinary references like `console` or `process` are flagged as undefined. Swap `globals.node` for `globals.browser` (or another entry from the `globals` package) if this project doesn't run on Node.
 
   Add `import tseslint from "typescript-eslint";` and spread `...tseslint.configs.recommended` into the array if TypeScript is present.
 
@@ -219,7 +229,11 @@ try {
     // Anything else (2 = fatal config/parse error, non-standard codes, null = killed)
     // means linting silently never happened even though eslint is installed — report it.
     if (eslint.status !== 0 && eslint.status !== 1) {
-      const detail = truncatedOutput(eslint.stdout, eslint.stderr, { head: 10 });
+      // A null status/signal means spawnSync could not even start the binary
+      // (e.g. EACCES) — the only diagnostic for that case lives in `.error`.
+      const detail = eslint.error
+        ? `could not spawn eslint: ${eslint.error.message}`
+        : truncatedOutput(eslint.stdout, eslint.stderr, { head: 10 });
       messages.push(
         `ESLint did not run on ${path.basename(f)} (exit ${eslint.status ?? `signal ${eslint.signal}`}) — linting was not applied:\n${detail}`
       );
@@ -242,7 +256,11 @@ try {
       stdio: ["ignore", "pipe", "pipe"]
     });
     if (prettier.status !== 0) {
-      const detail = truncatedOutput(prettier.stdout, prettier.stderr, { head: 10 });
+      // Same rationale as the ESLint block above: a null status/signal means
+      // spawnSync could not start the binary, and `.error` has the real cause.
+      const detail = prettier.error
+        ? `could not spawn prettier: ${prettier.error.message}`
+        : truncatedOutput(prettier.stdout, prettier.stderr, { head: 10 });
       messages.push(
         `Prettier error on ${path.basename(f)} (exit ${prettier.status ?? `signal ${prettier.signal}`}) — formatting was not applied:\n${detail}`
       );
