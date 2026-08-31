@@ -8,8 +8,8 @@
     "test": "node --test tests/*.test.js && npm test --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "format": "npm run format --workspaces --if-present",
-    "format:root": "prettier --write \"*.md\" \"docs/**/*.md\" \"plugins/elite-dev/**/*.md\" \".claude/*.json\" \".claude-plugin/*.json\"",
-    "format:check:root": "prettier --check \"*.md\" \"docs/**/*.md\" \"plugins/elite-dev/**/*.md\" \".claude/*.json\" \".claude-plugin/*.json\"",
+    "format:root": "prettier --write .",
+    "format:check:root": "prettier --check .",
     "validate-skill-evals": "node scripts/validate-skill-evals.js"
   },
   "devDependencies": {
