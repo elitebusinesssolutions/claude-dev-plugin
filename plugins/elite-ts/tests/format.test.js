@@ -312,3 +312,27 @@ test("monorepo fix does not regress a project with its own local node_modules", 
     assert.equal(r.stdout, "");
   });
 });
+
+// Regression test: format.js used to pass shell: true unconditionally to both
+// spawnSync calls, so a file_path containing shell metacharacters was parsed
+// by a shell on POSIX instead of passed through as one literal argument.
+// shell:true is now gated to Windows only (see hooks/format.js) — on POSIX, a
+// metacharacter in file_path must not run a second command.
+if (process.platform !== "win32") {
+  test("a shell metacharacter in file_path is not interpreted by a shell on POSIX", () => {
+    withEslintProject((cwd) => {
+      const injectedMarker = path.join(cwd, "injected");
+      const maliciousPath = `src/foo.ts; touch ${injectedMarker} #`;
+      run(
+        { tool_name: "Write", tool_input: { file_path: maliciousPath } },
+        { STUB_ESLINT_STATUS: "0", STUB_PRETTIER_STATUS: "0" },
+        cwd
+      );
+      assert.equal(
+        fs.existsSync(injectedMarker),
+        false,
+        "file_path's shell metacharacters must not run a second command"
+      );
+    });
+  });
+}

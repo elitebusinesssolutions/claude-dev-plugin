@@ -192,11 +192,15 @@ try {
     // Spawn the already-resolved binary directly rather than `npx eslint` — npx
     // re-resolves the package on every invocation, which is a wasted extra
     // process layer on a hook that fires on nearly every Write/Edit tool call.
-    // `shell: true` is kept so Windows' `eslint.cmd` still resolves correctly.
+    // `shell: true` is needed only on Windows, where the resolved binary is a
+    // `.cmd` wrapper that requires cmd.exe to run. On POSIX the resolved file
+    // is directly executable, so shell:true would only add unneeded
+    // shell-metacharacter parsing of `f`, a value that traces back to a tool
+    // call's file_path.
     const eslint = spawnSync(eslintBin, ["--fix", f], {
       cwd,
       encoding: "utf8",
-      shell: true,
+      shell: process.platform === "win32",
       stdio: ["ignore", "pipe", "pipe"]
     });
     // Exit 1 = unfixable lint warnings (expected — ESLint ran fine and found issues).
@@ -217,11 +221,12 @@ try {
   const prettierBin = findBin("prettier");
   if (prettierBin) {
     // Same rationale as the ESLint spawn above: use the already-resolved bin
-    // path directly instead of routing through `npx prettier`.
+    // path directly instead of routing through `npx prettier`, and enable
+    // shell only on Windows for the same `.cmd`-wrapper reason.
     const prettier = spawnSync(prettierBin, ["--write", "--ignore-unknown", f], {
       cwd,
       encoding: "utf8",
-      shell: true,
+      shell: process.platform === "win32",
       stdio: ["ignore", "pipe", "pipe"]
     });
     if (prettier.status !== 0) {
