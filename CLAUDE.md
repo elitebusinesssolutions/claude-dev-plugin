@@ -1,13 +1,11 @@
 # claude-dev-plugin — Development Guide
 
-This repo is a Claude Code plugin marketplace holding three plugins, each in its own subdirectory
+This repo is a Claude Code plugin marketplace holding two plugins, each in its own subdirectory
 under `plugins/`:
 
 - **`elite-dev`** — generic dev-workflow skills (git worktrees, GitHub issues, pull requests) for
   any TypeScript/JavaScript or .NET repo. Skills only, no hooks. See its own
   [CLAUDE.md](plugins/elite-dev/CLAUDE.md).
-- **`elite-next`** — shared skills and hooks for Next.js / TypeScript / .NET API projects. See its
-  own `plugins/elite-next/CLAUDE.md`.
 - **`elite-ts`** — shared lint/format hooks and formatting-setup/verification skills for
   TypeScript projects. See its own `plugins/elite-ts/CLAUDE.md`.
 
@@ -16,7 +14,6 @@ Install any of them via:
 ```bash
 claude plugin marketplace add elitebusinesssolutions/claude-dev-plugin
 claude plugin install elite-dev@elitebusinesssolutions
-claude plugin install elite-next@elitebusinesssolutions
 claude plugin install elite-ts@elitebusinesssolutions
 ```
 
@@ -34,8 +31,15 @@ Official docs this file enforces:
 ```text
 claude-dev-plugin/
 ├── .claude-plugin/
-│   └── marketplace.json        # catalog listing all three plugins
-├── package.json                 # root, npm workspaces for elite-next and elite-ts
+│   └── marketplace.json        # catalog listing both plugins
+├── .claude/settings.json        # dogfoods this repo's own hook (see docs/hooks-authoring.md)
+├── .prettierrc                  # root Prettier config, for files outside plugins/elite-ts
+├── package.json                 # root, npm workspace for elite-ts
+├── scripts/validate-skill-evals.js  # shared eval-file validator, all plugins
+├── tests/                       # node:test suite for scripts/validate-skill-evals.js
+├── docs/
+│   ├── hooks-authoring.md       # one copy of the hook mechanics
+│   └── skill-evals.md           # one copy of the eval-harness procedure
 ├── .github/workflows/ci.yml     # single workflow, runs across workspaces
 └── plugins/
     ├── elite-dev/
@@ -43,18 +47,13 @@ claude-dev-plugin/
     │   ├── skills/
     │   ├── README.md
     │   └── CLAUDE.md
-    ├── elite-next/
-    │   ├── .claude-plugin/plugin.json
-    │   ├── skills/
-    │   ├── hooks/
-    │   ├── package.json
-    │   ├── README.md
-    │   └── CLAUDE.md
     └── elite-ts/
         ├── .claude-plugin/plugin.json
         ├── skills/
         ├── hooks/
         ├── package.json
+        ├── eslint.config.mjs
+        ├── tests/
         ├── README.md
         └── CLAUDE.md
 ```
@@ -92,14 +91,14 @@ Each plugin has its own `plugins/<name>/.claude-plugin/plugin.json`, e.g.:
 
 Field rules:
 
-| Field         | Rule                                                                                                                                                                                                    |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`        | The namespace prefix — skills invoke as `/<name>:<skill>`. Keep it short, lowercase, hyphen-only.                                                                                                       |
-| `version`     | Bump this with every release of that plugin. Users only get updates when the version field changes. Omitting it causes every commit to count as a new version, triggering reinstalls. Use semver.       |
-| `description` | One sentence. Shown in the plugin manager.                                                                                                                                                              |
-| `repository`  | This repo's URL (`https://github.com/elitebusinesssolutions/claude-dev-plugin`), same for all three plugins now that they share a repo.                                                                |
-| `skills`      | Points at that plugin's own `./skills/` directory, relative to the plugin's own root — never a path into another plugin's directory.                                                                    |
-| `hooks`       | Only set when the plugin has a `hooks/` directory (`elite-next`, `elite-ts`). Omit entirely otherwise — pointing it at a nonexistent file causes a load error.                                          |
+| Field         | Rule                                                                                                                                                                                                                                                                                                           |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`        | The namespace prefix — skills invoke as `/<name>:<skill>`. Keep it short, lowercase, hyphen-only.                                                                                                                                                                                                              |
+| `version`     | Bump this with every release of that plugin. Users only get updates when the version field changes. Omitting it causes every commit to count as a new version, triggering reinstalls. Use semver.                                                                                                              |
+| `description` | One sentence. Shown in the plugin manager.                                                                                                                                                                                                                                                                     |
+| `repository`  | This repo's URL (`https://github.com/elitebusinesssolutions/claude-dev-plugin`), same for both plugins now that they share a repo.                                                                                                                                                                             |
+| `skills`      | Points at that plugin's own `./skills/` directory, relative to the plugin's own root — never a path into another plugin's directory.                                                                                                                                                                           |
+| `hooks`       | Never point it at `./hooks/hooks.json`. That file is the standard location and loads automatically; naming it again makes Claude Code report `Duplicate hooks file detected` and fail the whole plugin load. Set this field only for an _additional_ hooks file beyond the standard one. Both plugins omit it. |
 
 ---
 
@@ -133,6 +132,24 @@ automatically. Write it as a use-case sentence: what the skill does and when to 
 `"PR creation"`. Good: `"Opens a pull request following common conventions... Use whenever
 creating a PR — 'open a PR', 'create the PR', 'let's PR this'"`.
 
+### `disable-model-invocation`
+
+Set `disable-model-invocation: true` to stop Claude from auto-invoking the skill mid-conversation.
+Use this for a skill that needs explicit user intent — a destructive operation, or one whose
+output the user should trigger deliberately rather than have Claude reach for on its own. Omit it
+for a skill Claude should discover and apply automatically.
+
+### `$ARGUMENTS`
+
+Use `$ARGUMENTS` anywhere in the skill body to capture text typed after the skill name:
+
+```bash
+/<plugin-name>:<skill-name> some text here
+# $ARGUMENTS → "some text here"
+```
+
+If a skill needs no arguments, don't add `$ARGUMENTS` — calling with extra text is harmless.
+
 ### Writing effective skill bodies
 
 1. **State the goal first.** Open with what Claude is doing, not with rules.
@@ -154,13 +171,27 @@ mkdir plugins/<plugin-name>/skills/<skill-name>
 # Write plugins/<plugin-name>/skills/<skill-name>/SKILL.md
 ```
 
-Test it:
+Test it — see [Testing locally](#testing-locally) below.
 
-```bash
-claude --plugin-dir plugins/<plugin-name> /<plugin-name>:<skill-name>
-```
+### Adding a new skill checklist
 
-Then run `/reload-plugins` inside an active session to pick up changes without restarting.
+- [ ] Create `plugins/<plugin-name>/skills/<skill-name>/SKILL.md`
+- [ ] Frontmatter has a `description` that explains when Claude should invoke it
+- [ ] Skill body uses numbered steps
+- [ ] Skill body encodes decisions and conventions (not just vague advice)
+- [ ] Skill ends with a verification step
+- [ ] Test with `claude --plugin-dir plugins/<plugin-name> /<plugin-name>:<skill-name>`
+- [ ] Add row to that plugin's `README.md` skills table
+- [ ] Add `evals/evals.json` under the skill's own directory — see
+      [Testing skills (evals)](#testing-skills-evals)
+- [ ] Bump `PATCH`/`MINOR` version in that plugin's `plugin.json` as appropriate
+
+### Testing skills (evals)
+
+Skills are natural-language instructions, not deterministic code, so they're tested with evals
+rather than `tests/*.test.js`. See [docs/skill-evals.md](docs/skill-evals.md) for the schema, how
+to write cases, how to run the with-skill/without-skill comparison, and what CI validates
+automatically on every PR.
 
 ### Adding a new plugin to this repo
 
@@ -170,6 +201,14 @@ Then run `/reload-plugins` inside an active session to pick up changes without r
 3. If it needs npm tooling, add its path to the root `package.json`'s `workspaces` array and give
    it its own `package.json`.
 4. Add a row for it to the root `README.md`'s plugin index.
+
+---
+
+## Hooks
+
+`elite-ts` ships a lint/format hook; `elite-dev` ships no hooks. See
+[docs/hooks-authoring.md](docs/hooks-authoring.md) for `hooks.json` format, path resolution, the
+exit-code contract, matchers, timeouts, and the checklist for adding a new hook.
 
 ---
 
@@ -211,7 +250,7 @@ version. Pass `--strict` to treat unrecognized-field warnings as errors.
 Reference: [Version management](https://code.claude.com/docs/en/plugins-reference#version-management)
 
 - Each plugin's `version` field is **independent** — bumping `elite-dev`'s version does not bump
-  `elite-next`'s or `elite-ts`'s, and vice versa.
+  `elite-ts`'s, and vice versa.
 - **Bump once, on the PR that introduces the change** — not on every commit during review, and not
   separately after merge. The version bump and the feature land together.
 - Follow semver: `MAJOR.MINOR.PATCH`.
@@ -235,8 +274,11 @@ Reference: [Plugin marketplaces](https://code.claude.com/docs/en/plugin-marketpl
   "name": "elitebusinesssolutions",
   "owner": { "name": "elitebusinesssolutions" },
   "plugins": [
-    { "name": "elite-dev", "source": "./plugins/elite-dev", "description": "..." },
-    { "name": "elite-next", "source": "./plugins/elite-next", "description": "..." },
+    {
+      "name": "elite-dev",
+      "source": "./plugins/elite-dev",
+      "description": "..."
+    },
     { "name": "elite-ts", "source": "./plugins/elite-ts", "description": "..." }
   ]
 }
@@ -245,7 +287,7 @@ Reference: [Plugin marketplaces](https://code.claude.com/docs/en/plugin-marketpl
 Rules:
 
 - `source` is a relative path (`./plugins/<name>`) into this same repo, not a separate GitHub
-  `repo` reference — all three plugins live here now.
+  `repo` reference — both plugins live here now.
 - Each `plugins[].name` must match the `name` field in that plugin's own `plugin.json` exactly.
 - The top-level `name` (`"elitebusinesssolutions"`) is the marketplace identifier used in
   `claude plugin install <plugin-name>@elitebusinesssolutions`.
@@ -255,8 +297,8 @@ Rules:
 
 ## npm workspaces
 
-`elite-next` and `elite-ts` each carry their own `package.json`, tests, and lint config; the root
-`package.json` wires them into one npm workspace so both can be run from the repo root:
+`elite-ts` carries its own `package.json`, tests, and lint config; the root `package.json` wires
+it into one npm workspace so it can be run from the repo root:
 
 ```bash
 npm install
@@ -267,6 +309,16 @@ npm run lint --workspaces --if-present
 `elite-dev` has no npm tooling and is intentionally left out of `workspaces` — do not add an empty
 `package.json` for a plugin that doesn't need one.
 
+The root `package.json` also carries scripts that aren't per-workspace, since they cover every
+plugin at once:
+
+```bash
+npm run validate-skill-evals -- origin/main   # scripts/validate-skill-evals.js, see docs/skill-evals.md
+npm run format:root                           # prettier over root + docs/ + plugins/elite-dev
+npm run format:check:root
+npm test                                       # runs root tests/*.test.js, then --workspaces
+```
+
 ---
 
 ## Common mistakes
@@ -275,14 +327,10 @@ These are caught by `claude plugin validate` or by reading the official docs:
 
 | Mistake                                                          | Correct approach                                                                            |
 | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Putting a plugin's `skills/` inside its `.claude-plugin/`        | `skills/` goes at that plugin's own root                                                    |
-| Sharing one `skills/` directory across plugins                   | Each plugin under `plugins/<name>/` keeps its own `skills/`                                 |
 | Skill `description` that names the skill instead of the use-case | Write a sentence describing when to use it                                                  |
 | Not bumping a plugin's `version` after a change                  | Bump version for every release of that plugin                                               |
 | Hardcoding an org/repo name, default branch, or org-specific IDs | Resolve at runtime via `gh`; push org-specific IDs into the consuming project's `CLAUDE.md` |
-| Install syntax `elitebusinesssolutions/elite-dev`                | Correct syntax is `elite-dev@elitebusinesssolutions` (`<plugin>@<marketplace>`)              |
-| `plugin.json`'s `hooks` field pointing at a nonexistent file     | Omit the `hooks` field entirely if that plugin has no `hooks/` directory                    |
-| A plugin referencing files outside its own directory via `../`  | Not allowed — keep every plugin self-contained under `plugins/<name>/`                      |
+| `plugin.json` `hooks` field pointing at `./hooks/hooks.json`     | Omit it — the standard file loads automatically; declaring it fails the plugin load         |
 
 ---
 
@@ -290,7 +338,7 @@ These are caught by `claude plugin validate` or by reading the official docs:
 
 Reference: [Conventional Commits spec](https://www.conventionalcommits.org/en/v1.0.0/)
 
-This repo has no `dev` branch — only `main`. Branch from and target `main`.
+This repo has no `develop` branch — only `main`. Branch from and target `main`.
 
 ### Branch naming
 
@@ -335,4 +383,3 @@ instead of relying on hardcoded ones.
 
 - Title follows the same conventional commit format as the first commit on the branch
 - Target branch is `main`
-- Do not self-merge without review (exception: `chore`/`docs` branches)
