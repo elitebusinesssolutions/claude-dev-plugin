@@ -27,8 +27,7 @@ jobs:
 
       - run: |
           curl -fsSL https://claude.ai/install.sh | bash
-          echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-          source ~/.bashrc
+          export PATH="$HOME/.local/bin:$PATH"
           claude plugin validate .
           claude plugin validate plugins/elite-dev
           claude plugin validate plugins/elite-ts
