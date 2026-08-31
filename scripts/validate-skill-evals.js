@@ -57,7 +57,7 @@ function validateEvalsJson(data, skillName) {
     return ["evals.json must contain a single JSON object"];
   }
 
-  if (typeof data.skill_name !== "string" || data.skill_name.length === 0) {
+  if (typeof data.skill_name !== "string" || data.skill_name.trim().length === 0) {
     errors.push("skill_name must be a non-empty string");
   } else if (data.skill_name !== skillName) {
     errors.push(`skill_name "${data.skill_name}" does not match its directory name "${skillName}"`);
@@ -72,6 +72,11 @@ function validateEvalsJson(data, skillName) {
   data.evals.forEach((evalCase, index) => {
     const label = `evals[${index}]`;
 
+    if (typeof evalCase !== "object" || evalCase === null || Array.isArray(evalCase)) {
+      errors.push(`${label} must be an object`);
+      return;
+    }
+
     if (typeof evalCase.id !== "number") {
       errors.push(`${label}.id must be a number`);
     } else if (seenIds.has(evalCase.id)) {
@@ -84,14 +89,10 @@ function validateEvalsJson(data, skillName) {
       errors.push(`${label}.prompt must be a non-empty string`);
     }
 
-    if (evalCase.expectations !== undefined) {
-      if (!Array.isArray(evalCase.expectations) || evalCase.expectations.length === 0) {
-        errors.push(`${label}.expectations, if present, must be a non-empty array`);
-      } else if (
-        evalCase.expectations.some((e) => typeof e !== "string" || e.trim().length === 0)
-      ) {
-        errors.push(`${label}.expectations must contain only non-empty strings`);
-      }
+    if (!Array.isArray(evalCase.expectations) || evalCase.expectations.length === 0) {
+      errors.push(`${label}.expectations must be a non-empty array`);
+    } else if (evalCase.expectations.some((e) => typeof e !== "string" || e.trim().length === 0)) {
+      errors.push(`${label}.expectations must contain only non-empty strings`);
     }
   });
 

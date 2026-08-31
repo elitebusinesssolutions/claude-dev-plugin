@@ -29,11 +29,25 @@ test("a well-formed evals.json passes with no errors", () => {
   assert.deepEqual(errors, []);
 });
 
-test("expectations field is optional", () => {
+test("missing expectations is flagged", () => {
   const data = validEvals();
   delete data.evals[0].expectations;
   const errors = validateEvalsJson(data, "example-skill");
-  assert.deepEqual(errors, []);
+  assert.ok(errors.some((e) => /expectations must be a non-empty array/.test(e)));
+});
+
+test("whitespace-only skill_name is flagged", () => {
+  const data = validEvals();
+  data.skill_name = "   ";
+  const errors = validateEvalsJson(data, "example-skill");
+  assert.ok(errors.some((e) => /skill_name must be a non-empty string/.test(e)));
+});
+
+test("a null eval case is flagged, not thrown", () => {
+  const data = validEvals();
+  data.evals.push(null);
+  const errors = validateEvalsJson(data, "example-skill");
+  assert.ok(errors.some((e) => /evals\[1\] must be an object/.test(e)));
 });
 
 test("top-level non-object is rejected", () => {
