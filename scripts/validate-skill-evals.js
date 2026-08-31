@@ -7,6 +7,31 @@ const { execFileSync } = require("child_process");
 
 const REPO_ROOT = path.join(__dirname, "..");
 
+function pluginNames() {
+  const pluginsDir = path.join(REPO_ROOT, "plugins");
+  return fs
+    .readdirSync(pluginsDir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .filter((name) => fs.existsSync(path.join(pluginsDir, name, "skills")));
+}
+
+function parseChangedSkillNames(diffText, validPlugins) {
+  const seen = new Set();
+  const pairs = [];
+  for (const line of diffText.split("\n")) {
+    const match = /^plugins\/([^/]+)\/skills\/([^/]+)\//.exec(line.trim());
+    if (!match) continue;
+    const [, pluginName, skillName] = match;
+    if (!validPlugins.has(pluginName) || skillName.endsWith("-workspace")) continue;
+    const key = `${pluginName}/${skillName}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    pairs.push({ pluginName, skillName });
+  }
+  return pairs;
+}
+
 function changedSkillNames(baseRef) {
   let diff;
   try {
@@ -22,14 +47,7 @@ function changedSkillNames(baseRef) {
     );
   }
 
-  const names = new Set();
-  for (const line of diff.split("\n")) {
-    const match = /^skills\/([^/]+)\//.exec(line.trim());
-    if (match && !match[1].endsWith("-workspace")) {
-      names.add(match[1]);
-    }
-  }
-  return [...names];
+  return parseChangedSkillNames(diff, new Set(pluginNames()));
 }
 
 function validateEvalsJson(data, skillName) {
@@ -87,24 +105,33 @@ function main() {
     process.exit(1);
   }
 
-  let skillNames;
+  let pairs;
   try {
-    skillNames = changedSkillNames(baseRef);
+    pairs = changedSkillNames(baseRef);
   } catch (err) {
     console.error(err.message);
     process.exit(1);
   }
-  if (skillNames.length === 0) {
-    console.log("No changed files under skills/ — nothing to validate.");
+  if (pairs.length === 0) {
+    console.log("No changed files under plugins/*/skills/ — nothing to validate.");
     return;
   }
 
   let hadFailure = false;
 
-  for (const skillName of skillNames) {
-    const evalsPath = path.join(REPO_ROOT, "skills", skillName, "evals", "evals.json");
+  for (const { pluginName, skillName } of pairs) {
+    const label = `${pluginName}/${skillName}`;
+    const evalsPath = path.join(
+      REPO_ROOT,
+      "plugins",
+      pluginName,
+      "skills",
+      skillName,
+      "evals",
+      "evals.json"
+    );
     if (!fs.existsSync(evalsPath)) {
-      console.log(`- ${skillName}: no evals/evals.json (not all skills need one) — skipped`);
+      console.log(`- ${label}: no evals/evals.json (not all skills need one) — skipped`);
       continue;
     }
 
@@ -112,16 +139,16 @@ function main() {
     try {
       data = JSON.parse(fs.readFileSync(evalsPath, "utf8"));
     } catch (err) {
-      console.error(`- ${skillName}: evals/evals.json is not valid JSON (${err.message})`);
+      console.error(`- ${label}: evals/evals.json is not valid JSON (${err.message})`);
       hadFailure = true;
       continue;
     }
 
     const errors = validateEvalsJson(data, skillName);
     if (errors.length === 0) {
-      console.log(`- ${skillName}: evals/evals.json OK (${data.evals.length} eval case(s))`);
+      console.log(`- ${label}: evals/evals.json OK (${data.evals.length} eval case(s))`);
     } else {
-      console.error(`- ${skillName}: evals/evals.json is invalid:`);
+      console.error(`- ${label}: evals/evals.json is invalid:`);
       for (const error of errors) {
         console.error(`    - ${error}`);
       }
@@ -138,4 +165,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { validateEvalsJson, changedSkillNames };
+module.exports = { validateEvalsJson, changedSkillNames, parseChangedSkillNames, pluginNames };

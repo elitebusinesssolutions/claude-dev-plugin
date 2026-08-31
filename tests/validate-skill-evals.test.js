@@ -2,7 +2,11 @@ const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const { spawnSync } = require("node:child_process");
 const path = require("node:path");
-const { validateEvalsJson, changedSkillNames } = require("../scripts/validate-skill-evals");
+const {
+  validateEvalsJson,
+  changedSkillNames,
+  parseChangedSkillNames
+} = require("../scripts/validate-skill-evals");
 
 const SCRIPT_PATH = path.join(__dirname, "..", "scripts", "validate-skill-evals.js");
 
@@ -92,6 +96,24 @@ test("expectations with a blank entry is flagged", () => {
   data.evals[0].expectations = ["fine", "  "];
   const errors = validateEvalsJson(data, "example-skill");
   assert.ok(errors.some((e) => /non-empty strings/.test(e)));
+});
+
+test("parseChangedSkillNames matches a plugin-prefixed skill path", () => {
+  // Regression for Defect O: the subtree merge added a plugins/<name>/ prefix
+  // to every skill path, and the old regex (^skills/([^/]+)/) never matched
+  // it, so every CI run silently validated nothing.
+  const diff = "plugins/elite-ts/skills/setup-formatting/SKILL.md\n";
+  const pairs = parseChangedSkillNames(diff, new Set(["elite-ts", "elite-dev"]));
+  assert.deepEqual(pairs, [{ pluginName: "elite-ts", skillName: "setup-formatting" }]);
+});
+
+test("parseChangedSkillNames ignores an unknown plugin directory and a -workspace suffix", () => {
+  const diff = [
+    "plugins/not-a-real-plugin/skills/foo/SKILL.md",
+    "plugins/elite-ts/skills/setup-formatting-workspace/iteration-1/notes.md"
+  ].join("\n");
+  const pairs = parseChangedSkillNames(diff, new Set(["elite-ts", "elite-dev"]));
+  assert.deepEqual(pairs, []);
 });
 
 test("changedSkillNames throws a clean error for an unresolvable base ref", () => {
