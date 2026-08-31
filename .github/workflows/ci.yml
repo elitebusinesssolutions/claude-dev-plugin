@@ -22,7 +22,7 @@ jobs:
 
       - run: npm ci
       - run: npm run lint --workspaces --if-present
-      - run: npm test --workspaces --if-present
+      - run: npm test
       - run: npm run validate-skill-evals -- origin/${{ github.base_ref }}
 
       - run: |
@@ -30,5 +30,7 @@ jobs:
           echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
           source ~/.bashrc
           claude plugin validate .
+          claude plugin validate plugins/elite-dev
+          claude plugin validate plugins/elite-ts
         if: matrix.os == 'ubuntu-latest'
         name: claude plugin validate (ubuntu)
