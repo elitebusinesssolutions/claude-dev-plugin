@@ -46,16 +46,17 @@ troubleshoot correctly). Keep `expectations` objectively verifiable — "mention
 ## Running the eval
 
 1. Before spawning any agent, copy that eval's `files` into per-run input folders:
-   `skills/<skill-name>-workspace/iteration-1/<eval-name>/{with_skill,without_skill}/inputs/`.
-   Point each agent at its own copy, never at the shared `skills/<skill-name>/evals/files/`
-   originals — an agent that goes looking for "the project" on disk will find and edit whatever's
-   in front of it, "please don't modify the original" is an instruction, not a permission
-   boundary, and a stray edit to the shared fixture silently corrupts every other eval case that
-   reuses it.
+   `plugins/<plugin-name>/skills/<skill-name>-workspace/iteration-1/<eval-name>/{with_skill,without_skill}/inputs/`.
+   Point each agent at its own copy, never at the shared
+   `plugins/<plugin-name>/skills/<skill-name>/evals/files/` originals — an agent that goes looking
+   for "the project" on disk will find and edit whatever's in front of it, "please don't modify the
+   original" is an instruction, not a permission boundary, and a stray edit to the shared fixture
+   silently corrupts every other eval case that reuses it.
 2. For each eval case, spawn two subagents in the same turn: one instructed to read the skill's
    `SKILL.md` and follow it (`with_skill`), one given the same prompt with no skill reference at
    all (`without_skill`, the baseline). Point each at its own `inputs/` copy from step 1. Save each
-   response under `skills/<skill-name>-workspace/iteration-1/<eval-name>/{with_skill,without_skill}/outputs/`.
+   response under
+   `plugins/<plugin-name>/skills/<skill-name>-workspace/iteration-1/<eval-name>/{with_skill,without_skill}/outputs/`.
 3. Grade each response against that eval's `expectations`, saving `grading.json` per run (see
    `skill-creator`'s `references/schemas.md` for the exact field names — the viewer depends on them
    matching exactly).
@@ -65,15 +66,16 @@ troubleshoot correctly). Keep `expectations` objectively verifiable — "mention
 
    ```bash
    python <skill-creator-path>/eval-viewer/generate_review.py \
-     skills/<skill-name>-workspace/iteration-1 \
+     plugins/<plugin-name>/skills/<skill-name>-workspace/iteration-1 \
      --skill-name <skill-name> \
-     --benchmark skills/<skill-name>-workspace/iteration-1/benchmark.json \
+     --benchmark plugins/<plugin-name>/skills/<skill-name>-workspace/iteration-1/benchmark.json \
      --static <output.html>
    ```
 
 Ask Claude to "run the eval harness for `<skill-name>`" and it will do all of the above.
 `<skill-name>-workspace/` is scratch output from that run — regenerate it locally rather than
-committing it; it's gitignored.
+committing it. Each plugin's own `.gitignore` excludes its `skills/*-workspace/` directories; add
+that entry to a plugin's `.gitignore` if it's missing one.
 
 ## Iterating
 

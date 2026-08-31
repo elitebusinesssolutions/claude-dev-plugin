@@ -95,6 +95,9 @@ hook in this repo actually uses. Not every event follows it:
 Exit 2 is the correct code to block a tool call on these events. Never exit 1 to block — that's a
 non-blocking error that logs and continues.
 
+Claude Code still parses valid JSON on stdout when a hook exits `2`. That JSON cannot override the
+block — write the reason to stderr, not stdout, when blocking.
+
 Two events break this contract, and matter if you ever add a hook for either:
 
 - `WorktreeCreate` fails on **any** non-zero exit code, not just 2.
@@ -103,8 +106,10 @@ Two events break this contract, and matter if you ever add a hook for either:
 
 ## Stdin protocol
 
-Every hook receives the full event payload as JSON on stdin. Parse it with
-`fs.readFileSync(0, 'utf8')` (synchronous) or the async equivalent. Fields present on every event:
+Every command hook receives the full event payload as JSON on stdin. Parse it with
+`fs.readFileSync(0, 'utf8')` (synchronous) or the async equivalent. An HTTP hook receives the same
+payload as a POST body instead, and a prompt hook passes it to a model for evaluation — every hook
+in this repo is a command hook, so only this protocol applies here. Fields present on every event:
 
 ```json
 {
