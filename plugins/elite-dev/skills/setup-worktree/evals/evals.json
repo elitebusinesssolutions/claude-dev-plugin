@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "Set up a worktree for issue 21, branch feat/21-product-entities, based on main. Here is the current checkout state: evals/files/repo-no-worktree/repo-state.md.",
-      "expected_output": "Creates the worktree under .claude/worktrees/feat-21-product-entities, copies untracked local files into it, installs dependencies for the detected stack, and confirms .gitignore covers .claude/worktrees/.",
+      "expected_output": "Creates the worktree under .claude/worktrees/feat-21-product-entities, copies untracked local files into it, installs dependencies for the detected stack, and notes that .gitignore is missing a .claude/worktrees/ entry.",
       "files": ["evals/files/repo-no-worktree/repo-state.md"],
       "expectations": [
         "Uses `git worktree add .claude/worktrees/feat-21-product-entities -b feat/21-product-entities main`, flattening the `/` in the branch name to `-`",

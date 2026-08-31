@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "Review the unresolved comments on PR 153. Saved output of the reviewThreads GraphQL query: evals/files/pr-153-comments/review-threads.json. Current content of src/services/orderService.ts: evals/files/pr-153-comments/orderService.ts. Present the findings for me to triage.",
-      "expected_output": "Two findings in prose, each with file:line/summary/failure-scenario/fix, separated by a --- rule: thread A confirmed as a real division-by-zero defect with a concrete fix, thread B pushed back on since applyDiscount already null-checks customer. Ends by asking which findings to act on, without editing, committing, or replying to GitHub.",
+      "expected_output": "Two findings in prose, each with file:line/summary/failure-scenario/fix, separated by a --- rule: thread A confirmed as a real defect, correcting the comment's claim that it throws — orderTotal actually returns Infinity or NaN for a zero-count item — with a guard proposed for non-finite results. Thread B pushed back on since applyDiscount already null-checks customer. Ends by asking which findings to act on, without editing, committing, or replying to GitHub.",
       "files": [
         "evals/files/pr-153-comments/review-threads.json",
         "evals/files/pr-153-comments/orderService.ts"
@@ -12,6 +12,7 @@
       "expectations": [
         "Presents both threads as separate prose findings, each with a file:line header, summary, failure scenario, and fix suggestion, separated by --- rules",
         "Confirms thread A's division-by-zero defect is still present in the current orderTotal code, not just the stale diff comment",
+        "States the actual failure mechanism (orderTotal returns Infinity or NaN for a zero-count item) rather than repeating the comment's incorrect claim that it throws, and proposes a guard for non-finite results",
         "States thread B's finding is stale or incorrect, explaining that applyDiscount already returns early when customer is null",
         "Ends by asking the developer which findings to act on",
         "Does not edit any files, commit, or reply to GitHub in the same turn"
