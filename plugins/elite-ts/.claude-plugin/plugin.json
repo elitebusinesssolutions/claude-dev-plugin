@@ -3,5 +3,9 @@
   "description": "Shared lint/format hooks and formatting-setup/verification skills for TypeScript projects",
   "version": "0.2.0",
   "repository": "https://github.com/elitebusinesssolutions/claude-dev-plugin",
+  "author": {
+    "name": "Elite Business Solutions",
+    "email": "john@elitebusinesssolutions.com"
+  },
   "skills": "./skills/"
 }
