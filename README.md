@@ -9,8 +9,12 @@ own.
 | [elite-ts](plugins/elite-ts)   | Shared lint/format hooks and formatting-setup/verification skills for TypeScript projects.         | `claude plugin install elite-ts@elitebusinesssolutions`  |
 
 Both plugins can also be used with
-[copilot](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-finding-installing)
-by replacing `claude` with `copilot` in any command below.
+[GitHub Copilot CLI](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-finding-installing),
+though its commands differ from the `claude` ones used below: install with
+`copilot plugin install <plugin-name>@elitebusinesssolutions`. Copilot CLI has no `--plugin-dir`
+equivalent for trying an unreleased local change — instead, install the local path directly
+(`copilot plugin install ./plugins/<plugin-name>`), and reinstall after every edit; there is no
+`/reload-plugins` equivalent to pick up a change mid-session.
 
 See each plugin's own README for what its skills and hooks do, and the root
 [CLAUDE.md](CLAUDE.md) for how this repo is structured and how to contribute.
