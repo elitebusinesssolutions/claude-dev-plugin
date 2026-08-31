@@ -18,7 +18,9 @@ If none of the four apply, say so plainly and stop — there is nothing to verif
 
 ## 2. Lint
 
-If lint applies, run `npx eslint --fix .`. This auto-fixes what it can; report any remaining errors verbatim (file, line, rule) — don't summarize a list of errors down to "a few lint issues."
+If lint applies via a legacy config (`.eslintrc.*` or an `eslintConfig` key in `package.json`, not a flat `eslint.config.*`), first check the installed ESLint version: read the `eslint` devDependency in `package.json`, or run `npx eslint --version`. ESLint 9 stops auto-loading legacy config by default, and ESLint 10 removes legacy config support entirely — a legacy-config project on either version will fail to lint at all, or fail with a confusing "no config found" error that has nothing to do with the code being checked. If the installed version is 9 or higher, report this mismatch plainly (legacy config, incompatible ESLint version) instead of running `eslint` and treating whatever it returns as a real lint result.
+
+Otherwise, run `npx eslint --fix .`. This auto-fixes what it can; report any remaining errors verbatim (file, line, rule) — don't summarize a list of errors down to "a few lint issues."
 
 ## 3. Format
 
