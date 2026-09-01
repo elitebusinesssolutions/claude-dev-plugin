@@ -28,36 +28,6 @@ Official docs this file enforces:
 
 ## Directory layout
 
-```text
-claude-dev-plugin/
-├── .claude-plugin/
-│   └── marketplace.json        # catalog listing both plugins
-├── .claude/settings.json        # dogfoods this repo's own hook (see docs/hooks-authoring.md)
-├── .prettierrc                  # root Prettier config, for files outside plugins/elite-ts
-├── package.json                 # root, npm workspace for elite-ts
-├── scripts/validate-skill-evals.js  # shared eval-file validator, all plugins
-├── tests/                       # node:test suite for scripts/validate-skill-evals.js
-├── docs/
-│   ├── hooks-authoring.md       # one copy of the hook mechanics
-│   └── skill-evals.md           # one copy of the eval-harness procedure
-├── .github/workflows/ci.yml     # single workflow, runs across workspaces
-└── plugins/
-    ├── elite-dev/
-    │   ├── .claude-plugin/plugin.json
-    │   ├── skills/
-    │   ├── README.md
-    │   └── CLAUDE.md
-    └── elite-ts/
-        ├── .claude-plugin/plugin.json
-        ├── skills/
-        ├── hooks/
-        ├── package.json
-        ├── eslint.config.mjs
-        ├── tests/
-        ├── README.md
-        └── CLAUDE.md
-```
-
 **Rules enforced by the official spec:**
 
 - The root `.claude-plugin/` holds only `marketplace.json`. Each plugin's own `.claude-plugin/`
@@ -77,19 +47,7 @@ claude-dev-plugin/
 
 Reference: [Plugin manifest schema](https://code.claude.com/docs/en/plugins-reference#plugin-manifest-schema)
 
-Each plugin has its own `plugins/<name>/.claude-plugin/plugin.json`, e.g.:
-
-```json
-{
-  "name": "elite-dev",
-  "description": "Generic dev-workflow skills for git worktrees, GitHub issues, and pull requests",
-  "version": "0.2.1",
-  "repository": "https://github.com/elitebusinesssolutions/claude-dev-plugin",
-  "skills": "./skills/"
-}
-```
-
-Field rules:
+Each plugin has its own `plugins/<name>/.claude-plugin/plugin.json`. Field rules:
 
 | Field         | Rule                                                                                                                                                                                                                                                                                                           |
 | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -108,14 +66,8 @@ Reference: [Agent Skills](https://code.claude.com/docs/en/skills)
 
 ### File format
 
-Every skill is a folder under a plugin's own `skills/` with a `SKILL.md`:
-
-```text
-plugins/<plugin-name>/skills/
-└── my-skill/
-    ├── SKILL.md          # Required — instructions + frontmatter
-    └── reference.md      # Optional — large reference loaded on demand
-```
+Every skill is a folder under a plugin's own `skills/` containing a required `SKILL.md`
+(frontmatter plus body) and, optionally, a `reference.md` for large content loaded on demand.
 
 ### SKILL.md frontmatter
 
@@ -152,39 +104,15 @@ If a skill needs no arguments, don't add `$ARGUMENTS` — calling with extra tex
 
 ### Writing effective skill bodies
 
-1. **State the goal first.** Open with what Claude is doing, not with rules.
-2. **Use numbered steps.** Skills run sequentially — numbered steps make progress checkable.
-3. **Encode the decisions.** A skill that says "open a PR" is weaker than one that shows the exact
-   body/label conventions to follow. Embed hard-won knowledge directly.
-4. **Include examples.** Show correct output patterns, not just descriptions of them.
-5. **End with a verification step.** Prevents Claude from finishing a skill in a broken state.
-6. **Don't duplicate CLAUDE.md content** in skills. CLAUDE.md is always loaded; skill bodies load
-   only when invoked — use skills for step-by-step procedures, use CLAUDE.md for always-on rules.
+**Don't duplicate CLAUDE.md content** in skills. CLAUDE.md is always loaded; skill bodies load only
+when invoked — use skills for step-by-step procedures, use CLAUDE.md for always-on rules.
 
 Each plugin's own `CLAUDE.md` carries rules specific to that plugin (e.g. `elite-dev`'s
 stack-agnostic requirement) — check it before writing a skill for that plugin.
 
 ### Adding a new skill to an existing plugin
 
-```bash
-mkdir plugins/<plugin-name>/skills/<skill-name>
-# Write plugins/<plugin-name>/skills/<skill-name>/SKILL.md
-```
-
-Test it — see [Testing locally](#testing-locally) below.
-
-### Adding a new skill checklist
-
-- [ ] Create `plugins/<plugin-name>/skills/<skill-name>/SKILL.md`
-- [ ] Frontmatter has a `description` that explains when Claude should invoke it
-- [ ] Skill body uses numbered steps
-- [ ] Skill body encodes decisions and conventions (not just vague advice)
-- [ ] Skill ends with a verification step
-- [ ] Test with `claude --plugin-dir plugins/<plugin-name> /<plugin-name>:<skill-name>`
-- [ ] Add row to that plugin's `README.md` skills table
-- [ ] Add `evals/evals.json` under the skill's own directory — see
-      [Testing skills (evals)](#testing-skills-evals)
-- [ ] Bump `PATCH`/`MINOR` version in that plugin's `plugin.json` as appropriate
+See the `add-plugin-skill` skill for the step-by-step procedure and checklist.
 
 ### Testing skills (evals)
 
@@ -195,12 +123,7 @@ automatically on every PR.
 
 ### Adding a new plugin to this repo
 
-1. Create `plugins/<new-name>/.claude-plugin/plugin.json`, `plugins/<new-name>/skills/`,
-   `plugins/<new-name>/README.md`, and `plugins/<new-name>/CLAUDE.md`.
-2. Add an entry for it to the root `.claude-plugin/marketplace.json` (see below).
-3. If it needs npm tooling, add its path to the root `package.json`'s `workspaces` array and give
-   it its own `package.json`.
-4. Add a row for it to the root `README.md`'s plugin index.
+See the `add-new-plugin` skill for the step-by-step procedure.
 
 ---
 
@@ -269,21 +192,6 @@ Reference: [Version management](https://code.claude.com/docs/en/plugins-referenc
 
 Reference: [Plugin marketplaces](https://code.claude.com/docs/en/plugin-marketplaces)
 
-```json
-{
-  "name": "elitebusinesssolutions",
-  "owner": { "name": "elitebusinesssolutions" },
-  "plugins": [
-    {
-      "name": "elite-dev",
-      "source": "./plugins/elite-dev",
-      "description": "..."
-    },
-    { "name": "elite-ts", "source": "./plugins/elite-ts", "description": "..." }
-  ]
-}
-```
-
 Rules:
 
 - `source` is a relative path (`./plugins/<name>`) into this same repo, not a separate GitHub
@@ -298,26 +206,12 @@ Rules:
 ## npm workspaces
 
 `elite-ts` carries its own `package.json`, tests, and lint config; the root `package.json` wires
-it into one npm workspace so it can be run from the repo root:
+it into one npm workspace so it can be run from the repo root with the standard `--workspaces`
+flag. `elite-dev` has no npm tooling and is intentionally left out of `workspaces` — do not add an
+empty `package.json` for a plugin that doesn't need one.
 
-```bash
-npm install
-npm test --workspaces --if-present
-npm run lint --workspaces --if-present
-```
-
-`elite-dev` has no npm tooling and is intentionally left out of `workspaces` — do not add an empty
-`package.json` for a plugin that doesn't need one.
-
-The root `package.json` also carries scripts that aren't per-workspace, since they cover every
-plugin at once:
-
-```bash
-npm run validate-skill-evals -- origin/main   # scripts/validate-skill-evals.js, see docs/skill-evals.md
-npm run format:root                           # prettier over root + docs/ + plugins/elite-dev
-npm run format:check:root
-npm test                                       # runs root tests/*.test.js, then --workspaces
-```
+The root `package.json` also carries repo-wide scripts that aren't per-workspace (a shared eval
+validator, root-level Prettier commands) — see its `scripts` object for the exact commands.
 
 ---
 
