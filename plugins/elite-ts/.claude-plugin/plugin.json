@@ -1,7 +1,7 @@
 {
   "name": "elite-ts",
   "description": "Shared lint/format hooks and formatting-setup/verification skills for TypeScript projects",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "repository": "https://github.com/elitebusinesssolutions/claude-dev-plugin",
   "author": {
     "name": "Elite Business Solutions",

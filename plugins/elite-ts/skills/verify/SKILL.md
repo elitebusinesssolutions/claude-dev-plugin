@@ -12,10 +12,16 @@ Check the project root for a lockfile, in this order, and use the matching packa
 | Lockfile present            | Package manager | Run a script      | Exec a local binary |
 | --------------------------- | --------------- | ----------------- | ------------------- |
 | `pnpm-lock.yaml`            | pnpm            | `pnpm run <name>` | `pnpm exec <bin>`   |
-| `yarn.lock`                 | Yarn            | `yarn <name>`     | `yarn <bin>`        |
+| `yarn.lock`                 | Yarn            | `yarn <name>`     | `yarn run -B <bin>` (Yarn Berry) or `yarn <bin>` (Yarn Classic) |
 | `package-lock.json` or none | npm             | `npm run <name>`  | `npx <bin>`         |
 
 The steps below show the npm form as the concrete example — substitute the detected manager's equivalent everywhere an `npm run` or `npx` command appears. No lockfile and no other signal (e.g. `package.json`'s `packageManager` field) defaults to npm.
+
+For Yarn, check `yarn --version` first. Yarn Berry (2+) supports `yarn run -B <bin>`
+(`--binaries-only`), which skips any same-named `package.json` script and execs only the local
+binary. Yarn Classic (1.x) has no such flag — plain `yarn <bin>` there runs a same-named script
+instead of the binary if one exists, so check `package.json`'s `scripts` for a name collision
+before relying on it.
 
 ## 2. Determine what applies
 

@@ -61,6 +61,12 @@ If neither exists, create a flat config baseline appropriate to the project:
   ]);
   ```
 
+  `defineConfig` is exported from `eslint/config` only in ESLint 9.22.0 and later. After step 2's
+  install, check the resolved `eslint` version (`npm ls eslint` or the `package.json` devDependency
+  it wrote). If it is below 9.22.0, import `defineConfig` and `globalIgnores` from
+  `@eslint/config-helpers` instead of `eslint/config` — same function, same call shape, works on
+  any flat-config-capable 9.x release.
+
   `js.configs.recommended` enables `no-undef` but does not define any runtime globals on its own — without the `languageOptions` block above, ordinary references like `console` or `process` are flagged as undefined. Swap `globals.node` for `globals.browser` (or another entry from the `globals` package) if this project doesn't run on Node.
 
   Add `import tseslint from "typescript-eslint";` and spread `...tseslint.configs.recommended` into the array if TypeScript is present.
@@ -127,6 +133,13 @@ Create `.vscode/settings.json` if it does not exist:
 
 If you are using a flat config (`eslint.config.*`), add `"eslint.useFlatConfig": true`. If you are using a legacy `.eslintrc.*`, omit it (or set it to `false`).
 
+If `.vscode/settings.json` already exists, read it and merge these keys into the existing JSON —
+add or overwrite only `editor.defaultFormatter`, `editor.formatOnSave`,
+`editor.codeActionsOnSave`, and (when applicable) `eslint.useFlatConfig`, while preserving every
+other key already present. Do not overwrite the whole file — this step exists to turn on
+format-on-save, so skipping the merge or blanking unrelated settings both leave the project worse
+off than before this step ran.
+
 Also create `.vscode/extensions.json` (or merge into it) recommending `dbaeumer.vscode-eslint` and `esbenp.prettier-vscode` — without the ESLint extension installed, `editor.codeActionsOnSave` has nothing to trigger and saves will silently only run Prettier.
 
 ## 8. Add Claude Code post-edit hook
@@ -136,9 +149,8 @@ If this is a project using the elite-ts plugin, PostToolUse formatting is alread
 For a project repo without this plugin, copy the hook script and its shared helper and wire it up. First, create `.claude/hooks/lib/output.js` with this content:
 
 ```js
-// Shared helper for hook scripts (format.js): turns a
-// spawned process's stdout/stderr into a single truncated string suitable
-// for a failure message.
+// Shared helper for format.js: turns a spawned process's stdout/stderr into
+// a single truncated string suitable for a failure message.
 //
 // stdout and stderr are joined with an explicit "\n" separator before being
 // trimmed/split — without that separator, a stdout chunk that doesn't already
@@ -184,13 +196,18 @@ try {
   if (!f) process.exit(0);
 
   const cwd = process.cwd();
+  // Search from the edited file's own directory, not the session's cwd — a
+  // monorepo sub-package can carry its own eslint/prettier install even when
+  // Claude's session cwd is elsewhere (e.g. the workspace root).
+  const searchStart = path.dirname(path.resolve(cwd, f));
   const messages = [];
 
   // In an npm/yarn/pnpm workspace, ESLint/Prettier are typically hoisted to the
   // workspace root's node_modules only — a sub-package's own node_modules
-  // won't have them. Walk up from cwd (mirroring Node's own module resolution
-  // and how npx locates binaries) so the gates below don't misdetect "not
-  // installed" just because cwd is a sub-package directory.
+  // won't have them. Walk up from the edited file's directory (mirroring
+  // Node's own module resolution and how npx locates binaries) so the gates
+  // below find a hoisted root install and a sub-package's own local install
+  // alike.
   //
   // Resolve the package's own bin *script* via its package.json "bin" field,
   // not the node_modules/.bin/<name> shim — on Windows that shim is a `.cmd`
@@ -199,7 +216,7 @@ try {
   // metacharacter parsing. Spawning the resolved JS script with node itself
   // needs no shell, and no shell-metacharacter parsing of `f`, on any platform.
   function findBinScript(name) {
-    let dir = cwd;
+    let dir = searchStart;
     for (;;) {
       const pkgDir = path.join(dir, "node_modules", name);
       const pkgJsonPath = path.join(pkgDir, "package.json");

@@ -25,27 +25,40 @@ function writeStubPackage(pkgDir, name, stubJsPath) {
 }
 
 // format.js only invokes eslint/prettier if node_modules/<tool>/package.json
-// resolves to a bin script in cwd (or a parent of cwd — see the monorepo
-// fixture below) — this fixture simulates either or both being a project
-// devDependency. When `nested` is set, node_modules lives at the fixture root
-// but `fn` is invoked with a sub-package directory (no node_modules of its
-// own) as cwd, simulating an npm/yarn/pnpm workspace where eslint/prettier
-// are hoisted to the root. `brokenPrettier` simulates a package.json whose
+// resolves to a bin script starting from the edited file's own directory (or
+// a parent of it — see the monorepo fixtures below) — this fixture simulates
+// either or both being a project devDependency. When `nested` is set,
+// node_modules lives at the fixture root but `fn` is invoked with a
+// sub-package directory (no node_modules of its own) as cwd, simulating an
+// npm/yarn/pnpm workspace where eslint/prettier are hoisted to the root. When
+// `subPackageLocal` is set, node_modules instead lives only under
+// `packages/sub` and `fn` is invoked with the fixture root as cwd, simulating
+// a sub-package with its own local install while Claude's session cwd is
+// elsewhere in the workspace. `brokenPrettier` simulates a package.json whose
 // bin field points at a missing script (e.g. a corrupt install) instead of a
 // working stub.
 function withProject(
-  { eslint = false, prettier = false, brokenPrettier = false, nested = false } = {},
+  {
+    eslint = false,
+    prettier = false,
+    brokenPrettier = false,
+    nested = false,
+    subPackageLocal = false
+  } = {},
   fn
 ) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "elite-ts-hook-test-"));
-  const nodeModules = path.join(dir, "node_modules");
-  fs.mkdirSync(nodeModules, { recursive: true });
-  if (eslint) writeStubPackage(path.join(nodeModules, "eslint"), "eslint", STUB_ESLINT_JS);
-  if (prettier) writeStubPackage(path.join(nodeModules, "prettier"), "prettier", STUB_PRETTIER_JS);
+  const nodeModulesRoot = subPackageLocal
+    ? path.join(dir, "packages", "sub", "node_modules")
+    : path.join(dir, "node_modules");
+  fs.mkdirSync(nodeModulesRoot, { recursive: true });
+  if (eslint) writeStubPackage(path.join(nodeModulesRoot, "eslint"), "eslint", STUB_ESLINT_JS);
+  if (prettier)
+    writeStubPackage(path.join(nodeModulesRoot, "prettier"), "prettier", STUB_PRETTIER_JS);
   if (brokenPrettier) {
     // package.json exists and names a bin script, but the script itself was
     // never written — simulates a corrupt/incomplete install.
-    const pkgDir = path.join(nodeModules, "prettier");
+    const pkgDir = path.join(nodeModulesRoot, "prettier");
     fs.mkdirSync(pkgDir, { recursive: true });
     fs.writeFileSync(
       path.join(pkgDir, "package.json"),
@@ -296,6 +309,30 @@ test("monorepo: prettier hoisted to workspace root is still found from a nested 
     );
     const out = JSON.parse(r.stdout);
     assert.match(out.hookSpecificOutput.additionalContext, /Prettier error on foo\.ts/);
+  });
+});
+
+// Inverse of the hoisted-to-root case above: a sub-package carries its OWN
+// eslint/prettier install (not hoisted to the workspace root) while Claude's
+// session cwd is the workspace root. The search must start from the edited
+// file's own directory, not the session cwd, or it walks straight up from the
+// root and never finds the sub-package's local install.
+test("monorepo: sub-package's own local install is found even when session cwd is the workspace root", () => {
+  withProject({ eslint: true, prettier: true, subPackageLocal: true }, (cwd) => {
+    const r = run(
+      { tool_name: "Write", tool_input: { file_path: "packages/sub/src/foo.ts" } },
+      {
+        STUB_ESLINT_STATUS: "2",
+        STUB_ESLINT_STDERR: "ESLint couldn't find a configuration file",
+        STUB_PRETTIER_STATUS: "0"
+      },
+      cwd
+    );
+    // If the search had started at session cwd (the workspace root, which has
+    // no node_modules of its own here), eslint would never have been found or
+    // invoked, so there'd be no output here.
+    const out = JSON.parse(r.stdout);
+    assert.match(out.hookSpecificOutput.additionalContext, /ESLint did not run on foo\.ts/);
   });
 });
 

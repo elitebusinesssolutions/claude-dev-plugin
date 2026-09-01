@@ -10,13 +10,18 @@ try {
   if (!f) process.exit(0);
 
   const cwd = process.cwd();
+  // Search from the edited file's own directory, not the session's cwd — a
+  // monorepo sub-package can carry its own eslint/prettier install even when
+  // Claude's session cwd is elsewhere (e.g. the workspace root).
+  const searchStart = path.dirname(path.resolve(cwd, f));
   const messages = [];
 
   // In an npm/yarn/pnpm workspace, ESLint/Prettier are typically hoisted to the
   // workspace root's node_modules only — a sub-package's own node_modules
-  // won't have them. Walk up from cwd (mirroring Node's own module resolution
-  // and how npx locates binaries) so the gates below don't misdetect "not
-  // installed" just because cwd is a sub-package directory.
+  // won't have them. Walk up from the edited file's directory (mirroring
+  // Node's own module resolution and how npx locates binaries) so the gates
+  // below find a hoisted root install and a sub-package's own local install
+  // alike.
   //
   // Resolve the package's own bin *script* via its package.json "bin" field,
   // not the node_modules/.bin/<name> shim — on Windows that shim is a `.cmd`
@@ -25,7 +30,7 @@ try {
   // metacharacter parsing. Spawning the resolved JS script with node itself
   // needs no shell, and no shell-metacharacter parsing of `f`, on any platform.
   function findBinScript(name) {
-    let dir = cwd;
+    let dir = searchStart;
     for (;;) {
       const pkgDir = path.join(dir, "node_modules", name);
       const pkgJsonPath = path.join(pkgDir, "package.json");
