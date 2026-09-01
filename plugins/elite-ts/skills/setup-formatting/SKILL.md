@@ -55,7 +55,10 @@ If neither exists, create a flat config baseline appropriate to the project:
   import globals from "globals";
   import { defineConfig } from "eslint/config";
 
-  export default defineConfig([js.configs.recommended, { languageOptions: { globals: globals.node } }]);
+  export default defineConfig([
+    js.configs.recommended,
+    { languageOptions: { globals: globals.node } }
+  ]);
   ```
 
   `js.configs.recommended` enables `no-undef` but does not define any runtime globals on its own — without the `languageOptions` block above, ordinary references like `console` or `process` are flagged as undefined. Swap `globals.node` for `globals.browser` (or another entry from the `globals` package) if this project doesn't run on Node.
@@ -203,7 +206,9 @@ try {
       if (fs.existsSync(pkgJsonPath)) {
         const pkg = JSON.parse(fs.readFileSync(pkgJsonPath, "utf8"));
         const bin =
-          typeof pkg.bin === "string" ? pkg.bin : (pkg.bin?.[name] ?? Object.values(pkg.bin ?? {})[0]);
+          typeof pkg.bin === "string"
+            ? pkg.bin
+            : (pkg.bin?.[name] ?? Object.values(pkg.bin ?? {})[0]);
         if (bin) return path.join(pkgDir, bin);
       }
       const parent = path.dirname(dir);

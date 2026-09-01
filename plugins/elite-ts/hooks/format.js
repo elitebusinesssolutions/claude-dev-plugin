@@ -32,7 +32,9 @@ try {
       if (fs.existsSync(pkgJsonPath)) {
         const pkg = JSON.parse(fs.readFileSync(pkgJsonPath, "utf8"));
         const bin =
-          typeof pkg.bin === "string" ? pkg.bin : (pkg.bin?.[name] ?? Object.values(pkg.bin ?? {})[0]);
+          typeof pkg.bin === "string"
+            ? pkg.bin
+            : (pkg.bin?.[name] ?? Object.values(pkg.bin ?? {})[0]);
         if (bin) return path.join(pkgDir, bin);
       }
       const parent = path.dirname(dir);

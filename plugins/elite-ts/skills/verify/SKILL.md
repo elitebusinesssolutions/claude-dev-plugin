@@ -10,10 +10,10 @@ Verify that recent changes to this project are actually correct — don't just a
 Check the project root for a lockfile, in this order, and use the matching package manager for every run/exec command below:
 
 | Lockfile present            | Package manager | Run a script      | Exec a local binary |
-| ---------------------------- | --------------- | ----------------- | -------------------- |
-| `pnpm-lock.yaml`             | pnpm            | `pnpm run <name>` | `pnpm exec <bin>`    |
-| `yarn.lock`                  | Yarn            | `yarn <name>`     | `yarn <bin>`         |
-| `package-lock.json` or none  | npm             | `npm run <name>`  | `npx <bin>`          |
+| --------------------------- | --------------- | ----------------- | ------------------- |
+| `pnpm-lock.yaml`            | pnpm            | `pnpm run <name>` | `pnpm exec <bin>`   |
+| `yarn.lock`                 | Yarn            | `yarn <name>`     | `yarn <bin>`        |
+| `package-lock.json` or none | npm             | `npm run <name>`  | `npx <bin>`         |
 
 The steps below show the npm form as the concrete example — substitute the detected manager's equivalent everywhere an `npm run` or `npx` command appears. No lockfile and no other signal (e.g. `package.json`'s `packageManager` field) defaults to npm.
 
