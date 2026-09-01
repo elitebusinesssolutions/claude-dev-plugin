@@ -1,0 +1,30 @@
+{
+  "skill_name": "setup-worktree",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Set up a worktree for issue 21, branch feat/21-product-entities, based on main. Here is the current checkout state: evals/files/repo-no-worktree/repo-state.md.",
+      "expected_output": "Creates the worktree under .claude/worktrees/feat-21-product-entities, copies untracked local files into it, installs dependencies for the detected stack, and notes that .gitignore is missing a .claude/worktrees/ entry.",
+      "files": ["evals/files/repo-no-worktree/repo-state.md"],
+      "expectations": [
+        "Uses `git worktree add .claude/worktrees/feat-21-product-entities -b feat/21-product-entities main`, flattening the `/` in the branch name to `-`",
+        "Copies `.claude/settings.local.json` into the new worktree",
+        "Copies `.env.local` into the new worktree, preserving its relative path",
+        "Runs `npm install` (not `dotnet restore`) in the new worktree, since package.json marks this a Node/TypeScript project",
+        "Notes that `.gitignore` needs a `.claude/worktrees/` entry, since it does not have one yet",
+        "Does not ask again whether to create a worktree, since the developer already explicitly asked for one"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Here is the current checkout state: evals/files/repo-with-existing-worktree/repo-state.md. Clean up the worktree for the merged PR.",
+      "expected_output": "Removes the feat-9-old-thing worktree from the main checkout and confirms the cleanup, without creating any new worktree.",
+      "files": ["evals/files/repo-with-existing-worktree/repo-state.md"],
+      "expectations": [
+        "Uses `git worktree remove .claude/worktrees/feat-9-old-thing`, run from the main checkout",
+        "Does not attempt to create a new worktree, since this is a cleanup request",
+        "Confirms the removal, e.g. via `git worktree list` or `git worktree prune`"
+      ]
+    }
+  ]
+}

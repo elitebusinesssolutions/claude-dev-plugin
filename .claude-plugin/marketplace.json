@@ -1,15 +1,17 @@
 {
-  "name": "elite-dev-marketplace",
-  "description": "Generic dev-workflow skills for git worktrees, GitHub issues, and pull requests",
+  "name": "elitebusinesssolutions",
+  "description": "Shared Claude Code plugins for Elite Business Solutions projects",
   "owner": { "name": "elitebusinesssolutions" },
   "plugins": [
     {
       "name": "elite-dev",
       "description": "Generic dev-workflow skills for git worktrees, GitHub issues, and pull requests",
-      "source": {
-        "source": "github",
-        "repo": "elitebusinesssolutions/claude-dev-plugin"
-      }
+      "source": "./plugins/elite-dev"
+    },
+    {
+      "name": "elite-ts",
+      "description": "Shared lint/format hooks and formatting-setup/verification skills for TypeScript projects",
+      "source": "./plugins/elite-ts"
     }
   ]
 }

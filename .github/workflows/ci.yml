@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - run: npm ci
+      - run: npm run lint --workspaces --if-present
+      - run: npm test
+      - run: npm run validate-skill-evals -- origin/${{ github.base_ref }}
+
+      - run: |
+          curl -fsSL https://claude.ai/install.sh | bash
+          export PATH="$HOME/.local/bin:$PATH"
+          claude plugin validate .
+          claude plugin validate plugins/elite-dev
+          claude plugin validate plugins/elite-ts
+        if: matrix.os == 'ubuntu-latest'
+        name: claude plugin validate (ubuntu)

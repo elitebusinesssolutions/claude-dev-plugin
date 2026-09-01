@@ -1,0 +1,40 @@
+{
+  "skill_name": "start-issue",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Let's start issue 42. Here is this repo's CLAUDE.md: evals/files/repo-with-board/CLAUDE.md. Saved output of `gh issue view 42 --json assignees`: []. Mark the issue started.",
+      "expected_output": "Assigns the issue to @me and sets the board Status field to the In Progress option, using the exact IDs recorded in CLAUDE.md.",
+      "files": ["evals/files/repo-with-board/CLAUDE.md"],
+      "expectations": [
+        "Runs (or states it will run) `gh issue edit 42 --add-assignee \"@me\"`",
+        "Uses the exact project/field/option IDs given in CLAUDE.md (PVT_kwDOAtest1, PVTSSF_test2, 47fc9ee4) rather than inventing new ones",
+        "Uses the recorded project owner (elitebusinesssolutions) and project number (7) for the `gh project item-list` call that finds the board item, rather than inventing or omitting them",
+        "Sets the Status field to the In Progress option (47fc9ee4), not the Todo or Done option",
+        "States it will verify the result with a follow-up `gh issue view` call"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Let's start issue 7. Here is this repo's CLAUDE.md: evals/files/repo-without-board/CLAUDE.md. Saved output of `gh issue view 7 --json assignees`: []. Mark the issue started.",
+      "expected_output": "Assigns the issue to @me. Does not attempt any Projects-board step, and does not invent board IDs, since this repo has no board.",
+      "files": ["evals/files/repo-without-board/CLAUDE.md"],
+      "expectations": [
+        "Runs (or states it will run) `gh issue edit 7 --add-assignee \"@me\"`",
+        "Does not invent or guess a project/field/option ID for a board step",
+        "States explicitly that this repo has no Projects board, so the board-status step is skipped entirely"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Let's start issue 88. Here is this repo's CLAUDE.md: evals/files/repo-with-board/CLAUDE.md. Saved output of `gh issue view 88 --json assignees`: [{\"login\": \"another-dev\"}]. Mark the issue started.",
+      "expected_output": "Stops before assigning, states the issue is already assigned to another-dev, and asks the developer whether to add themselves as an additional assignee rather than doing it unasked.",
+      "files": ["evals/files/repo-with-board/CLAUDE.md"],
+      "expectations": [
+        "Does not run `gh issue edit --add-assignee \"@me\"` without asking first",
+        "States plainly that issue 88 is already assigned to another-dev",
+        "Asks the developer whether to proceed (e.g. add as an additional assignee) rather than silently assigning"
+      ]
+    }
+  ]
+}

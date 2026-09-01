@@ -1,0 +1,45 @@
+{
+  "skill_name": "verify",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Verify this project is ready to ship. It has tsconfig.json, eslint.config.mjs, prettier as a devDependency, and a `test` script in package.json.",
+      "expected_output": "Runs lint, format, type-check, and test in order, auto-fixing what it can, and reports a plain verdict on whether the project is clean.",
+      "files": [],
+      "expectations": [
+        "Runs `npx eslint --fix .` since a flat config is present (not the legacy-config version check)",
+        "Runs the project's `format` script or `npx prettier --write --ignore-unknown .`",
+        "Runs `npx tsc --noEmit` since tsconfig.json is present",
+        "Runs `npm test` since a test script is present",
+        "States a plain verdict on whether the project is clean, not just a raw command output dump"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Verify this project — its full contents are the files given to you. Inspect them yourself to determine what applies; do not assume anything beyond what the files show.",
+      "expected_output": "Reads package.json and the file listing itself, confirms none of tsconfig.json/an ESLint config/a prettier devDependency/a test script are present, and says plainly that none of the four checks apply — without blindly running `npx eslint`/`npx prettier`/`npx tsc` and letting them fetch an unpinned package.",
+      "files": [
+        "evals/files/plain-js-project/package.json",
+        "evals/files/plain-js-project/index.js"
+      ],
+      "expectations": [
+        "Reads package.json itself to check for a test script, an eslintConfig key, and a prettier devDependency/config, rather than taking the prompt's word for it",
+        "Confirms no tsconfig.json and no ESLint config file are present among the given files",
+        "Does not run eslint, prettier, tsc, or npm test, and does not let `npx` fetch an unpinned package to check for one",
+        "States plainly that there is nothing to verify, rather than reporting an error or a failed check"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Verify this project. It has a legacy .eslintrc.json (no flat eslint.config.*), and package.json lists `eslint: ^10.2.0` as a devDependency.",
+      "expected_output": "Detects that ESLint 10 has removed legacy-config support entirely (not merely stopped auto-loading it, as in v9) and reports the mismatch plainly instead of running ESLint and treating its output as a real lint result.",
+      "files": [],
+      "expectations": [
+        "Checks the installed ESLint version before running it, since the config is legacy",
+        "States specifically that ESLint 10 removes legacy config support entirely, not just that v9-style auto-loading is disabled",
+        "Reports the legacy-config/ESLint-10 mismatch plainly instead of running `eslint` against the legacy config",
+        "Does not report ESLint's actual exit/output as if it were a normal lint result"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "skill_name": "review-fix-pr-comments",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Review the unresolved comments on PR 153. Saved output of the reviewThreads GraphQL query: evals/files/pr-153-comments/review-threads.json. Current content of src/services/orderService.ts: evals/files/pr-153-comments/orderService.ts. Present the findings for me to triage.",
+      "expected_output": "Two findings in prose, each with file:line/summary/failure-scenario/fix, separated by a --- rule: thread A confirmed as a real defect, correcting the comment's claim that it throws — orderTotal actually returns Infinity or NaN for a zero-count item — with a guard proposed for non-finite results. Thread B pushed back on since applyDiscount already null-checks customer. Ends by asking which findings to act on, without editing, committing, or replying to GitHub.",
+      "files": [
+        "evals/files/pr-153-comments/review-threads.json",
+        "evals/files/pr-153-comments/orderService.ts"
+      ],
+      "expectations": [
+        "Presents both threads as separate prose findings, each with a file:line header, summary, failure scenario, and fix suggestion, separated by --- rules",
+        "Confirms thread A's division-by-zero defect is still present in the current orderTotal code, not just the stale diff comment",
+        "States the actual failure mechanism (orderTotal returns Infinity or NaN for a zero-count item) rather than repeating the comment's incorrect claim that it throws, and proposes a guard for non-finite results",
+        "States thread B's finding is stale or incorrect, explaining that applyDiscount already returns early when customer is null",
+        "Ends by asking the developer which findings to act on",
+        "Does not edit any files, commit, or reply to GitHub in the same turn"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Review the unresolved comments on PR 204. Saved output of the reviewThreads GraphQL query: evals/files/pr-204-stale-comment/review-threads.json. Current content of src/utils/parseDate.ts: evals/files/pr-204-stale-comment/parseDate.ts. Present the findings for me to triage.",
+      "expected_output": "States plainly that the comment describes a function (parseLegacyDateFormat) that no longer exists in the current file, still surfaces it as an item needing a disposition rather than dropping it, and ends the same triage checkpoint.",
+      "files": [
+        "evals/files/pr-204-stale-comment/review-threads.json",
+        "evals/files/pr-204-stale-comment/parseDate.ts"
+      ],
+      "expectations": [
+        "States that parseLegacyDateFormat does not exist in the current parseDate.ts, rather than inventing a fix for code that isn't there",
+        "Does not silently drop the finding — still presents it as an item that needs a disposition",
+        "Ends by asking the developer how to proceed, without editing, committing, or replying to GitHub"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Review the unresolved comments on PR 301. Saved output of the reviewThreads GraphQL query: evals/files/pr-301-suppressed-comments/review-threads.json. Saved output of `gh api repos/<owner>/<repo>/pulls/301/reviews`: evals/files/pr-301-suppressed-comments/reviews.json. Current content of src/services/authService.ts: evals/files/pr-301-suppressed-comments/authService.ts. Present the findings for me to triage.",
+      "expected_output": "Notices reviewThreads is empty but still checks the reviews list for a suppressed-comments block, finds one with two items, verifies each against the current file, and presents one as a confirmed defect (isTokenExpired compares seconds to milliseconds) and one as stale (refreshToken already clears the old token first).",
+      "files": [
+        "evals/files/pr-301-suppressed-comments/review-threads.json",
+        "evals/files/pr-301-suppressed-comments/reviews.json",
+        "evals/files/pr-301-suppressed-comments/authService.ts"
+      ],
+      "expectations": [
+        "Does not stop at the empty reviewThreads result and report there is nothing to review — also inspects the reviews.json content for a suppressed-comments block",
+        "Identifies the <details><summary>Suppressed comments</summary> block in the review body and treats each of its two bulleted items as its own candidate finding",
+        "Confirms the isTokenExpired finding is real: expiresAt is compared directly against Date.now(), a seconds-vs-milliseconds unit mismatch",
+        "States the refreshToken finding is stale, since tokenStore.delete(oldToken) already runs before the new token is stored",
+        "Ends by asking the developer which findings to act on, without editing, committing, or replying to GitHub in the same turn"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+[
+  {
+    "id": "PRRT_thread_A",
+    "isResolved": false,
+    "comments": {
+      "nodes": [
+        {
+          "databaseId": 9001,
+          "path": "src/services/orderService.ts",
+          "line": 42,
+          "body": "orderTotal divides by item.count without checking it's non-zero — a zero-count line item throws a division-by-zero here.",
+          "author": { "login": "github-actions[bot]" },
+          "pullRequestReview": { "databaseId": 501 }
+        }
+      ]
+    }
+  },
+  {
+    "id": "PRRT_thread_B",
+    "isResolved": false,
+    "comments": {
+      "nodes": [
+        {
+          "databaseId": 9002,
+          "path": "src/services/orderService.ts",
+          "line": 58,
+          "body": "applyDiscount doesn't guard against a null customer — this will throw if customer is missing.",
+          "author": { "login": "github-actions[bot]" },
+          "pullRequestReview": { "databaseId": 501 }
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "PRRT_thread_C",
+    "isResolved": false,
+    "comments": {
+      "nodes": [
+        {
+          "databaseId": 9101,
+          "path": "src/utils/parseDate.ts",
+          "line": 15,
+          "body": "parseLegacyDateFormat mutates the input string in place instead of returning a new one — this breaks any caller holding a reference to the original string.",
+          "author": { "login": "github-actions[bot]" },
+          "pullRequestReview": { "databaseId": 601 }
+        }
+      ]
+    }
+  }
+]
