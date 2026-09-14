@@ -9,7 +9,7 @@ TARGET="$1"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 mkdir -p "$TARGET/origin-bare"
-git init --bare -q "$TARGET/origin-bare"
+git init --bare -q -b main "$TARGET/origin-bare"
 
 git clone -q "$TARGET/origin-bare" "$TARGET/work"
 mkdir -p "$TARGET/work/src/services"
