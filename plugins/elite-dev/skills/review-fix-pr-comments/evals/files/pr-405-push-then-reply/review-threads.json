@@ -1,0 +1,19 @@
+[
+  {
+    "id": "PRRT_thread_A",
+    "isResolved": false,
+    "comments": {
+      "nodes": [
+        {
+          "databaseId": 9401,
+          "path": "src/services/orderService.ts",
+          "line": 4,
+          "originalLine": 4,
+          "body": "orderTotal divides by item.count without checking it's non-zero — a zero-count line item throws a division-by-zero here.",
+          "author": { "login": "github-actions" },
+          "pullRequestReview": { "databaseId": 55401 }
+        }
+      ]
+    }
+  }
+]
