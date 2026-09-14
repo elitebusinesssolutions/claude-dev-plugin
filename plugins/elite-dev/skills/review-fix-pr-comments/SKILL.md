@@ -163,7 +163,7 @@ If a finding is arguably correct but the fix isn't obvious (e.g. it depends on w
 existing conventions is authoritative, or touches a decision outside the diff), say so explicitly
 and ask rather than picking one — same as any other judgment call mid-execution.
 
-## 4. Apply only the agreed fixes
+## 4. Apply the agreed fixes, then stop
 
 Standard edit workflow: make the changes, then run this project's actual verify step before
 considering anything done. Check `package.json` scripts (`npm run lint`/`build`/`test`) or the
@@ -177,7 +177,10 @@ If a finding implies a decision that lives outside the diff (e.g. a contract mis
 code and a GitHub issue's spec text), fixing it may mean editing that other thing (the issue body)
 rather than the code — confirm which side is authoritative with the user before doing either.
 
-## 5. Commit and push — only if asked
+**Stop here.** Report what got fixed, then ask whether to commit and push. Do not run step 5 in
+the same turn — same triage checkpoint as step 3, not an assumed next action.
+
+## 5. Commit and push — only once approved
 
 Follow the repo's standing commit-message and git-safety conventions (Conventional Commits,
 create a new commit rather than amending, never force-push). Don't push without being told to,
@@ -204,37 +207,26 @@ reviewer, if human) checks to see whether the fix actually addresses what was ra
 the developer chose not to fix, reply with the reason instead (scope, disagreement, tracked
 elsewhere) rather than silently leaving it.
 
-## 7. Resolve the thread
+## 7. Resolve the thread, then confirm
 
 Match each replied-to comment back to its thread using the `databaseId` values gathered in step 1
 (check every comment in the thread's array, not just the first — a thread already carrying prior
-replies would otherwise fail to match), then resolve:
+replies would otherwise fail to match). Only resolve threads whose finding was actually addressed
+(fixed, or explained why not) in this pass — leave anything the developer didn't sign off on
+unresolved, still open for a future round.
 
-```bash
-gh api graphql -f query='mutation($id: ID!) { resolveReviewThread(input: {threadId: $id}) { thread { isResolved } } }' -f id="<thread-node-id>"
-```
-
-Only resolve threads whose finding was actually addressed (fixed, or explained why not) in this
-pass — leave anything the developer didn't sign off on unresolved, still open for a future round.
-
-## Verify before reporting done
-
-The step-1 query filters to `isResolved == false`, so re-running it unmodified can never show a
-just-resolved thread as `isResolved: true` — it filters that thread out instead. `gh pr view --json
-reviews,comments` doesn't expose thread-resolution state at all (that's a `reviewThreads`-only,
-GraphQL-only field). Neither confirms what you actually need to confirm.
-
-Instead, query the specific thread IDs you resolved, with no `isResolved` filter, and check each one
-individually:
+Batch every thread into one mutation call, one alias per thread ID, and read `isResolved` straight
+from the mutation's own response — a separate follow-up query cannot tell you anything this
+response does not already carry:
 
 ```bash
 gh api graphql -f query='
-query($ids: [ID!]!) {
-  nodes(ids: $ids) {
-    ... on PullRequestReviewThread { id isResolved }
-  }
-}' -f 'ids[]=<thread-node-id-1>' -f 'ids[]=<thread-node-id-2>'
+mutation($id1: ID!, $id2: ID!) {
+  t1: resolveReviewThread(input: {threadId: $id1}) { thread { id isResolved } }
+  t2: resolveReviewThread(input: {threadId: $id2}) { thread { id isResolved } }
+}' -f id1="<thread-node-id-1>" -f id2="<thread-node-id-2>"
 ```
 
-Confirm every ID you meant to resolve shows `isResolved: true` — a mutation typo or a mismatched
-thread ID otherwise fails silently into "nothing happened" rather than an obvious error.
+Add one aliased entry per additional thread. Confirm every ID you meant to resolve shows
+`isResolved: true` in this same response — a mutation typo or a mismatched thread ID otherwise
+fails silently into "nothing happened" rather than an obvious error.

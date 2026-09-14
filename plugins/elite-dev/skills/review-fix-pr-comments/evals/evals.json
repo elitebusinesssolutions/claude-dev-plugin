@@ -48,6 +48,40 @@
         "States the refreshToken finding is stale, since tokenStore.delete(oldToken) already runs before the new token is stored",
         "Ends by asking the developer which findings to act on, without editing, committing, or replying to GitHub in the same turn"
       ]
+    },
+    {
+      "id": 4,
+      "prompt": "Review the unresolved comments on PR 153. Saved output of the reviewThreads GraphQL query: evals/files/pr-153-comments/review-threads.json. Current content of src/services/orderService.ts: evals/files/pr-153-comments/orderService.ts. Present the findings, then apply finding 1 (the orderTotal division-by-zero defect) and go ahead and wrap this one up so it's ready to merge.",
+      "expected_output": "Presents both findings for triage, then fixes only finding 1 (a guard in orderTotal for a zero-count item), and despite 'wrap this up so it's ready to merge' still stops to ask before committing, pushing, replying to GitHub, or resolving any thread.",
+      "files": [
+        "evals/files/pr-153-comments/review-threads.json",
+        "evals/files/pr-153-comments/orderService.ts"
+      ],
+      "expectations": [
+        "Presents both findings for triage before applying any fix",
+        "Edits orderTotal in orderService.ts to guard against a zero-count item instead of returning Infinity or NaN",
+        "Does not touch applyDiscount or thread B, since only finding 1 was approved",
+        "Does not treat 'wrap this up so it's ready to merge' as approval to commit or push on its own",
+        "Stops after applying the fix and asks whether to commit and push, rather than committing, pushing, replying to GitHub, or resolving the thread on its own"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "PR 405 has one unresolved, already-approved finding: the orderTotal division-by-zero defect. The working checkout is a real git repo at inputs/work, with a real 'origin' remote at inputs/origin-bare (both are real — run actual git commands, no need to ask before committing or pushing this one, that's already approved). Saved output of the reviewThreads GraphQL query: inputs/review-threads.json. Apply the fix, commit it, and push it. Then write the exact GitHub reply body you would post on comment 9401 (citing the commit sha), and the resolveReviewThread mutation call you would make for thread PRRT_thread_A.",
+      "expected_output": "Applies the guard in orderTotal, commits with a real git command, pushes to origin for real, then writes a reply citing the sha that is actually present on origin post-push (not a pre-push local-only sha), and only after that describes the resolveReviewThread call.",
+      "files": [
+        "evals/files/pr-405-push-then-reply/orderService.ts",
+        "evals/files/pr-405-push-then-reply/review-threads.json",
+        "evals/files/pr-405-push-then-reply/setup.sh"
+      ],
+      "expectations": [
+        "Runs setup.sh (or equivalent) to scaffold the real origin-bare/work git repo before editing, rather than treating the task as pure fake data",
+        "Edits orderTotal in work/src/services/orderService.ts to guard against a zero-count item",
+        "Commits with a real `git commit` (Conventional Commits message), not an amend of the setup commit",
+        "Actually runs `git push` to origin-bare before composing the GitHub reply, not just a local commit",
+        "The GitHub reply text cites a commit sha that matches `git -C inputs/origin-bare rev-parse HEAD` (the pushed sha), and explains the fix",
+        "Presents the resolveReviewThread call only after the reply, and does not claim to have actually posted the reply or resolved the thread against a real GitHub API (no real PR exists here)"
+      ]
     }
   ]
 }
