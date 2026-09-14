@@ -66,16 +66,15 @@
     },
     {
       "id": 5,
-      "prompt": "PR 405 has one unresolved, already-approved finding: the orderTotal division-by-zero defect. The working checkout is a real git repo at inputs/work, with a real 'origin' remote at inputs/origin-bare (both are real — run actual git commands, no need to ask before committing or pushing this one, that's already approved). Saved output of the reviewThreads GraphQL query: inputs/review-threads.json. Apply the fix, commit it, and push it. Then write the exact GitHub reply body you would post on comment 9401 (citing the commit sha), and the resolveReviewThread mutation call you would make for thread PRRT_thread_A.",
-      "expected_output": "Applies the guard in orderTotal, commits with a real git command, pushes to origin for real, then writes a reply citing the sha that is actually present on origin post-push (not a pre-push local-only sha), and only after that describes the resolveReviewThread call.",
+      "prompt": "PR 405 has one unresolved finding: the orderTotal division-by-zero defect. Triage and the fix both happened last turn — the guard is already applied in the working checkout at inputs/work and is still uncommitted. I approve the commit, the push, the reply, and the thread resolve. The checkout is a real git repo with a real 'origin' remote at inputs/origin-bare (both are real — run actual git commands). Saved output of the reviewThreads GraphQL query: inputs/review-threads.json. Commit the fix and push it. Then write the exact GitHub reply body you would post on comment 9401 (citing the commit sha), and the resolveReviewThread mutation call you would make for thread PRRT_thread_A.",
+      "expected_output": "Commits the already-applied guard with a real git command, pushes to origin for real, then writes a reply citing the sha that is actually present on origin post-push (not a pre-push local-only sha), and only after that describes the resolveReviewThread call.",
       "files": [
         "evals/files/pr-405-push-then-reply/orderService.ts",
         "evals/files/pr-405-push-then-reply/review-threads.json",
         "evals/files/pr-405-push-then-reply/setup.sh"
       ],
       "expectations": [
-        "Runs setup.sh (or equivalent) to scaffold the real origin-bare/work git repo before editing, rather than treating the task as pure fake data",
-        "Edits orderTotal in work/src/services/orderService.ts to guard against a zero-count item",
+        "Runs setup.sh (or equivalent) to scaffold the real origin-bare/work git repo, and finds the approved guard already present in work/src/services/orderService.ts as an uncommitted change",
         "Commits with a real `git commit` (Conventional Commits message), not an amend of the setup commit",
         "Actually runs `git push` to origin-bare before composing the GitHub reply, not just a local commit",
         "The GitHub reply text cites a commit sha that matches `git -C inputs/origin-bare rev-parse HEAD` (the pushed sha), and explains the fix",
