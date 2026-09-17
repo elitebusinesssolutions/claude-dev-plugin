@@ -12,7 +12,7 @@
         "evals/files/issue-40-reuse/src/features/invoice/InvoicePage.tsx"
       ],
       "expectations": [
-        "Cites src/utils/formatCurrency.ts by path as the existing helper that covers the formatting work",
+        "Cites the existing helper as a path:line citation, for example src/utils/formatCurrency.ts:7, not a bare file path without a line number",
         "Does not propose a new currency formatting utility, helper, or component",
         "Names the file to change as the full repo-relative path src/features/invoice/InvoicePage.tsx, not a bare basename such as InvoicePage.tsx",
         "States that the currency code comes from the invoice, not a hardcoded symbol, reflecting the issue comment",
@@ -43,7 +43,7 @@
         "evals/files/issue-42-dotnet/src/Services/PricingService.cs"
       ],
       "expectations": [
-        "Cites src/Services/PricingService.cs by path as the existing code that covers the discount calculation",
+        "Cites the existing discount code as a path:line citation, for example src/Services/PricingService.cs:16, not a bare file path without a line number",
         "Names CalculateVolumeDiscount, ApplyDiscount, or both as the methods to call",
         "Does not propose a new discount calculation method or a new discount rate table",
         "Searches C# files rather than assuming a TypeScript or JavaScript project",
