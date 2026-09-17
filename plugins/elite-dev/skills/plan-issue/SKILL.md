@@ -100,7 +100,7 @@ A claim you cannot prove goes under Open questions. It never enters the plan as 
 | Section         | Content                                                                                        |
 | --------------- | ---------------------------------------------------------------------------------------------- |
 | Context         | The need the issue reports, and the intended outcome.                                          |
-| Files to change | Each file, and what changes in it.                                                             |
+| Files to change | Each file, what changes in it, and a snippet when prose leaves it unclear.                     |
 | Reuse table     | One row per work item: need, existing thing, `path:line`, reuse or new.                        |
 | New code        | Each new item, with the reason no existing thing covers it.                                    |
 | Open questions  | Every unknown that survives step 6. The developer answered "not sure yet", or no proof exists. |
@@ -113,6 +113,20 @@ Two sections carry most of the value:
   existing one. "No existing X covers this" with nothing behind it is not a reason.
 - **Out of scope** stops scope creep at the plan stage, where it costs a line of text, rather than
   at review, where it costs a rewrite.
+
+### Code in the plan
+
+Show code when prose alone leaves the change ambiguous. Keep each snippet at the smallest size
+that settles the question:
+
+- A function or method signature, with its parameter and return types.
+- A type, interface, or schema the change adds or alters.
+- The two or three lines that change at a call site, not the whole function.
+- An exact config key, migration, or command.
+
+Do not paste a finished implementation. Plan mode is read-only, so nothing in the plan compiles or
+runs. A long snippet reads as verified work when nobody verified it. Write the signature. Leave
+the body for implementation.
 
 ## 8. Call `ExitPlanMode`
 
