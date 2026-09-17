@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Mock `gh` for plan-issue evals. Serves a saved issue fixture for `gh issue view`
+# instead of calling GitHub, so an eval run exercises the same command SKILL.md issues.
+#
+# Setup: prepend this script's directory to PATH ahead of the real `gh`, and set
+# MOCK_GH_ISSUE_FIXTURE to the path of the issue-<n>.json fixture for the case being run.
+set -euo pipefail
+
+if [[ "${1:-}" == "issue" && "${2:-}" == "view" ]]; then
+  if [[ -z "${MOCK_GH_ISSUE_FIXTURE:-}" ]]; then
+    echo "mock gh: MOCK_GH_ISSUE_FIXTURE is not set" >&2
+    exit 1
+  fi
+  if [[ ! -f "$MOCK_GH_ISSUE_FIXTURE" ]]; then
+    echo "mock gh: fixture not found: $MOCK_GH_ISSUE_FIXTURE" >&2
+    exit 1
+  fi
+  cat "$MOCK_GH_ISSUE_FIXTURE"
+  exit 0
+fi
+
+echo "mock gh: unsupported command: $*" >&2
+exit 1

@@ -1,0 +1,70 @@
+{
+  "skill_name": "plan-issue",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "The session is already in plan mode. Plan issue 40. The repo is the tree under evals/files/issue-40-reuse/ — treat that directory as the repo root. Run `gh issue view 40 --json title,body,labels,comments` as the skill requires; a gh mock on PATH returns the fixture at evals/files/issue-40-reuse/issue-40.json. Produce the implementation plan.",
+      "expected_output": "A plan that reuses the existing formatCurrency helper for both the line items and the total, passing the invoice's own currency code, with no new formatting utility proposed.",
+      "files": [
+        "evals/files/issue-40-reuse/issue-40.json",
+        "evals/files/issue-40-reuse/CLAUDE.md",
+        "evals/files/issue-40-reuse/src/utils/formatCurrency.ts",
+        "evals/files/issue-40-reuse/src/features/invoice/InvoicePage.tsx"
+      ],
+      "expectations": [
+        "Cites the existing helper as a path:line citation, for example src/utils/formatCurrency.ts:7, not a bare file path without a line number",
+        "Does not propose a new currency formatting utility, helper, or component",
+        "Names the file to change as the full repo-relative path src/features/invoice/InvoicePage.tsx, not a bare basename such as InvoicePage.tsx",
+        "States that the currency code comes from the invoice, not a hardcoded symbol, reflecting the issue comment",
+        "The plan contains a reuse table or equivalent section that maps each work item to an existing thing or to new code",
+        "Shows the changed call site as a short snippet, for example formatCurrency(item.amount, invoice.currency), rather than a rewritten copy of the whole InvoicePage component",
+        "The plan contains no open questions, no 'to be decided' item, and no unresolved choice"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "The session is already in plan mode. Plan issue 41. The repo is the tree under evals/files/issue-41-underspecified/ — treat that directory as the repo root. Run `gh issue view 41 --json title,body,labels,comments` as the skill requires; a gh mock on PATH returns the fixture at evals/files/issue-41-underspecified/issue-41.json. Produce the implementation plan.",
+      "expected_output": "A stop that asks the developer which export format and which rows to export, rather than a plan that picks those answers itself.",
+      "expectations": [
+        "Asks the developer which export file format to produce, rather than choosing one",
+        "Asks which rows the export covers, for example the filtered rows or every row",
+        "Does not present a finished implementation plan in the same response as the questions",
+        "Does not state an assumed answer to either question as though the issue specified it",
+        "Does not defer the unanswered questions into an 'Open questions' section of a plan"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "The session is already in plan mode. Plan issue 42. The repo is the tree under evals/files/issue-42-dotnet/ — treat that directory as the repo root. Run `gh issue view 42 --json title,body,labels,comments` as the skill requires; a gh mock on PATH returns the fixture at evals/files/issue-42-dotnet/issue-42.json. Produce the implementation plan.",
+      "expected_output": "A plan that finds PricingService in the C# tree and reuses CalculateVolumeDiscount and ApplyDiscount rather than proposing new discount logic.",
+      "files": [
+        "evals/files/issue-42-dotnet/issue-42.json",
+        "evals/files/issue-42-dotnet/ExampleApp.csproj",
+        "evals/files/issue-42-dotnet/src/Services/PricingService.cs"
+      ],
+      "expectations": [
+        "Cites the existing discount code as a path:line citation, for example src/Services/PricingService.cs:16, not a bare file path without a line number",
+        "Names CalculateVolumeDiscount, ApplyDiscount, or both as the methods to call",
+        "Does not propose a new discount calculation method or a new discount rate table",
+        "Searches C# files rather than assuming a TypeScript or JavaScript project",
+        "The plan contains no open questions, no 'to be decided' item, and no unresolved choice"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "The session is already in plan mode. Plan issue 43. The repo is the tree under evals/files/issue-43-missing-helper/ — treat that directory as the repo root. Run `gh issue view 43 --json title,body,labels,comments` as the skill requires; a gh mock on PATH returns the fixture at evals/files/issue-43-missing-helper/issue-43.json. Produce the implementation plan.",
+      "expected_output": "A stop that reports the formatRelativeDate helper named in the issue does not exist in the tree, and asks the developer how to proceed, instead of citing it as existing code or planning around it.",
+      "files": [
+        "evals/files/issue-43-missing-helper/issue-43.json",
+        "evals/files/issue-43-missing-helper/src/utils/formatDate.ts"
+      ],
+      "expectations": [
+        "States that formatRelativeDate does not exist in src/utils, contradicting the issue body",
+        "Does not cite formatRelativeDate as an existing helper to reuse",
+        "Asks the developer about the discrepancy rather than recording it as an open question inside a finished plan",
+        "Does not silently substitute the unrelated formatDate helper as though it satisfied the requirement",
+        "Does not present a finished implementation plan in the same response as the question"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "title": "Show \"last seen\" as a relative time on the user list",
+  "body": "The user list shows the raw timestamp for Last seen. Show it as a relative time (\"3 hours ago\") instead.\n\nUse the existing `formatRelativeDate` helper in `src/utils` for this — it already handles the rounding rules we want.",
+  "labels": [{ "name": "frontend" }],
+  "comments": []
+}
