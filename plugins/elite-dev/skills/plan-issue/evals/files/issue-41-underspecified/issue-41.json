@@ -1,0 +1,6 @@
+{
+  "title": "Add export to the reports page",
+  "body": "Users keep asking for a way to get report data out of the app so they can work with it in a spreadsheet. Add an export button to the reports page.",
+  "labels": [{ "name": "frontend" }, { "name": "enhancement" }],
+  "comments": []
+}

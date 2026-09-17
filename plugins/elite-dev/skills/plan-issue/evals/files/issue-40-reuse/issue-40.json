@@ -1,0 +1,11 @@
+{
+  "title": "Invoice page shows raw numbers for money",
+  "body": "The invoice detail page renders the line item amounts and the total as plain numbers (`1499.5`). They should display as currency, matching the rest of the app.\n\nAcceptance criteria:\n- Each line item amount displays as currency\n- The invoice total displays as currency\n- The currency code comes from the invoice, not a hardcoded default",
+  "labels": [{ "name": "frontend" }, { "name": "bug" }],
+  "comments": [
+    {
+      "author": { "login": "dana-pm" },
+      "body": "Confirmed with finance: invoices can be USD, CAD or EUR, so please do not hardcode the symbol."
+    }
+  ]
+}

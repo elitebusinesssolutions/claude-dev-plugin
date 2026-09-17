@@ -19,6 +19,7 @@ the root [CLAUDE.md](../../CLAUDE.md). This file covers only what is specific to
 ## Skills
 
 - `create-pr`
+- `plan-issue`
 - `review-fix-pr-comments`
 - `setup-worktree`
 - `start-issue`

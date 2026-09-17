@@ -93,3 +93,6 @@ gh issue view <n> --json assignees,projectItems
 This skill only sets the "work has started" state — it does not create branches or worktrees.
 Whether the session wants a worktree is a separate, ask-first decision — see the `setup-worktree`
 skill.
+
+Planning the work is a separate step too — see the `plan-issue` skill, which runs inside plan mode
+and produces a reuse-checked implementation plan.

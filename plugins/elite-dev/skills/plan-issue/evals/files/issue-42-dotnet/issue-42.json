@@ -1,0 +1,11 @@
+{
+  "title": "Apply volume discount to order totals",
+  "body": "Orders over 100 units should get the volume discount applied to the order total. Right now the total ignores it.\n\nAcceptance criteria:\n- An order of 100 units or more has the volume discount applied\n- An order under 100 units is unchanged\n- The discounted total appears on the order summary",
+  "labels": [{ "name": "backend" }],
+  "comments": [
+    {
+      "author": { "login": "sam-eng" },
+      "body": "The discount percentages are already configured, so this is about calling the calculation from the total, not about defining new rates."
+    }
+  ]
+}
