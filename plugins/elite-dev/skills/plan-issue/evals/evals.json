@@ -14,7 +14,7 @@
       "expectations": [
         "Cites src/utils/formatCurrency.ts by path as the existing helper that covers the formatting work",
         "Does not propose a new currency formatting utility, helper, or component",
-        "Names src/features/invoice/InvoicePage.tsx as the file to change",
+        "Names the file to change as the full repo-relative path src/features/invoice/InvoicePage.tsx, not a bare basename such as InvoicePage.tsx",
         "States that the currency code comes from the invoice, not a hardcoded symbol, reflecting the issue comment",
         "The plan contains a reuse table or equivalent section that maps each work item to an existing thing or to new code",
         "Shows the changed call site as a short snippet, for example formatCurrency(item.amount, invoice.currency), rather than a rewritten copy of the whole InvoicePage component"

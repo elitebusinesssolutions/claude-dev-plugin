@@ -97,15 +97,20 @@ A claim you cannot prove goes under Open questions. It never enters the plan as 
 
 ## 7. Write the plan
 
-| Section         | Content                                                                                        |
-| --------------- | ---------------------------------------------------------------------------------------------- |
-| Context         | The need the issue reports, and the intended outcome.                                          |
-| Files to change | Each file, what changes in it, and a snippet when prose leaves it unclear.                     |
-| Reuse table     | One row per work item: need, existing thing, `path:line`, reuse or new.                        |
-| New code        | Each new item, with the reason no existing thing covers it.                                    |
-| Open questions  | Every unknown that survives step 6. The developer answered "not sure yet", or no proof exists. |
-| Out of scope    | What this plan deliberately excludes.                                                          |
-| Verification    | How each change gets tested end to end.                                                        |
+| Section         | Content                                                                                                      |
+| --------------- | ------------------------------------------------------------------------------------------------------------ |
+| Context         | The need the issue reports, and the intended outcome.                                                        |
+| Files to change | Each file as a full path from the repo root, what changes in it, and a snippet when prose leaves it unclear. |
+| Reuse table     | One row per work item: need, existing thing, `path:line`, reuse or new.                                      |
+| New code        | Each new item, with the reason no existing thing covers it.                                                  |
+| Open questions  | Every unknown that survives step 6. The developer answered "not sure yet", or no proof exists.               |
+| Out of scope    | What this plan deliberately excludes.                                                                        |
+| Verification    | How each change gets tested end to end.                                                                      |
+
+Write every path in full, from the repo root: `src/features/invoice/InvoicePage.tsx`, never
+`InvoicePage.tsx` or `.../invoice/`. A truncated path is not a path — the reader cannot open it,
+and two files often share a basename. The same rule covers the reuse table's `path:line`
+citations.
 
 Two sections carry most of the value:
 
