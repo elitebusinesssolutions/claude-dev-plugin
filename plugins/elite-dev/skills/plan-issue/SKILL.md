@@ -83,7 +83,12 @@ the developer with `AskUserQuestion`.
 Make no assumption. Pick no default. A plan built on a guess costs more to unwind than a question
 costs to ask.
 
-Wait for the answers before step 7.
+Repeat this step until nothing is unresolved. An answer often raises a new question. Ask that one
+too. Leave step 6 only when every question has an answer.
+
+A question the developer cannot answer yet does not become a line in the plan. Move that part of
+the work to Out of scope and plan the decided part. A smaller plan the developer can act on beats
+a larger one that waits on an answer.
 
 ### Verify every claim
 
@@ -93,7 +98,8 @@ Wait for the answers before step 7.
 | A library or tool behavior | The official documentation. Cite the URL in the plan.             |
 | A repo behavior or pattern | The code. Cite `path:line`.                                       |
 
-A claim you cannot prove goes under Open questions. It never enters the plan as a fact.
+A claim you cannot prove is a question, not a fact. Take it back to the developer with the rest of
+the list. It never enters the plan unproven.
 
 ## 7. Write the plan
 
@@ -103,8 +109,7 @@ A claim you cannot prove goes under Open questions. It never enters the plan as 
 | Files to change | Each file as a full path from the repo root, what changes in it, and a snippet when prose leaves it unclear. |
 | Reuse table     | One row per work item: need, existing thing, `path:line`, reuse or new.                                      |
 | New code        | Each new item, with the reason no existing thing covers it.                                                  |
-| Open questions  | Every unknown that survives step 6. The developer answered "not sure yet", or no proof exists.               |
-| Out of scope    | What this plan deliberately excludes.                                                                        |
+| Out of scope    | What this plan deliberately excludes, including work the developer deferred in step 6.                       |
 | Verification    | How each change gets tested end to end.                                                                      |
 
 Write every path in full, from the repo root: `src/features/invoice/InvoicePage.tsx`, never
@@ -118,6 +123,10 @@ Two sections carry most of the value:
   existing one. "No existing X covers this" with nothing behind it is not a reason.
 - **Out of scope** stops scope creep at the plan stage, where it costs a line of text, rather than
   at review, where it costs a rewrite.
+
+The plan carries no open questions. Step 6 answered them, or the developer deferred that work to
+Out of scope. A plan is a proposal the developer can approve as it stands, not a list of things
+still to settle.
 
 ### Code in the plan
 
@@ -135,8 +144,11 @@ the body for implementation.
 
 ## 8. Call `ExitPlanMode`
 
-This ends the turn and waits for the developer's approval. Approval exits plan mode, so the `gh`
-call in step 9 is no longer blocked.
+Before you call it, check the plan one last time. No open question, no "to be decided", no
+unproven claim. Anything still unsettled goes back to step 6.
+
+The call ends the turn and waits for the developer's approval. Approval exits plan mode, so the
+`gh` call in step 9 is no longer blocked.
 
 ## 9. Offer to record the plan
 

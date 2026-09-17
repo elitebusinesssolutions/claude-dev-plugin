@@ -17,7 +17,8 @@
         "Names the file to change as the full repo-relative path src/features/invoice/InvoicePage.tsx, not a bare basename such as InvoicePage.tsx",
         "States that the currency code comes from the invoice, not a hardcoded symbol, reflecting the issue comment",
         "The plan contains a reuse table or equivalent section that maps each work item to an existing thing or to new code",
-        "Shows the changed call site as a short snippet, for example formatCurrency(item.amount, invoice.currency), rather than a rewritten copy of the whole InvoicePage component"
+        "Shows the changed call site as a short snippet, for example formatCurrency(item.amount, invoice.currency), rather than a rewritten copy of the whole InvoicePage component",
+        "The plan contains no open questions, no 'to be decided' item, and no unresolved choice"
       ]
     },
     {
@@ -28,7 +29,8 @@
         "Asks the developer which export file format to produce, rather than choosing one",
         "Asks which rows the export covers, for example the filtered rows or every row",
         "Does not present a finished implementation plan in the same response as the questions",
-        "Does not state an assumed answer to either question as though the issue specified it"
+        "Does not state an assumed answer to either question as though the issue specified it",
+        "Does not defer the unanswered questions into an 'Open questions' section of a plan"
       ]
     },
     {
@@ -44,13 +46,14 @@
         "Cites src/Services/PricingService.cs by path as the existing code that covers the discount calculation",
         "Names CalculateVolumeDiscount, ApplyDiscount, or both as the methods to call",
         "Does not propose a new discount calculation method or a new discount rate table",
-        "Searches C# files rather than assuming a TypeScript or JavaScript project"
+        "Searches C# files rather than assuming a TypeScript or JavaScript project",
+        "The plan contains no open questions, no 'to be decided' item, and no unresolved choice"
       ]
     },
     {
       "id": 4,
       "prompt": "The session is already in plan mode. Plan issue 43. Here is the saved output of `gh issue view 43 --json title,body,labels,comments`: evals/files/issue-43-missing-helper/issue-43.json. The repo is the tree under evals/files/issue-43-missing-helper/ — treat that directory as the repo root. Produce the implementation plan.",
-      "expected_output": "A response that reports the formatRelativeDate helper named in the issue does not exist in the tree, instead of citing it as existing code.",
+      "expected_output": "A stop that reports the formatRelativeDate helper named in the issue does not exist in the tree, and asks the developer how to proceed, instead of citing it as existing code or planning around it.",
       "files": [
         "evals/files/issue-43-missing-helper/issue-43.json",
         "evals/files/issue-43-missing-helper/src/utils/formatDate.ts"
@@ -58,8 +61,9 @@
       "expectations": [
         "States that formatRelativeDate does not exist in src/utils, contradicting the issue body",
         "Does not cite formatRelativeDate as an existing helper to reuse",
-        "Either asks the developer about the discrepancy or records it under an open questions section",
-        "Does not silently substitute the unrelated formatDate helper as though it satisfied the requirement"
+        "Asks the developer about the discrepancy rather than recording it as an open question inside a finished plan",
+        "Does not silently substitute the unrelated formatDate helper as though it satisfied the requirement",
+        "Does not present a finished implementation plan in the same response as the question"
       ]
     }
   ]
