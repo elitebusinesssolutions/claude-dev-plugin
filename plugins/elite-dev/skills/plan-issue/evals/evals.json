@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "The session is already in plan mode. Plan issue 40. Here is the saved output of `gh issue view 40 --json title,body,labels,comments`: evals/files/issue-40-reuse/issue-40.json. The repo is the tree under evals/files/issue-40-reuse/ — treat that directory as the repo root. Produce the implementation plan.",
+      "prompt": "The session is already in plan mode. Plan issue 40. The repo is the tree under evals/files/issue-40-reuse/ — treat that directory as the repo root. Run `gh issue view 40 --json title,body,labels,comments` as the skill requires; a gh mock on PATH returns the fixture at evals/files/issue-40-reuse/issue-40.json. Produce the implementation plan.",
       "expected_output": "A plan that reuses the existing formatCurrency helper for both the line items and the total, passing the invoice's own currency code, with no new formatting utility proposed.",
       "files": [
         "evals/files/issue-40-reuse/issue-40.json",
@@ -23,7 +23,7 @@
     },
     {
       "id": 2,
-      "prompt": "The session is already in plan mode. Plan issue 41. Here is the saved output of `gh issue view 41 --json title,body,labels,comments`: evals/files/issue-41-underspecified/issue-41.json. The repo is the tree under evals/files/issue-41-underspecified/ — treat that directory as the repo root. Produce the implementation plan.",
+      "prompt": "The session is already in plan mode. Plan issue 41. The repo is the tree under evals/files/issue-41-underspecified/ — treat that directory as the repo root. Run `gh issue view 41 --json title,body,labels,comments` as the skill requires; a gh mock on PATH returns the fixture at evals/files/issue-41-underspecified/issue-41.json. Produce the implementation plan.",
       "expected_output": "A stop that asks the developer which export format and which rows to export, rather than a plan that picks those answers itself.",
       "expectations": [
         "Asks the developer which export file format to produce, rather than choosing one",
@@ -35,7 +35,7 @@
     },
     {
       "id": 3,
-      "prompt": "The session is already in plan mode. Plan issue 42. Here is the saved output of `gh issue view 42 --json title,body,labels,comments`: evals/files/issue-42-dotnet/issue-42.json. The repo is the tree under evals/files/issue-42-dotnet/ — treat that directory as the repo root. Produce the implementation plan.",
+      "prompt": "The session is already in plan mode. Plan issue 42. The repo is the tree under evals/files/issue-42-dotnet/ — treat that directory as the repo root. Run `gh issue view 42 --json title,body,labels,comments` as the skill requires; a gh mock on PATH returns the fixture at evals/files/issue-42-dotnet/issue-42.json. Produce the implementation plan.",
       "expected_output": "A plan that finds PricingService in the C# tree and reuses CalculateVolumeDiscount and ApplyDiscount rather than proposing new discount logic.",
       "files": [
         "evals/files/issue-42-dotnet/issue-42.json",
@@ -52,7 +52,7 @@
     },
     {
       "id": 4,
-      "prompt": "The session is already in plan mode. Plan issue 43. Here is the saved output of `gh issue view 43 --json title,body,labels,comments`: evals/files/issue-43-missing-helper/issue-43.json. The repo is the tree under evals/files/issue-43-missing-helper/ — treat that directory as the repo root. Produce the implementation plan.",
+      "prompt": "The session is already in plan mode. Plan issue 43. The repo is the tree under evals/files/issue-43-missing-helper/ — treat that directory as the repo root. Run `gh issue view 43 --json title,body,labels,comments` as the skill requires; a gh mock on PATH returns the fixture at evals/files/issue-43-missing-helper/issue-43.json. Produce the implementation plan.",
       "expected_output": "A stop that reports the formatRelativeDate helper named in the issue does not exist in the tree, and asks the developer how to proceed, instead of citing it as existing code or planning around it.",
       "files": [
         "evals/files/issue-43-missing-helper/issue-43.json",

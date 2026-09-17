@@ -57,6 +57,14 @@ troubleshoot correctly). Keep `expectations` objectively verifiable — "mention
    all (`without_skill`, the baseline). Point each at its own `inputs/` copy from step 1. Save each
    response under
    `plugins/<plugin-name>/skills/<skill-name>-workspace/iteration-1/<eval-name>/{with_skill,without_skill}/outputs/`.
+
+   If the skill's own steps run `gh` (for example, `plan-issue`'s `gh issue view`), do not hand the
+   agent that command's output inline in the prompt — that lets the agent skip the command SKILL.md
+   requires. Instead give the spawned agent a fake `gh` on PATH ahead of the real one, so it runs
+   the actual command and gets the fixture back. `plan-issue` ships one at
+   `plugins/elite-dev/skills/plan-issue/evals/mock-gh/gh`: prepend its directory to PATH and set
+   `MOCK_GH_ISSUE_FIXTURE` to that case's `issue-<n>.json` before spawning the agent.
+
 3. Grade each response against that eval's `expectations`, saving `grading.json` per run (see
    `skill-creator`'s `references/schemas.md` for the exact field names — the viewer depends on them
    matching exactly).
