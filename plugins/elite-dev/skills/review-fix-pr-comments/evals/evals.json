@@ -80,6 +80,24 @@
         "The GitHub reply text cites a commit sha that matches `git -C inputs/origin-bare rev-parse HEAD` (the pushed sha), and explains the fix",
         "Presents the resolveReviewThread call only after the reply, and does not claim to have actually posted the reply or resolved the thread against a real GitHub API (no real PR exists here)"
       ]
+    },
+    {
+      "id": 6,
+      "prompt": "Review the unresolved comments on PR 398. Saved output of the reviewThreads GraphQL query: evals/files/pr-398-outside-diff-range/review-threads.json. Saved output of `gh api repos/<owner>/<repo>/pulls/398/reviews`: evals/files/pr-398-outside-diff-range/reviews.json. Current content of src/services/productService.ts: evals/files/pr-398-outside-diff-range/productService.ts. Present the findings for me to triage.",
+      "expected_output": "Notices reviewThreads is empty but still checks the reviews list, finds the blockquote-wrapped 'Outside diff range comments' block (not just 'Suppressed comments'), treats its two nested <details> items as candidate findings, and presents one as a confirmed defect (categoryValues not loaded before delete) and one as stale (delete already guards against a missing product).",
+      "files": [
+        "evals/files/pr-398-outside-diff-range/review-threads.json",
+        "evals/files/pr-398-outside-diff-range/reviews.json",
+        "evals/files/pr-398-outside-diff-range/productService.ts"
+      ],
+      "expectations": [
+        "Does not stop at the empty reviewThreads result and report there is nothing to review — also inspects the reviews.json content",
+        "Recognizes the blockquote-wrapped '**⚠️ Outside diff range comments (2)**' heading as the same kind of hidden-finding block as a Suppressed comments block, not a heading it can ignore",
+        "Treats each of the two nested <details> items inside that block as its own candidate finding",
+        "Confirms the categoryValues finding is real: getById only includes 'files', so delete's loop over product.categoryValues runs against an empty collection and the row referencing those values in the database is never removed",
+        "States the second finding (delete not guarding a missing product) is stale, since delete already returns early when getById resolves to null",
+        "Ends by asking the developer which findings to act on, without editing, committing, or replying to GitHub in the same turn"
+      ]
     }
   ]
 }

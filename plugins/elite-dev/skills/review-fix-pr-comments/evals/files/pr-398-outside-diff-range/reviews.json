@@ -1,0 +1,7 @@
+[
+  {
+    "id": 82004415,
+    "user": { "login": "coderabbitai[bot]" },
+    "body": "**Actionable comments posted: 0**\n\n> [!CAUTION]\n> Some comments are outside the diff and can't be posted inline due to GitHub limitations.\n>\n> **⚠️ Outside diff range comments (2)**\n>\n> <details>\n> <summary><em>🟡 Minor</em> · Load <code>categoryValues</code> before deleting a <code>Product</code>. · <code>productService.ts:8-14</code></summary><blockquote>\n>\n> `src/services/productService.ts:8-14`\n>\n> **Load `categoryValues` before deleting a `Product`.**\n>\n> `delete` iterates `product.categoryValues`, but `getById` only includes `files`. A product with category values reaches the delete loop with an empty collection, so its row is removed while its category values remain.\n>\n> Add `'categoryValues'` to the `include` list in `getById`.\n>\n> </blockquote></details>\n>\n> <details>\n> <summary><em>🟢 Trivial</em> · Guard <code>delete</code> against a missing <code>Product</code>. · <code>productService.ts:9-16</code></summary><blockquote>\n>\n> `src/services/productService.ts:9-16`\n>\n> **Guard `delete` against a missing `Product`.**\n>\n> Calling `delete` for an id that does not exist could throw when the code below tries to use it.\n>\n> </blockquote></details>"
+  }
+]
