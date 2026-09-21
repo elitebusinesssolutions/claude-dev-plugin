@@ -1,0 +1,7 @@
+[
+  {
+    "id": 91002233,
+    "user": { "login": "sourcery-ai[bot]" },
+    "body": "Sourcery reviewed 1 file and left no inline comments.\n\n<details>\n<summary>Additional notes (1)</summary>\n\n* **src/services/emailService.ts:4** — `sendWelcomeEmail` calls `mailer.send(...)` without `await` or a `.catch`, so a rejected send becomes an unhandled promise rejection. `sendPasswordReset` below already awaits the same call.\n\n</details>"
+  }
+]

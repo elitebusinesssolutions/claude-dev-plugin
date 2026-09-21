@@ -80,6 +80,41 @@
         "The GitHub reply text cites a commit sha that matches `git -C inputs/origin-bare rev-parse HEAD` (the pushed sha), and explains the fix",
         "Presents the resolveReviewThread call only after the reply, and does not claim to have actually posted the reply or resolved the thread against a real GitHub API (no real PR exists here)"
       ]
+    },
+    {
+      "id": 6,
+      "prompt": "Review the unresolved comments on PR 398. Saved output of the reviewThreads GraphQL query: evals/files/pr-398-outside-diff-range/review-threads.json. Saved output of `gh api repos/<owner>/<repo>/pulls/398/reviews`: evals/files/pr-398-outside-diff-range/reviews.json. Current content of src/services/productService.ts: evals/files/pr-398-outside-diff-range/productService.ts. Present the findings for me to triage.",
+      "expected_output": "Notices reviewThreads is empty but still checks the reviews list, finds the blockquote-wrapped 'Outside diff range comments' block (not just 'Suppressed comments'), treats its two nested <details> items as candidate findings, and presents one as a confirmed defect (categoryValues not loaded before delete) and one as stale (delete already guards against a missing product).",
+      "files": [
+        "evals/files/pr-398-outside-diff-range/review-threads.json",
+        "evals/files/pr-398-outside-diff-range/reviews.json",
+        "evals/files/pr-398-outside-diff-range/productService.ts"
+      ],
+      "expectations": [
+        "Does not stop at the empty reviewThreads result and report there is nothing to review — also inspects the reviews.json content",
+        "Recognizes the blockquote-wrapped '**⚠️ Outside diff range comments (2)**' heading as the same kind of hidden-finding block as a Suppressed comments block, not a heading it can ignore",
+        "Treats each of the two nested <details> items inside that block as its own candidate finding",
+        "Confirms the categoryValues finding is real: getById's include list is missing 'categoryValues', so delete's loop at line 9 cannot be relying on the actual related rows -- the fix is adding 'categoryValues' to the include list",
+        "States the second finding (delete not guarding a missing product) is stale, since delete already returns early when getById resolves to null",
+        "Ends by asking the developer which findings to act on, without editing, committing, or replying to GitHub in the same turn"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Review the unresolved comments on PR 512. Saved output of the reviewThreads GraphQL query: evals/files/pr-512-unlabeled-hidden-block/review-threads.json. Saved output of `gh api repos/<owner>/<repo>/pulls/512/reviews`: evals/files/pr-512-unlabeled-hidden-block/reviews.json. Current content of src/services/emailService.ts: evals/files/pr-512-unlabeled-hidden-block/emailService.ts. Present the findings for me to triage.",
+      "expected_output": "Notices reviewThreads is empty, reads the full review body rather than checking it against a fixed list of known headings, recognizes the '<details><summary>Additional notes (1)</summary>' block as a hidden finding even though it is neither 'Suppressed comments' nor 'Outside diff range comments', and confirms the one item as a real defect (sendWelcomeEmail never awaits or catches the mailer.send call).",
+      "files": [
+        "evals/files/pr-512-unlabeled-hidden-block/review-threads.json",
+        "evals/files/pr-512-unlabeled-hidden-block/reviews.json",
+        "evals/files/pr-512-unlabeled-hidden-block/emailService.ts"
+      ],
+      "expectations": [
+        "Does not stop at the empty reviewThreads result and report there is nothing to review — reads the full reviews.json body",
+        "Recognizes the 'Additional notes (1)' heading as a hidden-finding block despite it matching neither 'Suppressed comments' nor 'Outside diff range comments'",
+        "Treats the single bulleted item inside that block as its own candidate finding",
+        "Confirms the finding is real: sendWelcomeEmail calls mailer.send without await or a .catch, so a rejected send becomes an unhandled promise rejection, unlike sendPasswordReset which already awaits the same call",
+        "Ends by asking the developer which findings to act on, without editing, committing, or replying to GitHub in the same turn"
+      ]
     }
   ]
 }

@@ -87,36 +87,50 @@ Each thread's `comments` array holds the original comment plus any prior replies
 array; you'll need every comment's `databaseId` later to match this thread when resolving it, not
 just the first one.
 
-### Also check for suppressed comments in review bodies
+### Also check review bodies for comments not posted as line comments
 
-A review can say "generated no new comments" and still be hiding real findings: Copilot (and
-possibly other reviewers) sometimes collapses lower-confidence findings into the review's own
-`body` text instead of posting them as line comments, under a
-`<details><summary>Suppressed comments (N)</summary>` block. These never become a `reviewThread` or
-a PR comment at all — the query above cannot see them. Always also pull every review's body and
-check for this block:
+A review can say "generated no new comments" and still be hiding real findings. Reviewers collapse
+lower-confidence or out-of-diff findings into the review's own `body` text instead of posting them
+as line comments — these never become a `reviewThread` or a PR comment at all, so the query above
+cannot see them. Two known headings mark this, with two different shapes:
+
+- Copilot's `<details><summary>Suppressed comments (N)</summary>` block: items are flat bullets
+  directly inside that one outer `<details>`.
+- CodeRabbit's `**⚠️ Outside diff range comments (N)**` heading, sitting inside a
+  blockquote (`> [!CAUTION] ...`): each item is its own nested
+  `<details><summary>severity · title · file:line</summary>` inside that blockquote, with no
+  single outer `<details>` wrapping the whole section.
+
+These two are examples, not the full list — a reviewer can name this concept anything. Pull every
+review's full body and read all of it; do not filter first on a keyword match for a known heading.
+A regex gate over known headings only catches the headings already seen once, and repeats this
+exact gap the next time a reviewer phrases it differently:
 
 ```bash
 gh api --paginate "repos/<owner>/<repo>/pulls/<pr-number>/reviews" \
-  --jq '.[] | select(.body | test("Suppressed comments")) | {id, user: .user.login, body}'
+  --jq '.[] | {id, user: .user.login, body}'
 ```
 
 `--paginate` matters here for the same reason as step 1's `reviewThreads` query: a PR with more than
-30 review submissions (the default page size) would otherwise silently drop any suppressed-comments
-block sitting on page 2+.
+30 review submissions (the default page size) would otherwise silently drop a review sitting on
+page 2+. Skim every returned body for a block describing findings that were not posted as line
+comments, under whatever heading it uses — a body that only restates line comments already seen in
+step 1, or says outright that nothing more was found, needs no further action.
 
-Before re-verifying a review's suppressed block, check whether an existing top-level PR comment
+Before re-verifying a review's hidden-finding block, check whether an existing top-level PR comment
 already links that review's `#pullrequestreview-<id>` (added per the link rule below) — these items
 have no `isResolved` state to dedup against, so this link is the only signal a re-run has for "already
 handled in a prior pass." That link is only a safe skip-this-whole-review signal once **every** item
-in the block got a disposition — if a developer signs off on only some of a review's suppressed
-items, do not post the review-ID link yet; a partial write-up (see below) that links the review would
+in the block got a disposition — if a developer signs off on only some of a review's hidden items,
+do not post the review-ID link yet; a partial write-up (see below) that links the review would
 cause a later run to skip the remaining, still-unaddressed items too.
 
-Treat each bulleted item inside a found `<details>` block as its own candidate finding, subject to
-the same code-verification step below. These have no `comment_id` or thread to reply to or resolve
-— there's nothing to attach a threaded reply or a `resolveReviewThread` call to. Once every item in
-the block has been verified and either fixed or dismissed, write up what was addressed as a single
+Treat each item inside a found block as its own candidate finding, subject to the same
+code-verification step below, whatever shape the block takes — a flat bullet for a Suppressed
+comments block, a nested `<details>` per item for an Outside diff range comments block, or
+something else again for a heading not seen before. These have no `comment_id` or thread to reply
+to or resolve — there's nothing to attach a threaded reply or a `resolveReviewThread` call to. Once
+every item in the block has been verified and either fixed or dismissed, write up what was addressed as a single
 top-level PR comment (`gh pr comment <pr-number> --body "..."`) instead, since that's the only
 attachment point that exists for this category — list each item's disposition individually in that
 comment, and only include the review-ID link once the write-up covers all of them.
