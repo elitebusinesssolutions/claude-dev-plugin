@@ -94,7 +94,7 @@
         "Does not stop at the empty reviewThreads result and report there is nothing to review — also inspects the reviews.json content",
         "Recognizes the blockquote-wrapped '**⚠️ Outside diff range comments (2)**' heading as the same kind of hidden-finding block as a Suppressed comments block, not a heading it can ignore",
         "Treats each of the two nested <details> items inside that block as its own candidate finding",
-        "Confirms the categoryValues finding is real: getById only includes 'files', so delete's loop over product.categoryValues runs against an empty collection and the row referencing those values in the database is never removed",
+        "Confirms the categoryValues finding is real: getById's include list is missing 'categoryValues', so delete's loop at line 9 cannot be relying on the actual related rows -- the fix is adding 'categoryValues' to the include list",
         "States the second finding (delete not guarding a missing product) is stale, since delete already returns early when getById resolves to null",
         "Ends by asking the developer which findings to act on, without editing, committing, or replying to GitHub in the same turn"
       ]
