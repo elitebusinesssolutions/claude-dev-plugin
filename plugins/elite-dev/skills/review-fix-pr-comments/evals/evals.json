@@ -98,6 +98,23 @@
         "States the second finding (delete not guarding a missing product) is stale, since delete already returns early when getById resolves to null",
         "Ends by asking the developer which findings to act on, without editing, committing, or replying to GitHub in the same turn"
       ]
+    },
+    {
+      "id": 7,
+      "prompt": "Review the unresolved comments on PR 512. Saved output of the reviewThreads GraphQL query: evals/files/pr-512-unlabeled-hidden-block/review-threads.json. Saved output of `gh api repos/<owner>/<repo>/pulls/512/reviews`: evals/files/pr-512-unlabeled-hidden-block/reviews.json. Current content of src/services/emailService.ts: evals/files/pr-512-unlabeled-hidden-block/emailService.ts. Present the findings for me to triage.",
+      "expected_output": "Notices reviewThreads is empty, reads the full review body rather than checking it against a fixed list of known headings, recognizes the '<details><summary>Additional notes (1)</summary>' block as a hidden finding even though it is neither 'Suppressed comments' nor 'Outside diff range comments', and confirms the one item as a real defect (sendWelcomeEmail never awaits or catches the mailer.send call).",
+      "files": [
+        "evals/files/pr-512-unlabeled-hidden-block/review-threads.json",
+        "evals/files/pr-512-unlabeled-hidden-block/reviews.json",
+        "evals/files/pr-512-unlabeled-hidden-block/emailService.ts"
+      ],
+      "expectations": [
+        "Does not stop at the empty reviewThreads result and report there is nothing to review — reads the full reviews.json body",
+        "Recognizes the 'Additional notes (1)' heading as a hidden-finding block despite it matching neither 'Suppressed comments' nor 'Outside diff range comments'",
+        "Treats the single bulleted item inside that block as its own candidate finding",
+        "Confirms the finding is real: sendWelcomeEmail calls mailer.send without await or a .catch, so a rejected send becomes an unhandled promise rejection, unlike sendPasswordReset which already awaits the same call",
+        "Ends by asking the developer which findings to act on, without editing, committing, or replying to GitHub in the same turn"
+      ]
     }
   ]
 }
