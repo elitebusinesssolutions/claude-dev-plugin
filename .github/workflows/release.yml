@@ -66,6 +66,7 @@ jobs:
           fi
 
           manifests=(plugins/*/.claude-plugin/plugin.json)
+          failed=0
 
           for manifest in "${manifests[@]}"; do
             plugin_dir="${manifest%/.claude-plugin/plugin.json}"
@@ -100,6 +101,7 @@ jobs:
             # set -e, abort before later plugins are processed).
             if [[ ! "$new_version" =~ ^[A-Za-z0-9._-]+$ ]]; then
               echo "$plugin: version \"$new_version\" is not a valid tag name, skipping." >&2
+              failed=1
               continue
             fi
 
@@ -119,6 +121,7 @@ jobs:
               rc=$?
               if [[ $rc -ne 2 ]]; then
                 echo "$plugin: git ls-remote failed checking for tag $tag (exit $rc), skipping." >&2
+                failed=1
                 continue
               fi
 
@@ -130,10 +133,12 @@ jobs:
 
               if ! git tag "$tag" "$AFTER"; then
                 echo "$plugin: git tag failed, skipping." >&2
+                failed=1
                 continue
               fi
               if ! git push origin "refs/tags/$tag"; then
                 echo "$plugin: git push of tag $tag failed, skipping release." >&2
+                failed=1
                 continue
               fi
             fi
@@ -159,20 +164,21 @@ jobs:
             # these notes (see README).
             prev_tag=$(git tag --list "${plugin}-v*" --sort=-v:refname | grep -F -v -x "$tag" | head -n1 || true)
 
+            # --notes-start-tag requires an existing tag name (it maps to the
+            # Release Notes API's previous_tag_name param); a commit SHA is
+            # not a valid value there. No prior tag for this plugin, so omit
+            # the flag and accept --generate-notes' default range for this
+            # one release.
             args=(--title "$plugin v$new_version" --generate-notes)
             if [[ -n "$prev_tag" ]]; then
               args+=(--notes-start-tag "$prev_tag")
-            else
-              # No prior tag for this plugin: anchor notes at the repo's
-              # root commit instead of omitting --notes-start-tag, so
-              # gh's --generate-notes can't fall back to another
-              # plugin's most recently created tag as the range start.
-              root_commit=$(git rev-list --max-parents=0 HEAD | head -n1)
-              args+=(--notes-start-tag "$root_commit")
             fi
 
             if ! gh release create "$tag" "${args[@]}"; then
               echo "$plugin: gh release create failed for $tag." >&2
+              failed=1
               continue
             fi
           done
+
+          exit "$failed"
