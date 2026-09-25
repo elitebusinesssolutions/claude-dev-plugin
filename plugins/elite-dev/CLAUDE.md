@@ -43,7 +43,7 @@ Every skill in this plugin must work for a plain TypeScript/JavaScript repo, a N
 
   Exception: ETT (this org's time-tracking tool) is elite-only infrastructure, not
   project-specific — every consuming repo is an elite project with an ETT task per PR. Skills
-  may hardcode ETT directly (see `create-pr/SKILL.md` §1) rather than pushing it to each
+  may hardcode ETT directly (see `create-pr/SKILL.md` §2) rather than pushing it to each
   consuming CLAUDE.md.
 
 This stack-agnostic rule is specific to `elite-dev` — `elite-ts`, by contrast, deliberately targets
