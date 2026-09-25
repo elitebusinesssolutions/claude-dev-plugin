@@ -29,6 +29,9 @@ Before running `gh pr create` — or before `gh stack submit --auto`, which crea
 If `gh stack submit --auto` already ran, run these checks now and report any findings before
 finishing the §3 body/label updates.
 
+For a stack, repeat both checks per PR it created/updated, against that PR's own diff — each
+branch may introduce different doc staleness.
+
 ## 2. Body conventions
 
 - This org tracks time in ETT — every dev has an ETT task assigned, so the PR body's first line

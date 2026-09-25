@@ -178,7 +178,8 @@ Reference: [Version management](https://code.claude.com/docs/en/plugins-referenc
   separately after merge. The version bump and the feature land together.
 - Follow semver: `MAJOR.MINOR.PATCH`.
   - **PATCH**: wording fixes in a skill
-  - **MINOR**: new skill
+  - **MINOR**: new skill, or a new capability added to an existing skill (new section, new
+    check, new behavior)
   - **MAJOR**: breaking change (renamed skill, changed behavior that affects how a consuming
     project must be set up)
 - Do not bump version for changes to `README.md` or `CLAUDE.md` only — those don't affect plugin
