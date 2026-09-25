@@ -157,11 +157,18 @@ jobs:
             # which plugin a PR belongs to — a PR that only touched the
             # other plugin and merged in that range can still appear in
             # these notes (see README).
-            prev_tag=$(git tag --list "${plugin}-v*" --sort=-v:refname | grep -v -x "$tag" | head -n1 || true)
+            prev_tag=$(git tag --list "${plugin}-v*" --sort=-v:refname | grep -F -v -x "$tag" | head -n1 || true)
 
             args=(--title "$plugin v$new_version" --generate-notes)
             if [[ -n "$prev_tag" ]]; then
               args+=(--notes-start-tag "$prev_tag")
+            else
+              # No prior tag for this plugin: anchor notes at the repo's
+              # root commit instead of omitting --notes-start-tag, so
+              # gh's --generate-notes can't fall back to another
+              # plugin's most recently created tag as the range start.
+              root_commit=$(git rev-list --max-parents=0 HEAD | head -n1)
+              args+=(--notes-start-tag "$root_commit")
             fi
 
             if ! gh release create "$tag" "${args[@]}"; then
