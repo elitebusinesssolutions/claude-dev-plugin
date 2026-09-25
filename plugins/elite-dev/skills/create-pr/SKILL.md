@@ -14,7 +14,7 @@ description: >
 
 ## 1. Pre-flight checks
 
-Before running `gh pr create`:
+Before running `gh pr create` — or before `gh stack submit --auto`, which creates PRs directly:
 
 - Suggest a code review over the diff (e.g. `/code-review` or `/security-review`, if installed in
   this environment). This is a suggestion the developer can decline, not a blocking requirement —
@@ -24,6 +24,9 @@ Before running `gh pr create`:
   skill/feature list, config option, or behavior description the diff changes or removes. Flag
   any mismatch to the developer instead of silently creating the PR; suggest updating the doc as
   part of this PR or a follow-up, developer's call.
+
+If `gh stack submit --auto` already ran, run these checks now and report any findings before
+finishing the §3 body/label updates.
 
 ## 2. Body conventions
 
