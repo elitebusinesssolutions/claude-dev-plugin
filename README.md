@@ -126,6 +126,27 @@ repo's own hook script up directly via `${CLAUDE_PROJECT_DIR}`, so unlike a skil
 `--plugin-dir`, that hook runs in any session, including the VS Code extension, without needing
 `--plugin-dir` at all.
 
+## Releases
+
+Each plugin releases independently. Bumping a plugin's `version` field in its own
+`plugins/<name>/.claude-plugin/plugin.json` and merging that to `main` is what triggers a release —
+there is no separate manual release step.
+
+[`.github/workflows/release.yml`](.github/workflows/release.yml) runs on every push to `main` that
+touches a `plugin.json`. For each plugin whose version changed since the previous commit, it:
+
+1. Creates a git tag `<plugin-name>-v<version>` (e.g. `elite-dev-v0.5.0`).
+2. Creates a GitHub Release for that tag, with an auto-generated title and release notes (GitHub's
+   native `--generate-notes`, started from that plugin's own prior tag rather than the other
+   plugin's most recent one). This bounds the _commit range_ the notes are generated from, not
+   which plugin each merged PR touched — a PR that only changed the other plugin can still appear
+   in the list if it merged inside that range.
+
+The workflow can also be run manually from the Actions tab (`workflow_dispatch`) — useful to retry
+a plugin whose tag got pushed but whose Release creation failed, since it's safe to re-run.
+
+A push that doesn't change any `plugin.json` version is a no-op — no tag, no release.
+
 ## Related
 
 Stacked-PR workflows aren't bundled here — install GitHub's own tooling:
