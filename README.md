@@ -137,8 +137,10 @@ touches a `plugin.json`. For each plugin whose version changed since the previou
 
 1. Creates a git tag `<plugin-name>-v<version>` (e.g. `elite-dev-v0.5.0`).
 2. Creates a GitHub Release for that tag, with an auto-generated title and release notes (GitHub's
-   native `--generate-notes`, scoped to that plugin's own prior tag so `elite-dev` and `elite-ts`
-   releases never mix into each other's notes).
+   native `--generate-notes`, started from that plugin's own prior tag rather than the other
+   plugin's most recent one). This bounds the _commit range_ the notes are generated from, not
+   which plugin each merged PR touched — a PR that only changed the other plugin can still appear
+   in the list if it merged inside that range.
 
 A push that doesn't change any `plugin.json` version is a no-op — no tag, no release.
 
