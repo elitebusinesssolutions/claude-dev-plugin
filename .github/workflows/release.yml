@@ -1,0 +1,86 @@
+name: Tag and release plugins
+
+on:
+  push:
+    branches: [main]
+    # Gate: only run when a plugin manifest actually changed. The in-script
+    # version diff below is still the real check (paths filters can behave
+    # oddly on some merge shapes) — this is purely to skip the job's own
+    # checkout/run cost on unrelated pushes (docs, skills, etc).
+    paths:
+      - "plugins/*/.claude-plugin/plugin.json"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      # For each plugin, compare its plugin.json "version" between the
+      # commit before this push and the commit after it. If the version
+      # changed: create a tag "<plugin>-v<version>", push it, then create a
+      # GitHub Release for that tag with an auto-generated title and notes.
+      # A plugin whose version did not change is skipped (no-op). Both
+      # plugins can bump in the same push — each is tagged/released
+      # independently. Re-running this job after a tag already exists is
+      # safe: the remote tag check below skips it instead of failing.
+      - name: Tag and release plugins whose version changed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          BEFORE="${{ github.event.before }}"
+          AFTER="${{ github.sha }}"
+
+          # First push of a new branch/history: nothing to diff against.
+          if [[ "$BEFORE" =~ ^0+$ ]]; then
+            echo "No previous commit to diff against, skipping."
+            exit 0
+          fi
+
+          for plugin in elite-dev elite-ts; do
+            manifest="plugins/$plugin/.claude-plugin/plugin.json"
+
+            old_version=$(git show "$BEFORE:$manifest" 2>/dev/null | jq -r '.version // empty' || true)
+            new_version=$(git show "$AFTER:$manifest" 2>/dev/null | jq -r '.version // empty' || true)
+
+            if [[ -z "$new_version" || "$old_version" == "$new_version" ]]; then
+              echo "$plugin: no version change, skipping."
+              continue
+            fi
+
+            tag="${plugin}-v${new_version}"
+
+            # Idempotency: skip if this tag already exists on the remote,
+            # so a retriggered/re-run workflow does not fail or duplicate.
+            if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; then
+              echo "$plugin: tag $tag already exists, skipping."
+              continue
+            fi
+
+            echo "$plugin: $old_version -> $new_version, tagging $tag"
+            git tag "$tag" "$AFTER"
+            git push origin "refs/tags/$tag"
+
+            # Scope release notes to this plugin's own tag history only.
+            # Tags interleave across plugins (elite-dev-v0.5.0,
+            # elite-ts-v0.2.2, elite-dev-v0.6.0, ...), so GitHub's default
+            # "previous tag" pick for --generate-notes would otherwise grab
+            # whichever plugin tagged most recently, not this plugin's own
+            # last release. --sort=-v:refname is version-aware (v0.10.0
+            # sorts after v0.9.0).
+            prev_tag=$(git tag --list "${plugin}-v*" --sort=-v:refname | grep -v -x "$tag" | head -n1 || true)
+
+            args=(--title "$plugin v$new_version" --generate-notes)
+            if [[ -n "$prev_tag" ]]; then
+              args+=(--notes-start-tag "$prev_tag")
+            fi
+
+            gh release create "$tag" "${args[@]}"
+          done
