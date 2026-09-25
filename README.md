@@ -142,6 +142,9 @@ touches a `plugin.json`. For each plugin whose version changed since the previou
    which plugin each merged PR touched — a PR that only changed the other plugin can still appear
    in the list if it merged inside that range.
 
+The workflow can also be run manually from the Actions tab (`workflow_dispatch`) — useful to retry
+a plugin whose tag got pushed but whose Release creation failed, since it's safe to re-run.
+
 A push that doesn't change any `plugin.json` version is a no-op — no tag, no release.
 
 ## Related
