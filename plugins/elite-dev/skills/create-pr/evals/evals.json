@@ -30,6 +30,21 @@
         "Does not ask the developer for an ETT link again, since they already confirmed this PR has none",
         "Still applies the other body conventions: a bulleted summary and a closing `Fixes #186` footer"
       ]
+    },
+    {
+      "id": 3,
+      "prompt": "Open a PR for the current branch. No linked GitHub issue, so skip the label step. Here is the current checkout state: evals/files/stale-readme/branch-state.md. Here is the repo's README.md: evals/files/stale-readme/repo-readme.md. Draft the `gh pr create` body and note any pre-flight findings.",
+      "expected_output": "A suggestion to run a code review before opening the PR, a flag that the README's `npm run build` command is now stale since the diff renames that script to `build:prod`, and a PR body with no ETT link or label step since no issue is linked.",
+      "files": [
+        "evals/files/stale-readme/branch-state.md",
+        "evals/files/stale-readme/repo-readme.md"
+      ],
+      "expectations": [
+        "Suggests a code review over the diff before creating the PR, framed as optional rather than blocking",
+        "Notices the README documents `npm run build` and flags it as stale, since the diff renames that script to `build:prod`",
+        "Suggests updating the README as part of this PR or a follow-up, without blocking PR creation on it",
+        "Still drafts a PR body with no ETT link and no label-copy step, since no issue is linked"
+      ]
     }
   ]
 }

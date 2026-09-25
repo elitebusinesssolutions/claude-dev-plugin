@@ -1,17 +1,31 @@
 ---
 name: create-pr
 description: >
-  Opens a pull request following common conventions: an ETT task link as the first line of the
-  body (skipped only when the developer confirms no ETT task applies), a bulleted summary,
-  unwrapped paragraphs, a footer that references the linked GitHub issue (and closes it on merge
-  when eligible), and labels copied from that issue. Use whenever creating a PR — "open a PR",
-  "create the PR", "let's PR this" — or after `gh stack submit --auto`, which can create several
-  PRs in one call that each need this treatment.
+  Opens a pull request following common conventions: a suggestion to run a code review and a
+  check for README/AGENTS/CLAUDE.md content the diff makes stale, an ETT task link as the first
+  line of the body (skipped only when the developer confirms no ETT task applies), a bulleted
+  summary, unwrapped paragraphs, a footer that references the linked GitHub issue (and closes it
+  on merge when eligible), and labels copied from that issue. Use whenever creating a PR — "open a
+  PR", "create the PR", "let's PR this" — or after `gh stack submit --auto`, which can create
+  several PRs in one call that each need this treatment.
 ---
 
 # Create PR
 
-## 1. Body conventions
+## 1. Pre-flight checks
+
+Before running `gh pr create`:
+
+- Suggest a code review over the diff (e.g. `/code-review` or `/security-review`, if installed in
+  this environment). This is a suggestion the developer can decline, not a blocking requirement —
+  this plugin ships no review tooling of its own.
+- Check the repo root for a README.md, AGENTS.md, and CLAUDE.md. For each that exists, check
+  whether the diff makes any of its content stale — a documented command, file path,
+  skill/feature list, config option, or behavior description the diff changes or removes. Flag
+  any mismatch to the developer instead of silently creating the PR; suggest updating the doc as
+  part of this PR or a follow-up, developer's call.
+
+## 2. Body conventions
 
 - This org tracks time in ETT — every dev has an ETT task assigned, so the PR body's first line
   is that task's link. Check the linked GitHub issue's body for the link first. Not there → ask
@@ -40,7 +54,7 @@ description: >
   previous stack branch, not the default branch, so use `Refs #<N>` there instead — only the
   bottom-of-stack PR (based on the default branch) can safely use `Fixes`.
 
-## 2. Copy the linked issue's labels
+## 3. Copy the linked issue's labels
 
 Right after `gh pr create` (or for each PR `gh stack submit --auto` creates/updates):
 
@@ -66,7 +80,7 @@ reference a different issue, so don't assume one branch's labels apply to the wh
 
 `gh stack submit --auto` has no way to set a PR's body at creation time — it generates one from
 commit metadata, leaving new PRs on the raw GitHub template. Before (or alongside) the label copy,
-`gh pr edit <PR#> --body "..."` each PR it created with the §1 body conventions applied — otherwise
+`gh pr edit <PR#> --body "..."` each PR it created with the §2 body conventions applied — otherwise
 those PRs keep the template body indefinitely, with no tracker link, summary, or issue footer.
 
 ## Scope
@@ -74,4 +88,6 @@ those PRs keep the template body indefinitely, with no tracker link, summary, or
 This skill only shapes the PR body and labels; it doesn't decide _whether_ to open a PR, resolve
 merge conflicts, or handle stacked-PR creation mechanics themselves — for that, install GitHub's
 own `gh-stack` tooling: `gh extension install github/gh-stack` for the `gh stack` commands, and
-`gh skill install github/gh-stack` for agent-native stack guidance.
+`gh skill install github/gh-stack` for agent-native stack guidance. Likewise, §1's review
+suggestion only names a review tool if one is already installed — this plugin doesn't ship or run
+a review itself.

@@ -9,13 +9,13 @@ claude plugin install elite-dev@elitebusinesssolutions
 
 ## Skills
 
-| Skill                    | Invoke                              | Purpose                                                                            |
-| ------------------------ | ----------------------------------- | ---------------------------------------------------------------------------------- |
-| `create-pr`              | `/elite-dev:create-pr`              | Open a PR with consistent body conventions and labels copied from the linked issue |
-| `plan-issue`             | `/elite-dev:plan-issue`             | Turn a GitHub issue into a reuse-checked implementation plan, inside plan mode     |
-| `review-fix-pr-comments` | `/elite-dev:review-fix-pr-comments` | Triage and (on approval) fix unresolved PR review comments                         |
-| `setup-worktree`         | `/elite-dev:setup-worktree`         | Set up or clean up a git worktree for a parallel dev session                       |
-| `start-issue`            | `/elite-dev:start-issue`            | Mark a GitHub issue as started: assignee + project board status                    |
+| Skill                    | Invoke                              | Purpose                                                                              |
+| ------------------------ | ----------------------------------- | ------------------------------------------------------------------------------------ |
+| `create-pr`              | `/elite-dev:create-pr`              | Open a PR: suggest a review, flag stale docs, apply body conventions and copy labels |
+| `plan-issue`             | `/elite-dev:plan-issue`             | Turn a GitHub issue into a reuse-checked implementation plan, inside plan mode       |
+| `review-fix-pr-comments` | `/elite-dev:review-fix-pr-comments` | Triage and (on approval) fix unresolved PR review comments                           |
+| `setup-worktree`         | `/elite-dev:setup-worktree`         | Set up or clean up a git worktree for a parallel dev session                         |
+| `start-issue`            | `/elite-dev:start-issue`            | Mark a GitHub issue as started: assignee + project board status                      |
 
 ## Prerequisites
 
