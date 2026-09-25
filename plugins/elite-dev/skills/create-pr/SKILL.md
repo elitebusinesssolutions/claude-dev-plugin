@@ -19,11 +19,12 @@ Before running `gh pr create` — or before `gh stack submit --auto`, which crea
 - Suggest a code review over the diff (e.g. `/code-review` or `/security-review`, if installed in
   this environment). This is a suggestion the developer can decline, not a blocking requirement —
   this plugin ships no review tooling of its own.
-- Check the repo root for a README.md, AGENTS.md, and CLAUDE.md. For each that exists, check
-  whether the diff makes any of its content stale — a documented command, file path,
-  skill/feature list, config option, or behavior description the diff changes or removes. Flag
-  any mismatch to the developer instead of silently creating the PR; suggest updating the doc as
-  part of this PR or a follow-up, developer's call.
+- Check the repo root, and any project-specific directory near the changed files (e.g. a
+  monorepo's `src/server/`, `src/client/`, or another package subdirectory), for a README.md,
+  AGENTS.md, and CLAUDE.md. For each that exists, check whether the diff makes any of its content
+  stale — a documented command, file path, skill/feature list, config option, or behavior
+  description the diff changes or removes. Flag any mismatch to the developer instead of silently
+  creating the PR; suggest updating the doc as part of this PR or a follow-up, developer's call.
 
 If `gh stack submit --auto` already ran, run these checks now and report any findings before
 finishing the §3 body/label updates.
@@ -85,6 +86,16 @@ reference a different issue, so don't assume one branch's labels apply to the wh
 commit metadata, leaving new PRs on the raw GitHub template. Before (or alongside) the label copy,
 `gh pr edit <PR#> --body "..."` each PR it created with the §2 body conventions applied — otherwise
 those PRs keep the template body indefinitely, with no tracker link, summary, or issue footer.
+
+## 4. Verify
+
+Before considering the PR done:
+
+- The PR body follows §2's conventions (ETT line or confirmed omission, bulleted summary,
+  unwrapped lines, correct footer).
+- Labels were copied per §3, or correctly skipped because no issue number was in the branch name.
+- Any §1 pre-flight findings (review suggestion, stale-doc flags) were reported to the developer,
+  not silently dropped.
 
 ## Scope
 
