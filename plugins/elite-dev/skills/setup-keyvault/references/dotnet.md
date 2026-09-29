@@ -29,8 +29,9 @@ Make sure each csproj has a `<UserSecretsId>` in the first `<PropertyGroup>` tha
 Place the block right after `builder.AddServiceDefaults()` when the file calls it. Otherwise place it right after `WebApplication.CreateBuilder(args)` (or the Functions host builder). In both cases the block goes before any service reads configuration.
 
 ```csharp
-// Local dev only, set by the AppHost or launchSettings.json. Not IsDevelopment() — a hosted
-// environment can also run with ASPNETCORE_ENVIRONMENT=Development and would wire in this vault too.
+// Local dev only, set by the AppHost, launchSettings.json, or local.settings.json (Functions).
+// Not IsDevelopment() — a hosted environment can also run with
+// ASPNETCORE_ENVIRONMENT=Development and would wire in this vault too.
 var keyVaultUrl = builder.Configuration["KeyVaultUrl"];
 if (!string.IsNullOrEmpty(keyVaultUrl))
 {
@@ -48,6 +49,28 @@ Rules:
 - Call `AddUserSecrets<Program>()` after `AddAzureKeyVault`. The order makes user secrets win.
 - Add `using Azure.Identity;` at the top of the file.
 - Use block-bodied code. Follow the code conventions of the target project.
+
+### Functions apps on the `HostBuilder` template
+
+If the Functions `Program.cs` uses `new HostBuilder().ConfigureFunctionsWorkerDefaults()` and not `FunctionsApplication.CreateBuilder(args)`, `builder.Configuration` does not exist. Chain this call right after `ConfigureFunctionsWorkerDefaults()`:
+
+```csharp
+.ConfigureAppConfiguration(config =>
+{
+    // Local dev only, set in local.settings.json. Not IsDevelopment() — a hosted
+    // environment can also run as Development and would wire in this vault too.
+    var keyVaultUrl = config.Build()["KeyVaultUrl"];
+    if (!string.IsNullOrEmpty(keyVaultUrl))
+    {
+        config.AddAzureKeyVault(new Uri(keyVaultUrl), new DefaultAzureCredential());
+
+        // Re-added after Key Vault so a developer's own user secrets win per key.
+        config.AddUserSecrets<Program>();
+    }
+})
+```
+
+`config.Build()` reads the sources added so far, which include the `local.settings.json` values that the Functions tools pass in as environment variables.
 
 ## 3. Api: where `KeyVaultUrl` comes from
 

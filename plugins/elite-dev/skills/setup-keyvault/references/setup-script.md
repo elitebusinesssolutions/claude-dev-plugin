@@ -19,7 +19,7 @@ If the repo has a `setup.ps1` (a script that prepares a developer machine), add 
 - A sign-in check. Compare `az account show --query tenantId -o tsv` with the tenant ID from the inputs. Run `az login --tenant <tenant-id> --skip-subscription-discovery` when they differ or when no sign-in exists.
 - Each step skips its work when already done, so the script runs again safely.
 - A final summary with three lists: installed, skipped, and manual steps.
-- Functions only: a step that copies each trigger secret from the Api vault into user secrets of the Functions project. Run `az keyvault secret show --vault-name <api-vault> --name "<Section>--<Key>" --query value -o tsv` and pass the value to `dotnet user-secrets set` without printing it. If Azure reports an authorization failure, add a manual step: ask for the Secrets User role on `<api-vault>` only. Report any other failure, such as a missing secret, as it is.
+- Functions only: a step that copies each trigger secret from the vault of the Functions app into user secrets of the Functions project. Run `az keyvault secret show --vault-name <functions-vault> --name "<Section>--<Key>" --query value -o tsv` and pass the value to `dotnet user-secrets set` without printing it. Capture stdout only. Do not redirect stderr into the value (no `2>&1`). Check `$LASTEXITCODE` for failure. If Azure reports an authorization failure, add a manual step: ask for the Secrets User role on `<functions-vault>` only. Report any other failure, such as a missing secret, as it is.
 
 ## 3. README section
 
@@ -29,7 +29,7 @@ Add a section named "Local dev secrets (Azure Key Vault)" to the README at the p
 2. The roles from section 1.
 3. The sign-in step: `az login --tenant <tenant-id>`.
 4. The secret name rules: `--` for `:` in .NET, and `-` to `_` in upper case for Next.js.
-5. The override rules: user secrets win in .NET, `.env.local` wins in Next.js.
+5. The override rules: user secrets win in .NET, `.env.local` wins in Next.js. In .NET the vault also wins over environment variables, so a vault key must not repeat a value that the AppHost sets.
 6. The full list of secret names for each vault. Names only, never values.
 7. The Functions limit, if the project has a Functions app.
 

@@ -67,7 +67,8 @@ Reference: [Agent Skills](https://code.claude.com/docs/en/skills)
 ### File format
 
 Every skill is a folder under a plugin's own `skills/` containing a required `SKILL.md`
-(frontmatter plus body) and, optionally, a `reference.md` for large content loaded on demand.
+(frontmatter plus body) and, optionally, reference files (a `reference.md` or a `references/`
+folder) for large content loaded on demand.
 
 ### SKILL.md frontmatter
 

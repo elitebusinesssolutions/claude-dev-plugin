@@ -58,7 +58,7 @@ Apply only the reference files that match. Write the plan: the inputs, every fil
 
 ## 6. Override rules
 
-- .NET: user secrets win for each key. The vault supplies every other key.
+- .NET: user secrets win for each key. The vault supplies every other key. The vault also wins over `appsettings.json`, environment variables, and command-line args, including values that Aspire injects. Do not put a key in the vault that the AppHost already sets, for example `ConnectionStrings--<resource>`.
 - Next.js: a value already in `.env.local` wins. The vault supplies every other key.
 
 ## 7. Verify
