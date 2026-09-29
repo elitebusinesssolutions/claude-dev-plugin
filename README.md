@@ -3,10 +3,10 @@
 Claude Code plugin marketplace for Elite Business Solutions. Two plugins, each installable on its
 own.
 
-| Plugin                         | What it ships                                                                                      | Install                                                  |
-| ------------------------------ | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| [elite-dev](plugins/elite-dev) | Generic dev-workflow skills — git worktrees, GitHub issues, pull requests. Any TS/JS or .NET repo. | `claude plugin install elite-dev@elitebusinesssolutions` |
-| [elite-ts](plugins/elite-ts)   | Shared lint/format hooks and formatting-setup/verification skills for TypeScript projects.         | `claude plugin install elite-ts@elitebusinesssolutions`  |
+| Plugin                         | What it ships                                                                                                                   | Install                                                  |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| [elite-dev](plugins/elite-dev) | Generic dev-workflow skills — git worktrees, GitHub issues, pull requests, Azure Key Vault dev secrets. Any TS/JS or .NET repo. | `claude plugin install elite-dev@elitebusinesssolutions` |
+| [elite-ts](plugins/elite-ts)   | Shared lint/format hooks and formatting-setup/verification skills for TypeScript projects.                                      | `claude plugin install elite-ts@elitebusinesssolutions`  |
 
 Both plugins can also be used with
 [GitHub Copilot CLI](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-finding-installing),

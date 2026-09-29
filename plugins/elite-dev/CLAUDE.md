@@ -1,7 +1,8 @@
 # elite-dev — Development Guide
 
 `elite-dev` ships generic dev-workflow skills — git worktrees, GitHub issue tracking, pull
-requests, PR review triage — for any TypeScript/JavaScript or .NET repo. No hooks, skills only.
+requests, PR review triage, Azure Key Vault dev secrets — for any TypeScript/JavaScript or .NET
+repo. No hooks, skills only.
 
 Install it via:
 
@@ -21,6 +22,7 @@ the root [CLAUDE.md](../../CLAUDE.md). This file covers only what is specific to
 - `create-pr`
 - `plan-issue`
 - `review-fix-pr-comments`
+- `setup-keyvault`
 - `setup-worktree`
 - `start-issue`
 

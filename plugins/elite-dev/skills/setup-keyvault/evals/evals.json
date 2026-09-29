@@ -1,0 +1,53 @@
+{
+  "skill_name": "setup-keyvault",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Set up Key Vault for local dev secrets in this project: evals/files/nextjs-npm. Project short name is shop, the resource group is rg-shop-dev, and the README is README.md.",
+      "expected_output": "Enters plan mode, suggests kv-shop-shop for confirmation, asks for the missing Azure tenant ID instead of guessing, and stops before ExitPlanMode without editing any file.",
+      "files": ["evals/files/nextjs-npm"],
+      "expectations": [
+        "Enters plan mode (or states it calls EnterPlanMode) before any file edit or install command",
+        "Asks the developer for the Azure tenant ID rather than inventing a value",
+        "Suggests the vault name kv-shop-shop and asks the developer to confirm it",
+        "Detects npm from package-lock.json as the package manager",
+        "Stops before ExitPlanMode because the tenant ID is missing, and does not treat the plan as approved",
+        "Does not edit, create, or delete any file in the project, and runs no install command"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Add Key Vault to this project: evals/files/pnpm-monorepo. Project short name is acme. Tenant ID 11111111-2222-3333-4444-555555555555, resource group rg-acme-dev, README at README.md. Both Next.js apps (apps/admin and apps/portal) need secrets. Use the suggested vault names.",
+      "expected_output": "Plans one helper file and one instrumentation.ts gate per app with pnpm, keeps the existing registerOTel code in apps/portal, and creates no shared package or workspace edit.",
+      "files": ["evals/files/pnpm-monorepo"],
+      "expectations": [
+        "Enters plan mode (or states it calls EnterPlanMode) before any file edit or install command",
+        "Uses pnpm (from pnpm-lock.yaml) and scopes each add command to one app (run inside the app folder or with `--filter <app>`)",
+        "Plans one keyvault-dev-secrets.ts helper under each app's src/lib, not a shared package",
+        "Does not plan an edit to pnpm-workspace.yaml or the root package.json",
+        "Keeps the existing registerOTel call in apps/portal/src/instrumentation.ts and adds the gate as a separate NEXT_RUNTIME block",
+        "Uses kv-acme-admin and kv-acme-portal as the vault names",
+        "Plans to add vitest to each app even though the root package.json lists vitest"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Load dev secrets from Key Vault in this project: evals/files/dotnet-apphost. Project short name is acme. Tenant ID 11111111-2222-3333-4444-555555555555, resource group rg-acme-dev, README at README.md. Only the Api needs secrets. Use the suggested vault name.",
+      "expected_output": "Plans the Api vault block gated on KeyVaultUrl, a new UserSecretsId, the AppHost IsRunMode WithEnvironment call, setup.ps1 sign-in step, README section, and the RBAC roles to request, without writing any secret value.",
+      "files": ["evals/files/dotnet-apphost"],
+      "expectations": [
+        "Enters plan mode (or states it calls EnterPlanMode) before any file edit or command that changes the project",
+        "Places the vault block in src/Acme.Api/Program.cs right after builder.AddServiceDefaults()",
+        "Gates the vault block on the KeyVaultUrl configuration value, not on IsDevelopment()",
+        "Calls AddUserSecrets<Program>() after AddAzureKeyVault inside the gate",
+        "Adds PackageReference entries for Azure.Extensions.AspNetCore.Configuration.Secrets and Azure.Identity to src/Acme.Api/Acme.Api.csproj, with a version or the command that finds the newest stable version",
+        "Adds a UserSecretsId with a new GUID to src/Acme.Api/Acme.Api.csproj, because it has none",
+        "Adds a .WithEnvironment call guarded by context.ExecutionContext.IsRunMode that sets KeyVaultUrl to https://kv-acme-api.vault.azure.net/ on the api resource in the AppHost",
+        "Names the Key Vault Secrets User role for runtime reads and states the skill does not create vaults or assign roles",
+        "Adds a tenant sign-in check (az account show compared with the tenant ID) to setup.ps1",
+        "Adds a section named Local dev secrets (Azure Key Vault) to README.md",
+        "Does not write any secret value to any file"
+      ]
+    }
+  ]
+}

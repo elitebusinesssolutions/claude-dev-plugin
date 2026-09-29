@@ -1,0 +1,7 @@
+{
+  "name": "acme",
+  "private": true,
+  "devDependencies": {
+    "vitest": "3.2.0"
+  }
+}

@@ -5,7 +5,7 @@
   "plugins": [
     {
       "name": "elite-dev",
-      "description": "Generic dev-workflow skills for git worktrees, GitHub issues, and pull requests",
+      "description": "Generic dev-workflow skills for git worktrees, GitHub issues, pull requests, and Azure Key Vault dev secrets",
       "source": "./plugins/elite-dev"
     },
     {
