@@ -1,0 +1,54 @@
+{
+  "skill_name": "setup-script",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Add a setup script to this repo: evals/files/fullstack. The Azure tenant ID is 11111111-2222-3333-4444-555555555555.",
+      "expected_output": "Enters plan mode, detects every tool from the repo files, asks what else to install, and writes a new setup.ps1 from the skeleton with the .NET SDK 9, Aspire CLI, nvm with Node 22, pnpm through corepack, Azure CLI, Functions Core Tools, GitHub CLI, both sign-ins, pnpm and dotnet restore, and dotnet tool restore.",
+      "files": ["evals/files/fullstack"],
+      "expectations": [
+        "Enters plan mode (or states it calls EnterPlanMode) before any file edit",
+        "Asks the developer whether anything else should be installed that the detection did not find",
+        "Installs .NET SDK 9 (from global.json) through winget ID Microsoft.DotNet.SDK.9",
+        "Installs the Aspire CLI only after a y/N prompt, because the installer is a remote script",
+        "Installs nvm for Windows and Node 22 (from src/client/.nvmrc), and enables pnpm through corepack",
+        "Installs the Azure CLI, Azure Functions Core Tools, and the GitHub CLI with Install-WithWinget",
+        "Signs in to Azure with a tenant comparison against 11111111-2222-3333-4444-555555555555, and signs in to GitHub with gh auth status / gh auth login",
+        "Restores src/client with pnpm install --frozen-lockfile, runs dotnet restore on src/server/Acme.slnx, and runs dotnet tool restore",
+        "Includes the elevation block and prints a summary of done, skipped, and manual steps",
+        "Adds a Developer machine setup section to README.md",
+        "Does not run setup.ps1, and parses it (or states the parse check) as the verification"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Add the web app to the setup script in this repo: evals/files/existing-script. Nothing else needs to be installed.",
+      "expected_output": "Extends the existing setup.ps1 in its own style: keeps the existing .NET check, adds nvm with Node 20 and an npm ci restore for web, and asks whether to also add the detected GitHub CLI and sign-in instead of adding them unasked. Adds no Azure or corepack step.",
+      "files": ["evals/files/existing-script"],
+      "expectations": [
+        "Enters plan mode (or states it calls EnterPlanMode) before any file edit",
+        "Keeps the existing .NET SDK check and the existing summary lines, and does not add a second .NET SDK install step",
+        "Does not rewrite or rename the existing code in setup.ps1",
+        "Adds nvm for Windows and Node 20 (from engines.node >=20 in web/package.json)",
+        "Restores web with npm ci, and does not add a corepack or pnpm step",
+        "Asks the developer whether to also add the GitHub CLI and the GitHub sign-in (detected, but outside the request), and does not add them without an answer",
+        "Does not add the Azure CLI or an Azure sign-in, because the repo has no Azure dependency",
+        "Does not run setup.ps1"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Create setup.ps1 for this repo: evals/files/extras. Also install Docker Desktop.",
+      "expected_output": "Writes a new setup.ps1 with nvm and Node 20, npm ci, the GitHub CLI and sign-in, and Docker Desktop through winget, with no .NET or Azure steps.",
+      "files": ["evals/files/extras"],
+      "expectations": [
+        "Enters plan mode (or states it calls EnterPlanMode) before any file edit",
+        "Adds Docker Desktop with Install-WithWinget and the winget ID Docker.DockerDesktop, before the sign-in steps",
+        "Adds nvm for Windows and Node 20 (from .nvmrc), and restores with npm ci",
+        "Does not add a .NET SDK, Aspire, Functions Core Tools, or Azure step",
+        "Adds the GitHub CLI install and the GitHub sign-in step",
+        "Does not run setup.ps1"
+      ]
+    }
+  ]
+}

@@ -4,8 +4,8 @@ This repo is a Claude Code plugin marketplace holding two plugins, each in its o
 under `plugins/`:
 
 - **`elite-dev`** — generic dev-workflow skills (git worktrees, GitHub issues, pull requests,
-  Azure Key Vault dev secrets) for any TypeScript/JavaScript or .NET repo. Skills only, no hooks.
-  See its own [CLAUDE.md](plugins/elite-dev/CLAUDE.md).
+  Azure Key Vault dev secrets, developer machine setup) for any TypeScript/JavaScript or .NET
+  repo. Skills only, no hooks. See its own [CLAUDE.md](plugins/elite-dev/CLAUDE.md).
 - **`elite-ts`** — shared lint/format hooks and formatting-setup/verification skills for
   TypeScript projects. See its own `plugins/elite-ts/CLAUDE.md`.
 

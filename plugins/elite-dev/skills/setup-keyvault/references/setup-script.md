@@ -13,13 +13,58 @@ The skill does not create vaults and does not assign roles. Tell the developer w
 
 ## 2. Setup script
 
-If the repo has a `setup.ps1` (a script that prepares a developer machine), add these parts. Keep the style of the existing script. If it has no such script, ask the developer whether to create one.
+The `setup-script` skill owns `setup.ps1`: its skeleton, its helpers, and its rules. This skill adds only the Key Vault steps.
 
-- A parameter for the Azure tenant ID and a variable for each vault name.
-- A sign-in check. Compare `az account show --query tenantId -o tsv` with the tenant ID from the inputs. Run `az login --tenant <tenant-id> --skip-subscription-discovery` when they differ or when no sign-in exists.
-- Each step skips its work when already done, so the script runs again safely.
-- A final summary with three lists: installed, skipped, and manual steps.
-- Functions only: a step that copies each trigger secret from the vault of the Functions app into user secrets of the Functions project. Run `az keyvault secret show --vault-name <functions-vault> --name "<Section>--<Key>" --query value -o tsv` and pass the value to `dotnet user-secrets set` without printing it. Capture stdout only. Do not redirect stderr into the value (no `2>&1`). Check `$LASTEXITCODE` for failure. If Azure reports an authorization failure, add a manual step: ask for the Secrets User role on `<functions-vault>` only. Report any other failure, such as a missing secret, as it is.
+If the repo has no `setup.ps1` (a script that prepares a developer machine), ask the developer whether to create one. If yes, follow the `setup-script` skill (`/elite-dev:setup-script`) to create it, and put its steps in this skill's plan. If no, add the Key Vault steps to the manual steps you report and skip the rest of this section.
+
+Add these parts to `setup.ps1`. Reuse a part that the script already has, under any name.
+
+1. The Azure CLI install step and the Azure sign-in step from the `setup-script` skill. The sign-in step compares the current tenant with the `$azureTenantId` parameter. Set the parameter default to the tenant ID from the inputs.
+2. A variable for each vault name, after `$repoRoot`.
+3. Functions only: a function that copies each trigger secret from the vault of the Functions app into user secrets of the Functions project. Call it at the end of the main `try` block. Use this template, once for each trigger key:
+
+```powershell
+# The Functions host reads user secrets, but it cannot read Key Vault. See the Functions README.
+function Set-FunctionsTriggerSecret($key) {
+    $existing = dotnet user-secrets list --project $functionsProject
+    if ($existing | Select-String -Pattern "^$([regex]::Escape($key))\s*=" -Quiet) {
+        Write-Host "[skipped]   Functions user secret $key is already set."
+        $skipped.Add("Functions user secret $key")
+        return
+    }
+
+    $secretName = $key -replace ":", "--"
+    Write-Host "[setting]   Functions user secret $key from $functionsVaultName"
+    $previous = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    $errorFile = New-TemporaryFile
+    try {
+        # stdout only: stderr goes to a file, so a warning never ends up in the secret value.
+        $value = az keyvault secret show --vault-name $functionsVaultName --name $secretName --query value -o tsv 2>$errorFile
+        $exitCode = $LASTEXITCODE
+        $errorText = Get-Content $errorFile -Raw
+    }
+    finally {
+        $ErrorActionPreference = $previous
+        Remove-Item $errorFile -ErrorAction SilentlyContinue
+    }
+
+    if ($exitCode -ne 0) {
+        Write-Host "Could not read $secretName from ${functionsVaultName}: $errorText" -ForegroundColor Yellow
+        if ($errorText -match "Forbidden|AuthorizationFailed") {
+            $manualSteps.Add("Ask the vault owner for the Key Vault Secrets User role on $functionsVaultName, then run setup.ps1 again.")
+            return
+        }
+
+        throw "Reading $secretName from $functionsVaultName failed."
+    }
+
+    Invoke-Checked { dotnet user-secrets set $key $value --project $functionsProject | Out-Null } "dotnet user-secrets set"
+    $installed.Add("Functions user secret $key")
+}
+```
+
+Set `$functionsProject` to the path of the Functions project, relative to `$repoRoot`. Never print the secret value.
 
 ## 3. README section
 
