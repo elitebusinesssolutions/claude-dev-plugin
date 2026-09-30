@@ -75,7 +75,7 @@
       "files": ["evals/files/pnpm-monorepo"],
       "expectations": [
         "Enters plan mode (or states it calls EnterPlanMode) before any file edit or command that changes the project",
-        "Asks whether to create a script that copies existing local secrets into the vaults, before writing the plan",
+        "Uses the developer's explicit consent to include the seed script in the plan, without asking for the same consent again",
         "Lists scripts/seed-keyvault-secrets.ps1 as a file to create, separate from setup.ps1",
         "The script runs az keyvault create with --enable-rbac-authorization true only when az keyvault show finds no vault",
         "The script reads every KEY=value line of apps/admin/.env.local and apps/portal/.env.local with no hardcoded key list, and maps each underscore in a name to a dash",

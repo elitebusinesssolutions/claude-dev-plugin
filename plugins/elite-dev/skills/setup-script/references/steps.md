@@ -133,10 +133,6 @@ function Install-Node {
         $installed.Add("Node $major")
     }
 
-    if ((Get-NodeMajor) -eq $defaultNodeMajor) {
-        return
-    }
-
     Use-NodeVersion $defaultNodeMajor
 }
 
