@@ -26,16 +26,25 @@ Values:
 
 - **.NET SDK major:** the major version of `sdk.version` in `global.json`. Without `global.json`, the highest `net<N>.0` in any `<TargetFramework>` or `<TargetFrameworks>`.
 - **Node majors:** for each package root, the major version in `.nvmrc`, then `.node-version`, then the lowest version that `engines.node` allows. Ask the developer when none exists. The default Node major is the one of the root `package.json`, or the one most package roots use.
-- **Package manager:** `pnpm-lock.yaml` is pnpm, `yarn.lock` is yarn, `package-lock.json` is npm.
+- **Package manager:** `pnpm-lock.yaml` is pnpm, `yarn.lock` is yarn, `package-lock.json` is npm. The script has one package manager for all package roots. When roots use different ones, stop and ask the developer before you generate the script.
 
 ## Step functions
 
 ### 1. .NET SDK
 
 ```powershell
+# dotnet reads global.json from the current folder, so a success here means an SDK satisfies sdk.version and sdk.rollForward.
+function Test-DotnetSdk($major) {
+    if (-not (Test-Command dotnet)) { return $false }
+    if (-not (dotnet --list-sdks | Select-String -Pattern "^$major\.")) { return $false }
+
+    Push-Location $repoRoot
+    try { return Test-NativeSuccess { dotnet --version } }
+    finally { Pop-Location }
+}
+
 function Install-DotnetSdk($major) {
-    $hasSdk = (Test-Command dotnet) -and (dotnet --list-sdks | Select-String -Pattern "^$major\.")
-    if ($hasSdk) {
+    if (Test-DotnetSdk $major) {
         Write-Host "[skipped]   .NET SDK $major is already installed."
         $skipped.Add(".NET SDK $major")
         return
@@ -48,6 +57,10 @@ function Install-DotnetSdk($major) {
     Update-SessionEnvironment
     Assert-Command dotnet
     $installed.Add(".NET SDK $major")
+
+    if (-not (Test-DotnetSdk $major)) {
+        $manualSteps.Add("Install the .NET SDK version that global.json requires. The installed SDK does not satisfy it.")
+    }
 }
 ```
 
@@ -120,7 +133,7 @@ function Install-Node {
         $installed.Add("Node $major")
     }
 
-    if (Test-Command node) {
+    if ((Get-NodeMajor) -eq $defaultNodeMajor) {
         return
     }
 
@@ -134,6 +147,11 @@ function Use-NodeVersion($major) {
     Update-SessionEnvironment
     Assert-Command node
     if ($packageManager -ne "npm") {
+        # Node 25 and later does not ship corepack.
+        if (-not (Test-Command corepack)) {
+            Invoke-Checked { npm install --global corepack } "npm install of corepack"
+        }
+
         Invoke-Checked { corepack enable $packageManager } "corepack enable $packageManager"
     }
 }
