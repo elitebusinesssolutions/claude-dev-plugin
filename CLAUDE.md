@@ -3,9 +3,9 @@
 This repo is a Claude Code plugin marketplace holding two plugins, each in its own subdirectory
 under `plugins/`:
 
-- **`elite-dev`** — generic dev-workflow skills (git worktrees, GitHub issues, pull requests) for
-  any TypeScript/JavaScript or .NET repo. Skills only, no hooks. See its own
-  [CLAUDE.md](plugins/elite-dev/CLAUDE.md).
+- **`elite-dev`** — generic dev-workflow skills (git worktrees, GitHub issues, pull requests,
+  Azure Key Vault dev secrets, developer machine setup) for any TypeScript/JavaScript or .NET
+  repo. Skills only, no hooks. See its own [CLAUDE.md](plugins/elite-dev/CLAUDE.md).
 - **`elite-ts`** — shared lint/format hooks and formatting-setup/verification skills for
   TypeScript projects. See its own `plugins/elite-ts/CLAUDE.md`.
 
@@ -67,7 +67,8 @@ Reference: [Agent Skills](https://code.claude.com/docs/en/skills)
 ### File format
 
 Every skill is a folder under a plugin's own `skills/` containing a required `SKILL.md`
-(frontmatter plus body) and, optionally, a `reference.md` for large content loaded on demand.
+(frontmatter plus body) and, optionally, reference files (a `reference.md` or a `references/`
+folder) for large content loaded on demand.
 
 ### SKILL.md frontmatter
 

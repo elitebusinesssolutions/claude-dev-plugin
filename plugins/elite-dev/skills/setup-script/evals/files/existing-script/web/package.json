@@ -1,0 +1,13 @@
+{
+  "name": "web",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "next dev"
+  },
+  "dependencies": {
+    "next": "15.3.0"
+  }
+}
