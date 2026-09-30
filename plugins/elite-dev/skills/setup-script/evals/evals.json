@@ -8,6 +8,7 @@
       "files": ["evals/files/fullstack"],
       "expectations": [
         "Enters plan mode (or states it calls EnterPlanMode) before any file edit",
+        "The plan names each step by its tool or action (for example \"Node 22 through nvm\"), and never by a table row number",
         "Asks the developer whether anything else should be installed that the detection did not find",
         "Installs .NET SDK 9 (from global.json) through winget ID Microsoft.DotNet.SDK.9",
         "Installs the Aspire CLI only after a y/N prompt, because the installer is a remote script",
@@ -16,6 +17,7 @@
         "Signs in to Azure with a tenant comparison against 11111111-2222-3333-4444-555555555555, and signs in to GitHub with gh auth status / gh auth login",
         "Restores src/client with pnpm install --frozen-lockfile, runs dotnet restore on src/server/Acme.slnx, and runs dotnet tool restore",
         "Includes the elevation block and prints a summary of done, skipped, and manual steps",
+        "The script has no switch-back to the default Node major, because the repo has one Node major",
         "Adds a Developer machine setup section to README.md",
         "Does not run setup.ps1, and parses it (or states the parse check) as the verification"
       ]
@@ -27,6 +29,7 @@
       "files": ["evals/files/existing-script"],
       "expectations": [
         "Enters plan mode (or states it calls EnterPlanMode) before any file edit",
+        "The plan names each step by its tool or action (for example \"Node 20 through nvm\"), and never by a table row number",
         "Keeps the existing .NET SDK check and the existing summary lines, and does not add a second .NET SDK install step",
         "Does not rewrite or rename the existing code in setup.ps1",
         "Adds nvm for Windows and Node 20 (from engines.node >=20 in web/package.json)",
@@ -43,10 +46,12 @@
       "files": ["evals/files/extras"],
       "expectations": [
         "Enters plan mode (or states it calls EnterPlanMode) before any file edit",
+        "The plan names each step by its tool or action (for example \"Node 20 through nvm\"), and never by a table row number",
         "Adds Docker Desktop with Install-WithWinget and the winget ID Docker.DockerDesktop, before the sign-in steps",
         "Adds nvm for Windows and Node 20 (from .nvmrc), and restores with npm ci",
         "Does not add a .NET SDK, Aspire, Functions Core Tools, or Azure step",
         "Adds the GitHub CLI install and the GitHub sign-in step",
+        "The script has no switch-back to the default Node major, because the repo has one Node major",
         "Does not run setup.ps1"
       ]
     }

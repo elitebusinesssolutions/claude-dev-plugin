@@ -25,6 +25,8 @@ Steps 1 through 3 are read-only. Do not edit a file before the developer approve
 
 Use the detection table in [references/steps.md](references/steps.md). For each row, check the files it names. Build the list of steps in the order of that table.
 
+The developer cannot see the table. Name each step by its tool or action, for example "Node 24 through nvm" or "GitHub CLI". Never use a table row number.
+
 Ask the developer for each value you cannot find in the repo. Do not guess:
 
 - The Node major version for a package root that has no `.nvmrc`, `.node-version`, or `engines.node`.
@@ -48,6 +50,8 @@ List:
 1. Each step to add, with the reason from the detection table (for example "Node 22: `src/client/.nvmrc`").
 2. Each step that the script already has, as "kept".
 3. The README section to add or update.
+
+Name each step by its tool or action, as in step 2. Never use a table row number. List the steps that do not apply under "Not added", by tool name.
 
 Then call `ExitPlanMode`. The approval of the plan is the one approval. Ask again only for a change that is not on the list.
 

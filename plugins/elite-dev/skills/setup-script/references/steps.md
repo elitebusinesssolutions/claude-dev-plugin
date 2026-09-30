@@ -210,7 +210,7 @@ function Assert-AzureSignedIn {
 
 ### 11. JavaScript restore
 
-Call it once per package root, for example `Restore-PackageRoot "$repoRoot/src/client" 22`. After the last call, switch back to the default Node major, so that the apps run on it after the script ends:
+Call it once per package root, for example `Restore-PackageRoot "$repoRoot/src/client" 22`. After the last call, switch back to the default Node major, so that the apps run on it after the script ends. Use this block only when `$nodeMajors` has more than one major:
 
 ```powershell
 if ((Test-Command nvm) -and (Get-NodeMajor) -ne $defaultNodeMajor) {
