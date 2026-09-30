@@ -13,7 +13,7 @@ description: >
 
 Each app reads its secrets from its own vault. Local dev only. A developer signs in with `az login`. `DefaultAzureCredential` tries several credential sources. It uses the `az login` sign-in when no earlier source works. If the app uses the wrong identity, unset the `AZURE_*` environment variables.
 
-Never read or print a secret value. Never search the disk for keys or connection strings. Ask the developer instead.
+Never read or print a secret value. Never search the disk for keys or connection strings. Ask the developer instead. The seed script that this skill can write reads secret values when the developer runs it. The skill never runs that script.
 
 ## 1. Enter plan mode
 
@@ -31,6 +31,10 @@ Ask for each value. Do not guess. For the vault name, suggest the default and as
 - Resource group that holds the vaults.
 - Vault name for each app. Suggest `kv-<project>-<app>`. For a .NET app, `<app>` is the last dot-separated segment of the project name, in lower case (`Acme.Api` gives `api`). For a Next.js app, `<app>` is the app folder name, or the `name` in `package.json` when the app sits at the repo root. Suggest the name only if the name has 3 to 24 characters, uses only letters, digits, and single hyphens, starts with a letter, and ends with a letter or digit. Otherwise ask the developer for a valid name. Vault URL: `https://<vault>.vault.azure.net/`.
 - Path of the README that holds the secrets section, relative to the repo root.
+- Seed script. Ask: "Create a script that copies your existing local secrets into the vaults?" If yes, ask for:
+  - The script path, relative to the repo root. Suggest `scripts/seed-keyvault-secrets.ps1`.
+  - The env file of each JS/TS app that has one, for example `.env.local`. Any JS/TS app can have a seed source: Next.js, Vue, React, Vite, or plain TypeScript. Suggest `<app folder>/.env.local`. For an app that is not a Next.js app, also ask for its vault name, with the same suggestion rule as above.
+  - The Azure location for new vaults, or use the location of the resource group.
 
 ## 3. Detect the stack
 
@@ -40,8 +44,9 @@ Look for these files in the target project.
 - `package.json` with `next`: Next.js app.
 - A csproj that references `Aspire.Hosting.AppHost` or uses the `Aspire.AppHost.Sdk`: the AppHost. The Api resource is the `AddProject` call that names the Api project. If several calls match, ask the developer.
 - `setup.ps1` at the repo root: setup script.
+- Seed script only: any other `package.json` app, for example with `vue`, `react`, or `vite`, and its env file.
 
-Apply only the reference files that match. Write the plan: the inputs, every file you plan to create or edit, and every command you plan to run. Then call `ExitPlanMode`. The approval of the plan is the one approval for the list. Ask again only for a file or command that is not on the list.
+Apply only the reference files that match. Write the plan: the inputs, every file you plan to create or edit (including the seed script, if requested), and every command you plan to run. Then call `ExitPlanMode`. The approval of the plan is the one approval for the list. Ask again only for a file or command that is not on the list.
 
 ## 4. Apply the references
 
@@ -49,6 +54,7 @@ Apply only the reference files that match. Write the plan: the inputs, every fil
 2. Next.js apps: [references/nextjs.md](references/nextjs.md).
 3. Aspire AppHost: [references/apphost.md](references/apphost.md).
 4. Setup script, README, and RBAC: [references/setup-script.md](references/setup-script.md).
+5. Seed script, only if the developer asked for it: [references/seed-script.md](references/seed-script.md).
 
 ## 5. Secret names
 
@@ -65,5 +71,6 @@ Apply only the reference files that match. Write the plan: the inputs, every fil
 
 1. For each changed .NET project, run `dotnet build`. Stop on a compile error and report it.
 2. For each changed Next.js app, run the checks in section 3 of [references/nextjs.md](references/nextjs.md).
-3. Make sure the skill added no secret value to any file.
-4. Show the diff to the developer. Wait for a go-ahead before `git commit`.
+3. If the skill wrote a seed script, check that it parses: `[System.Management.Automation.Language.Parser]::ParseFile(<path>, [ref]$null, [ref]$errors)` must leave `$errors` empty. Do not run the script.
+4. Make sure the skill added no secret value to any file.
+5. Show the diff to the developer. Wait for a go-ahead before `git commit`.

@@ -9,7 +9,7 @@
 - With only Secrets User, a write gives a 403 `ForbiddenByRbac`.
 - The developer runs `az login --tenant <tenant-id> --skip-subscription-discovery` before the first run.
 
-The skill does not create vaults and does not assign roles. Tell the developer which roles to request.
+The skill does not create vaults and does not assign roles. Tell the developer which roles to request. The one exception is the seed script in [seed-script.md](seed-script.md): when the developer asks for it, the script creates a missing vault when the developer runs it.
 
 ## 2. Setup script
 
@@ -77,9 +77,10 @@ Add a section named "Local dev secrets (Azure Key Vault)" to the README at the p
 5. The override rules: user secrets win in .NET, `.env.local` wins in Next.js. In .NET the vault also wins over environment variables, so a vault key must not repeat a value that the AppHost sets.
 6. The full list of secret names for each vault. Names only, never values.
 7. The Functions limit, if the project has a Functions app.
+8. The seed script, if the skill wrote one: its path, when to run it (once after the first sign-in, and again after a new local secret), the roles it needs, and the limits in section 4 of [seed-script.md](seed-script.md).
 
 Write the prose in the language style of the target project. Do not hard-wrap the lines of a markdown file.
 
 ## 4. Guide files
 
-If the project has an `AGENTS.md` or `CLAUDE.md`, add one short bullet under the local run section. The bullet names the vault of each app and points to the README section.
+If the project has an `AGENTS.md` or `CLAUDE.md`, add one short bullet under the local run section. The bullet names the vault of each app and points to the README section. If the skill wrote a seed script, the bullet also names its path.

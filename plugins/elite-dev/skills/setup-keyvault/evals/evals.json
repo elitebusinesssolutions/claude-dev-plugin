@@ -67,6 +67,24 @@
         "Documents in README.md that the Functions host cannot read Key Vault, so trigger connection keys also need user secrets",
         "Does not write any secret value to any file"
       ]
+    },
+    {
+      "id": 5,
+      "prompt": "Set up Key Vault for local dev secrets in this project: evals/files/pnpm-monorepo. Project short name is acme. Tenant ID 11111111-2222-3333-4444-555555555555, resource group rg-acme-dev, README at README.md. Both apps (apps/admin and apps/portal) need secrets. Use the suggested vault names. Yes, create a script that copies my existing local secrets into the vaults. Use the suggested script path and the suggested .env.local path in each app.",
+      "expected_output": "Plans a standalone seed script that creates missing vaults and pushes every key of each app's .env.local into that app's vault, in addition to the vault loading code, and does not run the script or write any secret value.",
+      "files": ["evals/files/pnpm-monorepo"],
+      "expectations": [
+        "Enters plan mode (or states it calls EnterPlanMode) before any file edit or command that changes the project",
+        "Asks whether to create a script that copies existing local secrets into the vaults, before writing the plan",
+        "Lists scripts/seed-keyvault-secrets.ps1 as a file to create, separate from setup.ps1",
+        "The script runs az keyvault create with --enable-rbac-authorization true only when az keyvault show finds no vault",
+        "The script reads every KEY=value line of apps/admin/.env.local and apps/portal/.env.local with no hardcoded key list, and maps each underscore in a name to a dash",
+        "The script sets secrets in kv-acme-admin for the admin app and kv-acme-portal for the portal app",
+        "The script never prints a secret value",
+        "Does not run the seed script",
+        "Adds a README note about the seed script: its path, when to run it, and the Key Vault Secrets Officer role",
+        "Does not write any secret value to any file"
+      ]
     }
   ]
 }
