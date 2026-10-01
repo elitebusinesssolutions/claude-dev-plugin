@@ -280,7 +280,9 @@ function Install-ClaudePlugins {
         return
     }
 
-    $knownMarketplaces = (claude plugin marketplace list --json | ConvertFrom-Json).name
+    $marketplaceJson = claude plugin marketplace list --json
+    if ($LASTEXITCODE -ne 0) { throw "claude plugin marketplace list failed with exit code $LASTEXITCODE." }
+    $knownMarketplaces = ($marketplaceJson | ConvertFrom-Json).name
     foreach ($name in $marketplaces.Keys) {
         if ($knownMarketplaces -contains $name) {
             Write-Host "[skipped]   Claude marketplace $name is already added."
@@ -293,7 +295,9 @@ function Install-ClaudePlugins {
         $installed.Add("Claude marketplace $name")
     }
 
-    $installedPlugins = (claude plugin list --json | ConvertFrom-Json).id
+    $pluginJson = claude plugin list --json
+    if ($LASTEXITCODE -ne 0) { throw "claude plugin list failed with exit code $LASTEXITCODE." }
+    $installedPlugins = ($pluginJson | ConvertFrom-Json).id
     foreach ($plugin in $plugins) {
         if ($installedPlugins -contains $plugin) {
             Write-Host "[skipped]   Claude plugin $plugin is already installed."
@@ -310,18 +314,18 @@ function Install-ClaudePlugins {
 
 ### 10b. ASD-STE100 skill
 
-The step runs `npx`, which downloads and runs a remote package, so it asks first.
+The step runs `npx`, which downloads and runs a remote package, so it asks first. The "already installed" check reads the skill folder, because `npx skills list` would also download the package.
 
 ```powershell
 function Install-Asdste100Skill {
-    if (-not (Test-Command npx)) {
-        $manualSteps.Add("Install the ASD-STE100 skill: npx skills add danyuchn/asd-ste100-skill -g -y")
+    if (Test-Path (Join-Path $HOME ".agents/skills/asd-ste100")) {
+        Write-Host "[skipped]   ASD-STE100 skill is already installed."
+        $skipped.Add("ASD-STE100 skill")
         return
     }
 
-    if ((npx --yes skills list -g | Out-String) -match "asd-ste100") {
-        Write-Host "[skipped]   ASD-STE100 skill is already installed."
-        $skipped.Add("ASD-STE100 skill")
+    if (-not (Test-Command npx)) {
+        $manualSteps.Add("Install the ASD-STE100 skill: npx skills add danyuchn/asd-ste100-skill -g -y")
         return
     }
 
