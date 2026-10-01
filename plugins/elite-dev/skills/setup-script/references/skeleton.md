@@ -13,7 +13,8 @@ Sets up a developer machine for this repo.
 <One sentence per group of steps, for example: Installs the required tools with winget, signs in to
 Azure and GitHub, and restores dependencies.> Safe to run again: it skips every tool and step that is
 already done. In a terminal that is not elevated, it opens an elevated window through a UAC prompt
-and runs there.
+and runs there. Run it from a local administrator account: the elevated window runs as the account
+that approves the prompt, so per-user setup lands in that account's profile.
 
 .EXAMPLE
 ./setup.ps1

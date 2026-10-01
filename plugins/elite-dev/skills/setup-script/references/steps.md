@@ -14,9 +14,12 @@ Add a step when its condition matches. Keep this order in the main `try` block: 
 | 6   | Azure Functions Core Tools    | a csproj references `Microsoft.Azure.Functions.Worker`                                                                 | `Install-WithWinget "Azure Functions Core Tools" "Microsoft.Azure.FunctionsCoreTools" "func"` |
 | 7   | GitHub CLI                    | always                                                                                                                 | `Install-WithWinget "GitHub CLI" "GitHub.cli" "gh"`                                           |
 | 7a  | Extra tools                   | the developer names them in SKILL.md step 2                                                                            | `Install-WithWinget`, or a custom function                                                    |
+| 7b  | Claude CLI                    | always                                                                                                                 | `Install-ClaudeCli`                                                                           |
 | 8   | gh-stack (optional)           | the developer asks for it                                                                                              | `Install-GhStack`                                                                             |
 | 9   | Azure sign-in                 | step 5 is in the list                                                                                                  | `Assert-AzureSignedIn`                                                                        |
 | 10  | GitHub sign-in                | always                                                                                                                 | `Assert-SignedIn "GitHub" { gh auth status } { gh auth login }`                               |
+| 10a | Claude plugins                | always                                                                                                                 | `Install-ClaudePlugins`                                                                       |
+| 10b | ASD-STE100 skill              | always                                                                                                                 | `Install-Asdste100Skill`                                                                      |
 | 11  | JavaScript restore            | once per package root that has a lockfile                                                                              | `Restore-PackageRoot`                                                                         |
 | 12  | .NET restore                  | once per `*.sln` or `*.slnx`, or per csproj when the repo has no solution file                                         | `Invoke-Checked { dotnet restore "<path>" } "dotnet restore"`                                 |
 | 13  | .NET local tools              | `.config/dotnet-tools.json` exists                                                                                     | `Restore-DotnetTools`                                                                         |
@@ -178,6 +181,37 @@ function Enable-PackageManager {
 }
 ```
 
+### 7b. Claude CLI
+
+The installer is a remote script, so the step asks before it runs it.
+
+```powershell
+function Install-ClaudeCli {
+    if (Test-Command claude) {
+        Write-Host "[skipped]   Claude CLI is already installed."
+        $skipped.Add("Claude CLI")
+        return
+    }
+
+    $confirm = Read-Host "This will download and execute a remote script from https://claude.ai/install.ps1. Continue? [y/N]"
+    if ($confirm -notmatch '^[Yy]') {
+        $manualSteps.Add("Install the Claude CLI: irm https://claude.ai/install.ps1 | iex")
+        return
+    }
+
+    Write-Host "[installing] Claude CLI"
+    $installer = Join-Path ([IO.Path]::GetTempPath()) "claude-install.ps1"
+    Invoke-RestMethod https://claude.ai/install.ps1 -OutFile $installer
+    try {
+        Invoke-Checked { & (Get-Process -Id $PID).Path -NoProfile -ExecutionPolicy Bypass -File $installer } "Claude CLI install"
+    }
+    finally { Remove-Item $installer -ErrorAction SilentlyContinue }
+    Update-SessionEnvironment
+    Assert-Command claude
+    $installed.Add("Claude CLI")
+}
+```
+
 ### 8. gh-stack
 
 ```powershell
@@ -219,6 +253,115 @@ function Assert-AzureSignedIn {
     Write-Host "[sign-in]   Azure tenant $azureTenantId"
     Invoke-Checked { az login --tenant $azureTenantId --skip-subscription-discovery } "Azure sign-in"
     $installed.Add("Azure sign-in")
+}
+```
+
+### 10a. Claude plugins
+
+The marketplace and plugin lists are the baseline for every developer. Change the lists when the developer adds or drops a plugin. Plugins install in user scope. A marketplace or plugin that is already there is updated, and a failed update adds a manual line instead of stopping the script.
+
+```powershell
+function Install-ClaudePlugins {
+    $marketplaces = [ordered]@{
+        "claude-plugins-official" = "anthropics/claude-plugins-official"
+        "elitebusinesssolutions"  = "elitebusinesssolutions/claude-dev-plugin"
+        "ponytail"                = "DietrichGebert/ponytail"
+    }
+    $plugins = @(
+        "auth0@claude-plugins-official"
+        "claude-md-management@claude-plugins-official"
+        "code-review@claude-plugins-official"
+        "csharp-lsp@claude-plugins-official"
+        "elite-dev@elitebusinesssolutions"
+        "elite-ts@elitebusinesssolutions"
+        "github@claude-plugins-official"
+        "ponytail@ponytail"
+        "skill-creator@claude-plugins-official"
+        "typescript-lsp@claude-plugins-official"
+    )
+
+    if (-not (Test-Command claude)) {
+        $manualSteps.Add("Install the Claude CLI, then run setup.ps1 again to install the Claude plugins.")
+        return
+    }
+
+    $marketplaceJson = claude plugin marketplace list --json
+    if ($LASTEXITCODE -ne 0) { throw "claude plugin marketplace list failed with exit code $LASTEXITCODE." }
+    $knownMarketplaces = ($marketplaceJson | ConvertFrom-Json).name
+    foreach ($name in $marketplaces.Keys) {
+        if ($knownMarketplaces -contains $name) {
+            # The plugin updates below read the catalog, so the catalog is refreshed first.
+            Write-Host "[updating]  Claude marketplace $name"
+            if (Test-NativeSuccess { claude plugin marketplace update $name }) {
+                $installed.Add("Claude marketplace $name (update checked)")
+            }
+            else {
+                $manualSteps.Add("Update the Claude marketplace: claude plugin marketplace update $name")
+            }
+
+            continue
+        }
+
+        Write-Host "[installing] Claude marketplace $name"
+        Invoke-Checked { claude plugin marketplace add $marketplaces[$name] } "claude plugin marketplace add of $name"
+        $installed.Add("Claude marketplace $name")
+    }
+
+    $pluginJson = claude plugin list --json
+    if ($LASTEXITCODE -ne 0) { throw "claude plugin list failed with exit code $LASTEXITCODE." }
+    $installedPlugins = @(($pluginJson | ConvertFrom-Json) | Where-Object { $_.scope -eq "user" } | ForEach-Object { $_.id })
+    $pluginUpdated = $false
+    foreach ($plugin in $plugins) {
+        if ($installedPlugins -contains $plugin) {
+            Write-Host "[updating]  Claude plugin $plugin"
+            if (Test-NativeSuccess { claude plugin update $plugin --scope user }) {
+                $installed.Add("Claude plugin $plugin (update checked)")
+                $pluginUpdated = $true
+            }
+            else {
+                $manualSteps.Add("Update the Claude plugin: claude plugin update $plugin --scope user")
+            }
+
+            continue
+        }
+
+        Write-Host "[installing] Claude plugin $plugin"
+        Invoke-Checked { claude plugin install $plugin --scope user } "claude plugin install of $plugin"
+        $installed.Add("Claude plugin $plugin")
+    }
+
+    if ($pluginUpdated) {
+        $manualSteps.Add("Restart Claude Code to apply any plugin updates.")
+    }
+}
+```
+
+### 10b. ASD-STE100 skill
+
+The step runs `npx`, which downloads and runs a remote package, so it asks first. The "already installed" check reads the skill folder, because `npx skills list` would also download the package.
+
+```powershell
+function Install-Asdste100Skill {
+    if (Test-Path (Join-Path $HOME ".agents/skills/asd-ste100")) {
+        Write-Host "[skipped]   ASD-STE100 skill is already installed."
+        $skipped.Add("ASD-STE100 skill")
+        return
+    }
+
+    if (-not (Test-Command npx)) {
+        $manualSteps.Add("Install the ASD-STE100 skill: npx skills add danyuchn/asd-ste100-skill -g -y")
+        return
+    }
+
+    $confirm = Read-Host "This will download and run the npm package 'skills' to install danyuchn/asd-ste100-skill. Continue? [y/N]"
+    if ($confirm -notmatch '^[Yy]') {
+        $manualSteps.Add("Install the ASD-STE100 skill: npx skills add danyuchn/asd-ste100-skill -g -y")
+        return
+    }
+
+    Write-Host "[installing] ASD-STE100 skill"
+    Invoke-Checked { npx --yes skills add danyuchn/asd-ste100-skill -g -y } "npx skills add of the ASD-STE100 skill"
+    $installed.Add("ASD-STE100 skill")
 }
 ```
 
