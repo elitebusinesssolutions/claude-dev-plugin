@@ -6,7 +6,9 @@ Sets up a developer machine for this repo.
 Installs Node through nvm, the GitHub CLI, and the Claude CLI with winget or their installers, signs in
 to GitHub, installs the Claude plugins and the ASD-STE100 skill, and restores the npm packages. Safe to
 run again: it skips every tool and step that is already done. In a terminal that is not elevated, it
-opens an elevated window through a UAC prompt and runs there.
+opens an elevated window through a UAC prompt and runs there. Run it from a local administrator
+account: the elevated window runs as the account that approves the prompt, so per-user setup lands in
+that account's profile.
 
 .EXAMPLE
 ./setup.ps1
@@ -193,7 +195,12 @@ function Install-ClaudeCli {
     }
 
     Write-Host "[installing] Claude CLI"
-    Invoke-RestMethod https://claude.ai/install.ps1 | Invoke-Expression
+    $installer = Join-Path ([IO.Path]::GetTempPath()) "claude-install.ps1"
+    Invoke-RestMethod https://claude.ai/install.ps1 -OutFile $installer
+    try {
+        Invoke-Checked { & (Get-Process -Id $PID).Path -NoProfile -ExecutionPolicy Bypass -File $installer } "Claude CLI install"
+    }
+    finally { Remove-Item $installer -ErrorAction SilentlyContinue }
     Update-SessionEnvironment
     Assert-Command claude
     $installed.Add("Claude CLI")

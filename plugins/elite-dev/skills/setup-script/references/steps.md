@@ -200,7 +200,12 @@ function Install-ClaudeCli {
     }
 
     Write-Host "[installing] Claude CLI"
-    Invoke-RestMethod https://claude.ai/install.ps1 | Invoke-Expression
+    $installer = Join-Path ([IO.Path]::GetTempPath()) "claude-install.ps1"
+    Invoke-RestMethod https://claude.ai/install.ps1 -OutFile $installer
+    try {
+        Invoke-Checked { & (Get-Process -Id $PID).Path -NoProfile -ExecutionPolicy Bypass -File $installer } "Claude CLI install"
+    }
+    finally { Remove-Item $installer -ErrorAction SilentlyContinue }
     Update-SessionEnvironment
     Assert-Command claude
     $installed.Add("Claude CLI")

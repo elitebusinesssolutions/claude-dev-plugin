@@ -56,7 +56,7 @@ Run [`setup.ps1`](setup.ps1) from a PowerShell terminal at the repo root:
 ./setup.ps1
 ```
 
-The script asks for elevation through a UAC prompt and continues in an elevated window. It is safe to run again: it skips every tool and step that is already done.
+The script asks for elevation through a UAC prompt and continues in an elevated window. Run it from a local administrator account: the elevated window runs as the account that approves the prompt, so GitHub sign-in, Claude plugins, and npm packages land in that account's profile. It is safe to run again: it skips every tool and step that is already done.
 
 It installs:
 
