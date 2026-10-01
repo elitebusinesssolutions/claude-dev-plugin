@@ -25,14 +25,15 @@ if ($PSCmdlet.ShouldProcess($records, 'Upper-case drive letters in projectPath')
     Copy-Item -LiteralPath $records "$records.bak" -Force
 
     # Edit the raw text, not parsed JSON, so the file keeps its original formatting.
-    $text = Get-Content -LiteralPath $records -Raw
+    # Read and write UTF-8 explicitly, because Windows PowerShell 5.1 defaults to the ANSI code page.
+    $text = [System.IO.File]::ReadAllText($records, [System.Text.Encoding]::UTF8)
 
     # Match each "projectPath": "x:... value. Group 1 is the key and opening quote, group 2 is the
     # drive letter, group 3 is the colon. Only a lower-case letter matches, so the edit is idempotent.
     $text = [regex]::Replace($text, '("projectPath"\s*:\s*")([a-z])(:)', {
             param($m) $m.Groups[1].Value + $m.Groups[2].Value.ToUpperInvariant() + $m.Groups[3].Value
         })
-    Set-Content -LiteralPath $records $text -NoNewline
+    [System.IO.File]::WriteAllText($records, $text, [System.Text.UTF8Encoding]::new($false))
 }
 
 $failed = 0

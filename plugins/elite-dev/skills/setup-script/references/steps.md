@@ -297,7 +297,7 @@ function Install-ClaudePlugins {
 
     $pluginJson = claude plugin list --json
     if ($LASTEXITCODE -ne 0) { throw "claude plugin list failed with exit code $LASTEXITCODE." }
-    $installedPlugins = ($pluginJson | ConvertFrom-Json).id
+    $installedPlugins = @(($pluginJson | ConvertFrom-Json) | Where-Object { $_.scope -eq "user" } | ForEach-Object { $_.id })
     foreach ($plugin in $plugins) {
         if ($installedPlugins -contains $plugin) {
             Write-Host "[skipped]   Claude plugin $plugin is already installed."
