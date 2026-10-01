@@ -253,7 +253,7 @@ function Assert-AzureSignedIn {
 
 ### 10a. Claude plugins
 
-The marketplace and plugin lists are the baseline for every developer. Change the lists when the developer adds or drops a plugin. Plugins install in user scope.
+The marketplace and plugin lists are the baseline for every developer. Change the lists when the developer adds or drops a plugin. Plugins install in user scope. A marketplace or plugin that is already there is updated, and a failed update adds a manual line instead of stopping the script.
 
 ```powershell
 function Install-ClaudePlugins {
@@ -285,8 +285,15 @@ function Install-ClaudePlugins {
     $knownMarketplaces = ($marketplaceJson | ConvertFrom-Json).name
     foreach ($name in $marketplaces.Keys) {
         if ($knownMarketplaces -contains $name) {
-            Write-Host "[skipped]   Claude marketplace $name is already added."
-            $skipped.Add("Claude marketplace $name")
+            # The plugin updates below read the catalog, so the catalog is refreshed first.
+            Write-Host "[updating]  Claude marketplace $name"
+            if (Test-NativeSuccess { claude plugin marketplace update $name }) {
+                $installed.Add("Claude marketplace $name (update checked)")
+            }
+            else {
+                $manualSteps.Add("Update the Claude marketplace: claude plugin marketplace update $name")
+            }
+
             continue
         }
 
@@ -298,16 +305,28 @@ function Install-ClaudePlugins {
     $pluginJson = claude plugin list --json
     if ($LASTEXITCODE -ne 0) { throw "claude plugin list failed with exit code $LASTEXITCODE." }
     $installedPlugins = @(($pluginJson | ConvertFrom-Json) | Where-Object { $_.scope -eq "user" } | ForEach-Object { $_.id })
+    $pluginUpdated = $false
     foreach ($plugin in $plugins) {
         if ($installedPlugins -contains $plugin) {
-            Write-Host "[skipped]   Claude plugin $plugin is already installed."
-            $skipped.Add("Claude plugin $plugin")
+            Write-Host "[updating]  Claude plugin $plugin"
+            if (Test-NativeSuccess { claude plugin update $plugin --scope user }) {
+                $installed.Add("Claude plugin $plugin (update checked)")
+                $pluginUpdated = $true
+            }
+            else {
+                $manualSteps.Add("Update the Claude plugin: claude plugin update $plugin --scope user")
+            }
+
             continue
         }
 
         Write-Host "[installing] Claude plugin $plugin"
         Invoke-Checked { claude plugin install $plugin --scope user } "claude plugin install of $plugin"
         $installed.Add("Claude plugin $plugin")
+    }
+
+    if ($pluginUpdated) {
+        $manualSteps.Add("Restart Claude Code to apply any plugin updates.")
     }
 }
 ```
