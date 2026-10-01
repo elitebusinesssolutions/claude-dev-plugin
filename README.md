@@ -48,64 +48,6 @@ This refreshes the marketplace catalog only — follow it with
 manual pair always works regardless of whether `autoUpdate` is set anywhere; use it any time you
 don't want to wait for the next automatic startup check, or to confirm an update actually landed.
 
-## Consumer project setup (recommended)
-
-Running `claude plugin install` locally only configures your own machine — it doesn't reach any of
-your teammates', and each person has to repeat it themselves. For a team project, commit this to
-the project's own `.claude/settings.json` instead, so the plugin is declared for everyone who
-opens the repo:
-
-```json
-{
-  "extraKnownMarketplaces": {
-    "elitebusinesssolutions": {
-      "source": {
-        "source": "github",
-        "repo": "elitebusinesssolutions/claude-dev-plugin"
-      },
-      "autoUpdate": true
-    }
-  },
-  "enabledPlugins": {
-    "elite-dev@elitebusinesssolutions": true,
-    "elite-ts@elitebusinesssolutions": true
-  }
-}
-```
-
-Paste one entry under `enabledPlugins` for each plugin the project wants — drop whichever it
-doesn't need.
-
-If the project doesn't have a `.claude/settings.json` yet, create it with just this content. If it
-already has one — for anything, not just a plugin from here — merge `extraKnownMarketplaces` and
-`enabledPlugins` in as additional top-level keys; don't replace the file. This repo's own
-[`.claude/settings.json`](.claude/settings.json) is a working example of `enabledPlugins` sitting
-alongside an unrelated `hooks` block.
-
-This does **not** reliably auto-install the plugin — declaring it in `settings.json` only makes
-Claude Code aware the project wants it. Trusting the folder is only evaluated through the
-interactive trust dialog, and does nothing in headless/print mode (`-p`), including in CI. Once
-installed, `autoUpdate: true` keeps that installation current without anyone manually running
-`claude plugin marketplace update` — third-party marketplaces default to auto-update off.
-
-### Syncing plugins with sync-claude-plugins.ps1
-
-[`sync-claude-plugins.ps1`](sync-claude-plugins.ps1) is a standalone PowerShell script you can copy
-into any project that commits its plugin config to `.claude/settings.json` (not specific to this
-repo). Run it once when a developer starts on that project, and again any time
-`.claude/settings.json` changes (a new plugin, a new marketplace, or after pulling someone else's
-change to it):
-
-```powershell
-./sync-claude-plugins.ps1
-```
-
-It installs the Claude CLI if missing, registers/refreshes every marketplace listed under
-`extraKnownMarketplaces`, and installs/updates every plugin listed under `enabledPlugins` — safe to
-re-run any time, since installing/updating an already-current plugin is a no-op. Pass
-`-SettingsPath` to point at a non-default location, `-Scope user` to install at user scope instead
-of project scope, or `-DryRun` to print the commands it would run without executing them.
-
 ## Developing a plugin
 
 To try a skill from this repo before it's released:

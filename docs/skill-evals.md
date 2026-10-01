@@ -7,12 +7,11 @@ grade the responses against a checklist.
 
 ## Setup
 
-`skill-creator@claude-plugins-official` is enabled at project scope (see the root
-[`.claude/settings.json`](../.claude/settings.json)), so it's available to everyone working in
-this repo. If it's ever missing:
+The evals use the `skill-creator` plugin from `claude-plugins-official`, installed in user scope.
+The `elite-dev` setup script installs it. If it's missing:
 
 ```bash
-claude plugin install skill-creator@claude-plugins-official --scope project
+claude plugin install skill-creator@claude-plugins-official --scope user
 ```
 
 ## Creating evals for a skill
