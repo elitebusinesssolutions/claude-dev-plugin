@@ -338,29 +338,29 @@ function Install-ClaudePlugins {
 
 ### 10b. ASD-STE100 skill
 
-The step runs `npx`, which downloads and runs a remote package, so it asks first. The "already installed" check reads the skill folder, because `npx skills list` would also download the package.
+The step runs `npx`, which downloads and runs a remote package, so it asks first. The "already installed" check reads the Claude skills folder, because `npx skills list` would also download the package. The install command names the `claude-code` agent, because the shared `~/.agents/skills` folder does not make the skill available to Claude Code.
 
 ```powershell
 function Install-Asdste100Skill {
-    if (Test-Path (Join-Path $HOME ".agents/skills/asd-ste100")) {
+    if (Test-Path (Join-Path $HOME ".claude/skills/asd-ste100/SKILL.md")) {
         Write-Host "[skipped]   ASD-STE100 skill is already installed."
         $skipped.Add("ASD-STE100 skill")
         return
     }
 
     if (-not (Test-Command npx)) {
-        $manualSteps.Add("Install the ASD-STE100 skill: npx skills add danyuchn/asd-ste100-skill -g -y")
+        $manualSteps.Add("Install the ASD-STE100 skill: npx skills add danyuchn/asd-ste100-skill -g -a claude-code -y")
         return
     }
 
     $confirm = Read-Host "This will download and run the npm package 'skills' to install danyuchn/asd-ste100-skill. Continue? [y/N]"
     if ($confirm -notmatch '^[Yy]') {
-        $manualSteps.Add("Install the ASD-STE100 skill: npx skills add danyuchn/asd-ste100-skill -g -y")
+        $manualSteps.Add("Install the ASD-STE100 skill: npx skills add danyuchn/asd-ste100-skill -g -a claude-code -y")
         return
     }
 
     Write-Host "[installing] ASD-STE100 skill"
-    Invoke-Checked { npx --yes skills add danyuchn/asd-ste100-skill -g -y } "npx skills add of the ASD-STE100 skill"
+    Invoke-Checked { npx --yes skills add danyuchn/asd-ste100-skill -g -a claude-code -y } "npx skills add of the ASD-STE100 skill"
     $installed.Add("ASD-STE100 skill")
 }
 ```

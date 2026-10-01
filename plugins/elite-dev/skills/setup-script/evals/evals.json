@@ -17,7 +17,7 @@
         "Signs in to Azure with a tenant comparison against 11111111-2222-3333-4444-555555555555, and signs in to GitHub with gh auth status / gh auth login",
         "Installs the Claude CLI only after a y/N prompt, because the installer is a remote script",
         "Adds the Claude marketplaces claude-plugins-official, elitebusinesssolutions, and ponytail, and installs each baseline plugin with claude plugin install --scope user, and runs claude plugin update --scope user (not a skip) for any that claude plugin list --json already shows, adding a manual line when an update fails",
-        "Does not add the chele-bi marketplace or the asd-ste100@chele-bi plugin, and installs the ASD-STE100 skill with npx skills add danyuchn/asd-ste100-skill after a y/N prompt",
+        "Does not add the chele-bi marketplace or the asd-ste100@chele-bi plugin, and installs the ASD-STE100 skill with npx skills add danyuchn/asd-ste100-skill -g -a claude-code after a y/N prompt, and skips it when ~/.claude/skills/asd-ste100/SKILL.md exists",
         "Restores src/client with pnpm install --frozen-lockfile, runs dotnet restore on src/server/Acme.slnx, and runs dotnet tool restore",
         "Includes the elevation block and prints a summary of done, skipped, and manual steps",
         "The script has no switch-back to the default Node major, because the repo has one Node major",
