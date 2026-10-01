@@ -48,6 +48,27 @@ This refreshes the marketplace catalog only — follow it with
 manual pair always works regardless of whether `autoUpdate` is set anywhere; use it any time you
 don't want to wait for the next automatic startup check, or to confirm an update actually landed.
 
+## Developer machine setup
+
+Run [`setup.ps1`](setup.ps1) from a PowerShell terminal at the repo root:
+
+```powershell
+./setup.ps1
+```
+
+The script asks for elevation through a UAC prompt and continues in an elevated window. It is safe to run again: it skips every tool and step that is already done.
+
+It installs:
+
+- nvm for Windows and Node 20
+- The GitHub CLI, and signs in to GitHub
+- The Claude CLI
+- The baseline Claude plugins and marketplaces, in user scope
+- The ASD-STE100 skill
+- The npm packages of this repo, with `npm ci`
+
+The script asks before it runs a remote installer (the Claude CLI) or `npx` (the ASD-STE100 skill). When you decline, or a step cannot finish, the script lists the manual step in its summary, for example restarting Claude Code after a plugin update.
+
 ## Developing a plugin
 
 To try a skill from this repo before it's released:
