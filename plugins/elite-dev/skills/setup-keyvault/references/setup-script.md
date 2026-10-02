@@ -40,7 +40,8 @@ function Set-FunctionsTriggerSecret($key) {
     $errorFile = New-TemporaryFile
     try {
         # stdout only: stderr goes to a file, so a warning never ends up in the secret value.
-        $value = az keyvault secret show --vault-name $functionsVaultName --name $secretName --query value -o tsv 2>$errorFile
+        # JSON keeps a multi-line value as one string.
+        $value = az keyvault secret show --vault-name $functionsVaultName --name $secretName --query value -o json 2>$errorFile | ConvertFrom-Json
         $exitCode = $LASTEXITCODE
         $errorText = Get-Content $errorFile -Raw
     }
