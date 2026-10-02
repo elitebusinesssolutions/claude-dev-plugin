@@ -260,6 +260,10 @@ function Assert-AzureSignedIn {
             winget upgrade --id Microsoft.AzureCLI --exact --silent --accept-source-agreements --accept-package-agreements
         } "winget upgrade of Azure CLI"
         Update-SessionEnvironment
+        $azVersion = [version]((az version -o json | ConvertFrom-Json).'azure-cli')
+        if ($azVersion -lt [version]"2.86.0") {
+            throw "Azure CLI is still $azVersion after the upgrade. az login --skip-subscription-discovery needs 2.86.0 or later."
+        }
         $installed.Add("Azure CLI upgrade")
     }
 
