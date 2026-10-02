@@ -62,7 +62,7 @@
         "Calls AddUserSecrets<Program>() after AddAzureKeyVault inside the gate",
         "Adds a UserSecretsId with a new GUID to src/Acme.Functions/Acme.Functions.csproj",
         "Sets KeyVaultUrl to https://kv-acme-functions.vault.azure.net/ under Values in src/Acme.Functions/local.settings.json",
-        "Adds a setup.ps1 step that reads StorageSettings--ConnectionString from kv-acme-functions (not an Api vault) and passes it to dotnet user-secrets set without printing it",
+        "Adds a setup.ps1 step that reads StorageSettings--ConnectionString from kv-acme-functions (not an Api vault) and pipes it to dotnet user-secrets set as JSON on stdin, never as a command-line argument, without printing it",
         "Does not add or wire an Aspire AppHost",
         "Documents in README.md that the Functions host cannot read Key Vault, so trigger connection keys also need user secrets",
         "Does not write any secret value to any file"

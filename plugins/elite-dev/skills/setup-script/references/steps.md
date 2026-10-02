@@ -237,6 +237,8 @@ Add the tenant ID to the `param` block. A tenant ID is not a secret.
     [string]$azureTenantId = "<tenant-id>"
 ```
 
+The Azure CLI step skips any installed `az`, but `az login --skip-subscription-discovery` needs Azure CLI 2.86.0 or later. So the sign-in step upgrades an older Azure CLI through winget first. The step reads the version from `az version -o json`, because Windows PowerShell 5.1 drops the inner quotes of `--query '"azure-cli"'`.
+
 ```powershell
 function Assert-AzureSignedIn {
     $currentTenant = $null
@@ -248,6 +250,21 @@ function Assert-AzureSignedIn {
         Write-Host "[skipped]   Already signed in to Azure tenant $azureTenantId."
         $skipped.Add("Azure sign-in")
         return
+    }
+
+    # az login --skip-subscription-discovery needs Azure CLI 2.86.0 or later.
+    $azVersion = [version]((az version -o json | ConvertFrom-Json).'azure-cli')
+    if ($azVersion -lt [version]"2.86.0") {
+        Write-Host "[upgrading] Azure CLI $azVersion"
+        Invoke-Checked {
+            winget upgrade --id Microsoft.AzureCLI --exact --silent --accept-source-agreements --accept-package-agreements
+        } "winget upgrade of Azure CLI"
+        Update-SessionEnvironment
+        $azVersion = [version]((az version -o json | ConvertFrom-Json).'azure-cli')
+        if ($azVersion -lt [version]"2.86.0") {
+            throw "Azure CLI is still $azVersion after the upgrade. az login --skip-subscription-discovery needs 2.86.0 or later."
+        }
+        $installed.Add("Azure CLI upgrade")
     }
 
     Write-Host "[sign-in]   Azure tenant $azureTenantId"

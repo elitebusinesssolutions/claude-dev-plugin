@@ -7,7 +7,7 @@
 - Runtime reads need the role **Key Vault Secrets User** on each vault.
 - Seeding or editing secrets needs **Key Vault Secrets Officer** on each vault. Creating a vault needs a Contributor-level role on the resource group.
 - With only Secrets User, a write gives a 403 `ForbiddenByRbac`.
-- The developer runs `az login --tenant <tenant-id> --skip-subscription-discovery` before the first run.
+- The developer runs `az login --tenant <tenant-id> --skip-subscription-discovery` before the first run. The skip subscription discovery flag needs Azure CLI 2.86.0 or later.
 
 The skill does not create vaults and does not assign roles. Tell the developer which roles to request. The one exception is the seed script in [seed-script.md](seed-script.md): when the developer asks for it, the script creates a missing vault when the developer runs it.
 
@@ -40,7 +40,8 @@ function Set-FunctionsTriggerSecret($key) {
     $errorFile = New-TemporaryFile
     try {
         # stdout only: stderr goes to a file, so a warning never ends up in the secret value.
-        $value = az keyvault secret show --vault-name $functionsVaultName --name $secretName --query value -o tsv 2>$errorFile
+        # JSON keeps a multi-line value as one string.
+        $value = az keyvault secret show --vault-name $functionsVaultName --name $secretName --query value -o json 2>$errorFile | ConvertFrom-Json
         $exitCode = $LASTEXITCODE
         $errorText = Get-Content $errorFile -Raw
     }
@@ -59,7 +60,10 @@ function Set-FunctionsTriggerSecret($key) {
         throw "Reading $secretName from $functionsVaultName failed."
     }
 
-    Invoke-Checked { dotnet user-secrets set $key $value --project $functionsProject | Out-Null } "dotnet user-secrets set"
+    # stdin keeps the value out of the process command line. Every non-ASCII character becomes \uXXXX,
+    # because Windows PowerShell 5.1 pipes text to a native command as ASCII.
+    $json = [regex]::Replace((@{ $key = $value } | ConvertTo-Json -Compress), '[^\x00-\x7F]', { param($m) '\u{0:x4}' -f [int][char]$m.Value })
+    Invoke-Checked { $json | dotnet user-secrets set --project $functionsProject | Out-Null } "dotnet user-secrets set"
     $installed.Add("Functions user secret $key")
 }
 ```
