@@ -7,13 +7,11 @@ Claude Code plugin marketplace for Elite Business Solutions. Two plugins, each i
 | [elite-dev](plugins/elite-dev) | Generic dev-workflow skills — git worktrees, GitHub issues, pull requests, Azure Key Vault dev secrets, dev machine setup, plus a pinned context-usage line. Any TS/JS or .NET repo. | `claude plugin install elite-dev@elitebusinesssolutions` |
 | [elite-ts](plugins/elite-ts) | Shared lint/format hooks and formatting-setup/verification skills for TypeScript projects. | `claude plugin install elite-ts@elitebusinesssolutions` |
 
-Both plugins can also be used with [GitHub Copilot CLI](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-finding-installing), though its commands differ from the `claude` ones used below: install with `copilot plugin install <plugin-name>@elitebusinesssolutions`. Copilot CLI has no `--plugin-dir` equivalent for trying an unreleased local change — instead, install the local path directly (`copilot plugin install ./plugins/<plugin-name>`), and reinstall after every edit; there is no `/reload-plugins` equivalent to pick up a change mid-session.
-
 See each plugin's own README for what its skills and hooks do, and the root [CLAUDE.md](CLAUDE.md) for how this repo is structured and how to contribute.
 
 ## Install
 
-This is the personal, one-machine install path. Run it once per machine per person; it doesn't reach anyone else's setup — see [Consumer project setup](#consumer-project-setup-recommended) below for the team-wide alternative.
+This is the personal, one-machine install path. Run it once per machine per person; it doesn't reach anyone else's setup.
 
 Add the marketplace:
 
@@ -26,6 +24,8 @@ Then install whichever plugin(s) you need, e.g.:
 ```bash
 claude plugin install elite-dev@elitebusinesssolutions
 ```
+
+[GitHub Copilot CLI](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-finding-installing) takes the same commands with `claude` replaced by `copilot`.
 
 ## Update
 

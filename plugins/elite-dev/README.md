@@ -20,10 +20,10 @@ claude plugin install elite-dev@elitebusinesssolutions
 
 ## Context usage mod
 
-`elite-dev` also loads a mod that pins the context window usage (`ctx 42% 84k/200k`) under the prompt and refreshes it on session start, each prompt, and each finished turn. It needs no setup beyond installing the plugin.
+`elite-dev` also loads a mod that pins the context window usage (`ctx 42% 84k/200k`) under the prompt and refreshes it on session start, each prompt, after compaction, and each finished turn. It needs no setup beyond installing the plugin.
 
 ## Prerequisites
 
 Requires the [GitHub CLI](https://cli.github.com/) (`gh`), authenticated (`gh auth login`) — the GitHub issue, PR, and worktree skills shell out to it. `setup-keyvault` instead needs the [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) (`az`) on each developer machine that runs the configured app.
 
-See the root [README](../../README.md) for install/update/consumer-project setup shared by every plugin in this repo, and the root [CLAUDE.md](../../CLAUDE.md) for how this repo is developed.
+See the root [README](../../README.md) for install/update shared by every plugin in this repo, and the root [CLAUDE.md](../../CLAUDE.md) for how this repo is developed.
