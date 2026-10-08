@@ -1,7 +1,7 @@
 {
   "name": "elite-dev",
-  "description": "Generic dev-workflow skills for git worktrees, GitHub issues, pull requests, Azure Key Vault dev secrets, and developer machine setup",
-  "version": "0.8.0",
+  "description": "Generic dev-workflow skills for git worktrees, GitHub issues, pull requests, Azure Key Vault dev secrets, and developer machine setup, plus a pinned context-usage line",
+  "version": "0.9.0",
   "repository": "https://github.com/elitebusinesssolutions/claude-dev-plugin",
   "author": {
     "name": "Elite Business Solutions",

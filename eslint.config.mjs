@@ -6,14 +6,17 @@ import { defineConfig } from "eslint/config";
 import jsdoc from "eslint-plugin-jsdoc";
 
 export default defineConfig([
-  // Skill eval fixtures are not source.
-  { ignores: ["skills/*/evals/**"] },
+  {
+    // Local Claude state and .NET build output are not source.
+    ignores: [".claude/**", "**/bin/**", "**/obj/**"]
+  },
   // Baseline rules for every linted file.
   js.configs.recommended,
   {
-    files: ["**/*.js"],
+    // The repo's own Node scripts and their tests.
+    files: ["scripts/**/*.js", "tests/**/*.js"],
     languageOptions: {
-      // The hooks use require() and module.exports, not ES modules.
+      // The scripts use require() and module.exports, not ES modules.
       sourceType: "commonjs",
       // Node globals that the recommended rules would otherwise report as undefined.
       globals: {
@@ -22,36 +25,19 @@ export default defineConfig([
         process: "readonly",
         console: "readonly",
         __dirname: "readonly",
-        Buffer: "readonly",
-        setTimeout: "readonly",
-        clearTimeout: "readonly",
-        setInterval: "readonly",
-        clearInterval: "readonly"
+        Buffer: "readonly"
       }
     },
     rules: {
+      // Every if/else/loop body takes braces, so an added line never falls outside the block.
+      curly: ["error", "all"],
       // An empty block is an error, except a catch that deliberately swallows.
       "no-empty": ["error", { allowEmptyCatch: true }]
     }
   },
   {
-    // Test runner globals, so test files do not report describe/it/test as undefined.
-    files: ["tests/**/*.js"],
-    languageOptions: {
-      globals: {
-        describe: "readonly",
-        it: "readonly",
-        test: "readonly",
-        before: "readonly",
-        after: "readonly",
-        beforeEach: "readonly",
-        afterEach: "readonly"
-      }
-    }
-  },
-  {
-    // Hooks carry JSDoc on every function; tests are exempt.
-    files: ["hooks/**/*.js"],
+    // Scripts carry JSDoc on every function; tests are exempt.
+    files: ["scripts/**/*.js"],
     plugins: { jsdoc },
     rules: {
       "jsdoc/require-jsdoc": [

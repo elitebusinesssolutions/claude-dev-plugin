@@ -4,7 +4,8 @@ Sets up a developer machine for this repo.
 
 .DESCRIPTION
 Installs Node through nvm, the GitHub CLI, and the Claude CLI with winget or their installers, signs in
-to GitHub, installs the Claude plugins and the ASD-STE100 skill, and restores the npm packages. Safe to
+to GitHub, installs the Claude plugins and the ASD-STE100 skill, generates the elite-dev mod's
+TypeScript types with one short Claude session, and restores the npm packages. Safe to
 run again: it skips every tool and step that is already done. In a terminal that is not elevated, it
 opens an elevated window through a UAC prompt and runs there. Run it from a local administrator
 account: the elevated window runs as the account that approves the prompt, so per-user setup lands in
@@ -303,6 +304,37 @@ function Install-Asdste100Skill {
     $installed.Add("ASD-STE100 skill")
 }
 
+# The engine writes the TypeScript types of a mod when a session loads it from its folder, and
+# the editor needs them to resolve the mod's "claude-code" imports.
+function Initialize-ModTypes {
+    $modTypes = Join-Path $repoRoot "plugins/elite-dev/.claude-plugin/types/claude-code/index.d.ts"
+    $manualStep = "Run claude --plugin-dir plugins/elite-dev once, then restart the TypeScript server in the editor, to generate the elite-dev mod's TypeScript types."
+
+    if (-not (Test-Command claude)) {
+        $manualSteps.Add($manualStep)
+        return
+    }
+
+    # The session that writes the types is a model call, so it needs a signed-in claude.
+    try { Assert-SignedIn -label "Claude" -check { claude auth status } -login { claude auth login } }
+    catch {
+        $manualSteps.Add($manualStep)
+        return
+    }
+
+    Write-Host "[installing] elite-dev mod types"
+    Push-Location $repoRoot
+    try { $generated = Test-NativeSuccess { claude --plugin-dir plugins/elite-dev --no-session-persistence -p "Reply with the word ok." } }
+    finally { Pop-Location }
+
+    if ($generated -and (Test-Path $modTypes)) {
+        $installed.Add("elite-dev mod types")
+    }
+    else {
+        $manualSteps.Add($manualStep)
+    }
+}
+
 function Restore-PackageRoot($path, $major) {
     if ((Get-NodeMajor) -ne $major) {
         if (-not (Test-Command nvm)) {
@@ -336,6 +368,7 @@ try {
 
     Install-ClaudePlugins
     Install-Asdste100Skill
+    Initialize-ModTypes
 
     Restore-PackageRoot $repoRoot 20
 }

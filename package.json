@@ -5,8 +5,12 @@
     "plugins/elite-ts"
   ],
   "scripts": {
-    "test": "node --test tests/*.test.js && npm test --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present",
+    "test": "node --test tests/*.test.js && npm test --workspaces --if-present && npm run test:context-usage-mod",
+    "test:context-usage-mod": "node scripts/test-context-usage-mod.js",
+    "lint": "eslint .",
+    "typecheck": "tsc -p plugins/elite-dev --noEmit",
+    "pre-pr": "node scripts/pre-pr-check.js",
+    "validate:plugins": "claude plugin validate . && claude plugin validate plugins/elite-dev && claude plugin validate plugins/elite-ts",
     "format": "npm run format --workspaces --if-present",
     "format:root": "prettier --write .",
     "format:check:root": "prettier --check .",
@@ -15,7 +19,10 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "eslint": "^10.6.0",
-    "prettier": "^3.9.4"
+    "eslint-plugin-jsdoc": "^65.2.0",
+    "prettier": "^3.9.4",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.71.1"
   },
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24"

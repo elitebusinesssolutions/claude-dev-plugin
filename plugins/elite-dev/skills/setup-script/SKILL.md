@@ -1,13 +1,7 @@
 ---
 name: setup-script
 description: >
-  Creates or extends a Windows setup.ps1 at the repo root that prepares a developer machine: it
-  installs the tools the repo needs with winget, installs Node through nvm and pnpm or yarn
-  through corepack, installs the Claude CLI, the baseline Claude plugins, and the ASD-STE100 skill,
-  signs in to Azure and GitHub, and restores dependencies. Safe to run again.
-  Enters plan mode first, so the developer approves every file change. Use when the user asks to
-  "add a setup script", "create setup.ps1", "script the dev machine setup", or "add X to the
-  setup script". Other skills, such as setup-keyvault, add their own steps to this script.
+  Creates or extends a Windows setup.ps1 at the repo root that prepares a developer machine: it installs the tools the repo needs with winget, installs Node through nvm and pnpm or yarn through corepack, installs the Claude CLI, the baseline Claude plugins, and the ASD-STE100 skill, signs in to Azure and GitHub, and restores dependencies. Safe to run again. Enters plan mode first, so the developer approves every file change. Use when the user asks to "add a setup script", "create setup.ps1", "script the dev machine setup", or "add X to the setup script". Other skills, such as setup-keyvault, add their own steps to this script.
 ---
 
 # Set up the setup script

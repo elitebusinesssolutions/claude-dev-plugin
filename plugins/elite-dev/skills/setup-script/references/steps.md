@@ -4,26 +4,26 @@
 
 Add a step when its condition matches. Keep this order in the main `try` block: tools, then sign-ins, then restore, then steps from other skills.
 
-| #   | Step                          | Add when                                                                                                               | Function                                                                                      |
-| --- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| 1   | .NET SDK                      | any `*.csproj` exists                                                                                                  | `Install-DotnetSdk`                                                                           |
-| 2   | Aspire CLI                    | a csproj uses `Aspire.AppHost.Sdk` or references `Aspire.Hosting.AppHost`                                              | `Install-AspireCli`                                                                           |
-| 3   | Node through nvm              | any `package.json` exists                                                                                              | `Install-Node`                                                                                |
-| 4   | pnpm or yarn through corepack | a `pnpm-lock.yaml` or `yarn.lock` exists                                                                               | `Enable-PackageManager`                                                                       |
-| 5   | Azure CLI                     | a csproj references an `Azure.*` package, a `package.json` depends on an `@azure/*` package, or another step runs `az` | `Install-WithWinget "Azure CLI" "Microsoft.AzureCLI" "az"`                                    |
-| 6   | Azure Functions Core Tools    | a csproj references `Microsoft.Azure.Functions.Worker`                                                                 | `Install-WithWinget "Azure Functions Core Tools" "Microsoft.Azure.FunctionsCoreTools" "func"` |
-| 7   | GitHub CLI                    | always                                                                                                                 | `Install-WithWinget "GitHub CLI" "GitHub.cli" "gh"`                                           |
-| 7a  | Extra tools                   | the developer names them in SKILL.md step 2                                                                            | `Install-WithWinget`, or a custom function                                                    |
-| 7b  | Claude CLI                    | always                                                                                                                 | `Install-ClaudeCli`                                                                           |
-| 8   | gh-stack (optional)           | the developer asks for it                                                                                              | `Install-GhStack`                                                                             |
-| 9   | Azure sign-in                 | step 5 is in the list                                                                                                  | `Assert-AzureSignedIn`                                                                        |
-| 10  | GitHub sign-in                | always                                                                                                                 | `Assert-SignedIn "GitHub" { gh auth status } { gh auth login }`                               |
-| 10a | Claude plugins                | always                                                                                                                 | `Install-ClaudePlugins`                                                                       |
-| 10b | ASD-STE100 skill              | always                                                                                                                 | `Install-Asdste100Skill`                                                                      |
-| 11  | JavaScript restore            | once per package root that has a lockfile                                                                              | `Restore-PackageRoot`                                                                         |
-| 12  | .NET restore                  | once per `*.sln` or `*.slnx`, or per csproj when the repo has no solution file                                         | `Invoke-Checked { dotnet restore "<path>" } "dotnet restore"`                                 |
-| 13  | .NET local tools              | `.config/dotnet-tools.json` exists                                                                                     | `Restore-DotnetTools`                                                                         |
-| 14  | Steps from other skills       | another skill, such as setup-keyvault, adds them                                                                       | the other skill's function                                                                    |
+| # | Step | Add when | Function |
+| --- | --- | --- | --- |
+| 1 | .NET SDK | any `*.csproj` exists | `Install-DotnetSdk` |
+| 2 | Aspire CLI | a csproj uses `Aspire.AppHost.Sdk` or references `Aspire.Hosting.AppHost` | `Install-AspireCli` |
+| 3 | Node through nvm | any `package.json` exists | `Install-Node` |
+| 4 | pnpm or yarn through corepack | a `pnpm-lock.yaml` or `yarn.lock` exists | `Enable-PackageManager` |
+| 5 | Azure CLI | a csproj references an `Azure.*` package, a `package.json` depends on an `@azure/*` package, or another step runs `az` | `Install-WithWinget "Azure CLI" "Microsoft.AzureCLI" "az"` |
+| 6 | Azure Functions Core Tools | a csproj references `Microsoft.Azure.Functions.Worker` | `Install-WithWinget "Azure Functions Core Tools" "Microsoft.Azure.FunctionsCoreTools" "func"` |
+| 7 | GitHub CLI | always | `Install-WithWinget "GitHub CLI" "GitHub.cli" "gh"` |
+| 7a | Extra tools | the developer names them in SKILL.md step 2 | `Install-WithWinget`, or a custom function |
+| 7b | Claude CLI | always | `Install-ClaudeCli` |
+| 8 | gh-stack (optional) | the developer asks for it | `Install-GhStack` |
+| 9 | Azure sign-in | step 5 is in the list | `Assert-AzureSignedIn` |
+| 10 | GitHub sign-in | always | `Assert-SignedIn "GitHub" { gh auth status } { gh auth login }` |
+| 10a | Claude plugins | always | `Install-ClaudePlugins` |
+| 10b | ASD-STE100 skill | always | `Install-Asdste100Skill` |
+| 11 | JavaScript restore | once per package root that has a lockfile | `Restore-PackageRoot` |
+| 12 | .NET restore | once per `*.sln` or `*.slnx`, or per csproj when the repo has no solution file | `Invoke-Checked { dotnet restore "<path>" } "dotnet restore"` |
+| 13 | .NET local tools | `.config/dotnet-tools.json` exists | `Restore-DotnetTools` |
+| 14 | Steps from other skills | another skill, such as setup-keyvault, adds them | the other skill's function |
 
 Values:
 

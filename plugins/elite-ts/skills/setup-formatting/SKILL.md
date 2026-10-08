@@ -149,19 +149,24 @@ If this is a project using the elite-ts plugin, PostToolUse formatting is alread
 For a project repo without this plugin, copy the hook script and its shared helper and wire it up. First, create `.claude/hooks/lib/output.js` with this content:
 
 ```js
-// Shared helper for format.js: turns a spawned process's stdout/stderr into
-// a single truncated string suitable for a failure message.
-//
-// stdout and stderr are joined with an explicit "\n" separator before being
-// trimmed/split — without that separator, a stdout chunk that doesn't already
-// end in its own trailing newline would have its last line silently merge
-// with stderr's first line into one garbled line. Empty streams are dropped
-// before joining so a missing stdout or stderr doesn't leave a stray blank
-// line at the start/end/middle of the result.
-//
-// `head` mirrors Array.prototype.slice(0, n) — pass it to keep only the
-// earliest lines, where the root cause of a failure usually shows up first
-// (e.g. tsc/eslint errors). Omitting it returns the full (trimmed, joined) output.
+// Shared helper for format.js.
+
+/**
+ * Turns a spawned process's stdout/stderr into a single truncated string suitable for a failure
+ * message.
+ *
+ * stdout and stderr are joined with an explicit "\n" separator before being trimmed/split — without
+ * that separator, a stdout chunk that doesn't already end in its own trailing newline would have its
+ * last line silently merge with stderr's first line into one garbled line. Empty streams are dropped
+ * before joining so a missing stdout or stderr doesn't leave a stray blank line at the start, end or
+ * middle of the result.
+ * @param {string} stdout Captured standard output.
+ * @param {string} stderr Captured standard error.
+ * @param {{ head?: number }} [options] `head` mirrors Array.prototype.slice(0, n): it keeps only the
+ * earliest lines, where the root cause of a failure usually shows up first (e.g. tsc/eslint errors).
+ * Omitting it returns the full (trimmed, joined) output.
+ * @returns {string} The combined, trimmed output.
+ */
 function truncatedOutput(stdout, stderr, { head } = {}) {
   const combined = [stdout, stderr]
     // Strip any trailing newline(s) each stream already ends with, so joining
@@ -215,6 +220,11 @@ try {
   // routing `f` (traced back to a tool call's file_path) through cmd.exe's
   // metacharacter parsing. Spawning the resolved JS script with node itself
   // needs no shell, and no shell-metacharacter parsing of `f`, on any platform.
+  /**
+   * Finds a package's bin script by walking up from the edited file's directory.
+   * @param {string} name Package name, e.g. `eslint`.
+   * @returns {string | null} Path of the bin script, or null when no install is found.
+   */
   function findBinScript(name) {
     let dir = searchStart;
     for (;;) {

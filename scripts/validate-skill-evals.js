@@ -7,6 +7,10 @@ const { execFileSync } = require("child_process");
 
 const REPO_ROOT = path.join(__dirname, "..");
 
+/**
+ * Lists the plugin directories that have a `skills/` folder.
+ * @returns {string[]} Plugin directory names.
+ */
 function pluginNames() {
   const pluginsDir = path.join(REPO_ROOT, "plugins");
   return fs
@@ -16,22 +20,41 @@ function pluginNames() {
     .filter((name) => fs.existsSync(path.join(pluginsDir, name, "skills")));
 }
 
+/**
+ * Extracts the skills a `git diff --name-only` listing touches, skipping unknown plugins and
+ * `-workspace` folders.
+ * @param {string} diffText Newline-separated changed file paths.
+ * @param {Set<string>} validPlugins Plugin names whose skills count.
+ * @returns {{ pluginName: string, skillName: string }[]} Each changed skill once.
+ */
 function parseChangedSkillNames(diffText, validPlugins) {
   const seen = new Set();
   const pairs = [];
   for (const line of diffText.split("\n")) {
     const match = /^plugins\/([^/]+)\/skills\/([^/]+)\//.exec(line.trim());
-    if (!match) continue;
+    if (!match) {
+      continue;
+    }
     const [, pluginName, skillName] = match;
-    if (!validPlugins.has(pluginName) || skillName.endsWith("-workspace")) continue;
+    if (!validPlugins.has(pluginName) || skillName.endsWith("-workspace")) {
+      continue;
+    }
     const key = `${pluginName}/${skillName}`;
-    if (seen.has(key)) continue;
+    if (seen.has(key)) {
+      continue;
+    }
     seen.add(key);
     pairs.push({ pluginName, skillName });
   }
   return pairs;
 }
 
+/**
+ * Lists the skills changed between a base ref and HEAD.
+ * @param {string} baseRef Git ref to diff against.
+ * @returns {{ pluginName: string, skillName: string }[]} Each changed skill once.
+ * @throws {Error} When the diff against the base ref fails.
+ */
 function changedSkillNames(baseRef) {
   let diff;
   try {
@@ -50,6 +73,12 @@ function changedSkillNames(baseRef) {
   return parseChangedSkillNames(diff, new Set(pluginNames()));
 }
 
+/**
+ * Checks a parsed `evals.json` against the eval schema.
+ * @param {unknown} data The parsed file contents.
+ * @param {string} skillName The skill directory name the file must declare.
+ * @returns {string[]} One message per problem; empty when the file is valid.
+ */
 function validateEvalsJson(data, skillName) {
   const errors = [];
 
@@ -106,6 +135,7 @@ function validateEvalsJson(data, skillName) {
   return errors;
 }
 
+/** Validates the `evals.json` of every skill changed since the base ref given on the command line. */
 function main() {
   const baseRef = process.argv[2];
   if (!baseRef) {

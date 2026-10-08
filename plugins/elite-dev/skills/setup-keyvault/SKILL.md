@@ -1,12 +1,7 @@
 ---
 name: setup-keyvault
 description: >
-  Configures Azure Key Vault for local development secrets in a new project. Adds the vault
-  loading code to .NET Api and Functions apps, Next.js apps, and an Aspire AppHost, then adds the
-  setup script step and the README section. Enters plan mode first, so the developer approves
-  every file and command before any edit. Use when the user asks to "set up Key Vault", "add
-  Key Vault to this project", or "load dev secrets from Key Vault". Copy the pattern exactly.
-  Do not invent alternatives.
+  Configures Azure Key Vault for local development secrets in a new project. Adds the vault loading code to .NET Api and Functions apps, Next.js apps, and an Aspire AppHost, then adds the setup script step and the README section. Enters plan mode first, so the developer approves every file and command before any edit. Use when the user asks to "set up Key Vault", "add Key Vault to this project", or "load dev secrets from Key Vault". Copy the pattern exactly. Do not invent alternatives.
 ---
 
 # Set up Key Vault
