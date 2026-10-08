@@ -21,8 +21,13 @@ try {
     fs.copyFileSync(file, target);
   }
 
-  // shell: true lets Windows resolve claude.cmd and claude.exe alike.
-  status = spawnSync("claude", ["plugin", "test", copy], { stdio: "inherit", shell: true }).status;
+  // shell: true lets Windows resolve claude.cmd and claude.exe alike. The copy is the working
+  // directory, so no path reaches the shell to be split on a space.
+  status = spawnSync("claude", ["plugin", "test", "."], {
+    cwd: copy,
+    stdio: "inherit",
+    shell: true
+  }).status;
 } finally {
   fs.rmSync(copy, { recursive: true, force: true });
 }

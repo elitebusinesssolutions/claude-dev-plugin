@@ -321,9 +321,12 @@ function Initialize-ModTypes {
         return
     }
 
+    # The session that writes the types is a model call, so it needs a signed-in claude.
+    Assert-SignedIn "Claude" { claude auth status } { claude auth login }
+
     Write-Host "[installing] elite-dev mod types"
     Push-Location $repoRoot
-    try { Test-NativeSuccess { claude --plugin-dir plugins/elite-dev -p "Reply with the word ok." } | Out-Null }
+    try { Test-NativeSuccess { claude --plugin-dir plugins/elite-dev --no-session-persistence -p "Reply with the word ok." } | Out-Null }
     finally { Pop-Location }
 
     if (Test-Path $modTypes) {

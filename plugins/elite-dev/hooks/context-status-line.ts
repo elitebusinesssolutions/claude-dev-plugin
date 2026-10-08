@@ -25,6 +25,13 @@ export const register: Register = (on) => {
     return next(e);
   }).catch((_$, e, next) => next(e));
 
+  on("session.compact", async ($, e, next) => {
+    const result = await next(e);
+    await refreshContextStatus($);
+
+    return result;
+  });
+
   on("turn.complete", async ($, e, next) => {
     const result = await next(e);
     await refreshContextStatus($);

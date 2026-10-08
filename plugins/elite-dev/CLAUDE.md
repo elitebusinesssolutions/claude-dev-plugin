@@ -62,8 +62,8 @@ hooks module that runs inside the engine, with no Node and no npm dependencies),
 hook, so `elite-dev` has no `package.json`.
 
 - `hooks/hooks.json` names the one module in `modules`.
-- `hooks/context-status-line.ts` hooks `session.start`, `prompt.submit`, and `turn.complete` and
-  refreshes the status line on each.
+- `hooks/context-status-line.ts` hooks `session.start`, `prompt.submit`, `session.compact`, and
+  `turn.complete` and refreshes the status line on each.
 - `hooks/context-status-format.ts` turns the usage reading into the status text.
 - `hooks/*.test.ts` hold the tests.
 - `tsconfig.json` extends the engine-generated `.claude-plugin/types/tsconfig.json`.
@@ -73,22 +73,26 @@ from this folder, and git ignores it. A fresh clone or worktree shows `claude-co
 VS Code until `setup.ps1` or `claude --plugin-dir plugins/elite-dev` has run once; then run
 "TypeScript: Restart TS Server".
 
-Check the mod with:
+Before every PR, run this from the repo root:
 
 ```bash
-npm test
-npm run validate:plugins
-npm run typecheck
-npm run lint
+npm run pre-pr
 ```
 
-Run them from the repo root. `npm test` includes `test:mod` (`claude plugin test`), so it needs the
-`claude` CLI; `validate:plugins` needs it too. `typecheck` needs the generated types below.
-`eslint.config.mjs` here lints the mod's TypeScript.
+`scripts/pre-pr-check.js` deletes `.claude-plugin/types/`, regenerates it with
+`claude --plugin-dir plugins/elite-dev -p "Reply with the word ok."`, then runs `npm test`,
+`npm run validate:plugins`, `npm run typecheck`, and `npm run lint`, stopping at the first failure.
+CI does not run `typecheck` (it has no generated types), so this local run is the only type check.
+Regenerating makes it run against the types of the current `claude` CLI, not a stale copy. The
+`claude -p` run is a real model call, so it needs a signed-in `claude`.
+
+`npm test` includes `test:context-usage-mod` (`claude plugin test`), so it needs the `claude` CLI;
+`validate:plugins` needs it too. `eslint.config.mjs` here lints the mod's TypeScript.
 
 `claude plugin test` runs every `*.test.ts` under the folder it is given, gitignored ones included.
-`test:mod` (`scripts/test-mod.js`) therefore runs it on a temporary copy holding only the files git
-tracks or would track. A committed `*.test.ts` under `skills/` still runs and fails it.
+`test:context-usage-mod` (`scripts/test-context-usage-mod.js`) therefore runs it on a temporary copy
+holding only the files git tracks or would track. A committed `*.test.ts` under `skills/` still runs
+and fails it.
 
 ---
 

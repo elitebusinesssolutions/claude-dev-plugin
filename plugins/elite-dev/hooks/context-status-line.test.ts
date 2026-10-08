@@ -1,4 +1,4 @@
-import type { On } from "claude-code";
+import type { On, SessionMessage } from "claude-code";
 import { expect, test } from "claude-code/testing";
 
 const usage = {
@@ -9,6 +9,8 @@ const usage = {
 
 const sessionStart = { cwd: "/repo", surface: "terminal", isInteractive: true } as const;
 const promptSubmit = { text: "hello", wait: false, origin: { kind: "composer" } } as const;
+const summary: SessionMessage = { role: "user", text: "summary", toolUses: [] };
+const sessionCompact = { trigger: "manual", messages: [summary] } as const;
 const turnComplete = {
   answer: "done",
   durationMs: 1,
@@ -43,6 +45,10 @@ const stubEngine = (on: On, { readUsage = async () => usage, failSubmits = 0 }: 
 
     return { text: e.text };
   });
+  on("session.compact", async () => {
+    log.push("session.compact");
+    return { messages: [summary] };
+  });
   on("turn.complete", async (_$, e) => {
     log.push("turn.complete");
     return { text: e.answer };
@@ -70,6 +76,13 @@ test("turn.complete refreshes the context line after the turn", async ($, on) =>
 
   expect(await $.turn.complete(turnComplete)).toEqual({ text: "done" });
   expect(log).toEqual(["turn.complete", "status:ctx 42% 84k/200k"]);
+});
+
+test("session.compact refreshes the context line after the compaction", async ($, on) => {
+  const log = stubEngine(on);
+
+  expect(await $.session.compact(sessionCompact)).toEqual({ messages: [summary] });
+  expect(log).toEqual(["session.compact", "status:ctx 42% 84k/200k"]);
 });
 
 test("a failed usage read leaves the line alone and the event still completes", async ($, on) => {

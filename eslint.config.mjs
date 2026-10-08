@@ -2,6 +2,9 @@ import js from "@eslint/js";
 import { defineConfig } from "eslint/config";
 
 export default defineConfig([
+  {
+    ignores: [".claude/**", "**/bin/**", "**/obj/**"]
+  },
   js.configs.recommended,
   {
     files: ["scripts/**/*.js", "tests/**/*.js"],

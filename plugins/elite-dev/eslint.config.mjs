@@ -3,6 +3,9 @@ import { defineConfig } from "eslint/config";
 import tseslint from "typescript-eslint";
 
 export default defineConfig([
+  {
+    ignores: [".claude-plugin/types/**", "skills/*-workspace/**", "skills/*/evals/**"]
+  },
   { files: ["hooks/**/*.ts"] },
   js.configs.recommended,
   tseslint.configs.recommended,
