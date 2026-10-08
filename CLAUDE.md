@@ -5,7 +5,8 @@ under `plugins/`:
 
 - **`elite-dev`** — generic dev-workflow skills (git worktrees, GitHub issues, pull requests,
   Azure Key Vault dev secrets, developer machine setup) for any TypeScript/JavaScript or .NET
-  repo. Skills only, no hooks. See its own [CLAUDE.md](plugins/elite-dev/CLAUDE.md).
+  repo, plus a `context-usage` mod that pins the context window usage under the prompt. See its own
+  [CLAUDE.md](plugins/elite-dev/CLAUDE.md).
 - **`elite-ts`** — shared lint/format hooks and formatting-setup/verification skills for
   TypeScript projects. See its own `plugins/elite-ts/CLAUDE.md`.
 
@@ -130,7 +131,9 @@ See the `add-new-plugin` skill for the step-by-step procedure.
 
 ## Hooks
 
-`elite-ts` ships a lint/format hook; `elite-dev` ships no hooks. See
+`elite-ts` ships a lint/format hook; `elite-dev` ships a `context-usage` mod
+(`hooks/context-status-line.ts`, not a command hook; see its own
+[CLAUDE.md](plugins/elite-dev/CLAUDE.md#context-usage-mod)). See
 [docs/hooks-authoring.md](docs/hooks-authoring.md) for `hooks.json` format, path resolution, the
 exit-code contract, matchers, timeouts, and the checklist for adding a new hook.
 

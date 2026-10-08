@@ -19,6 +19,12 @@ claude plugin install elite-dev@elitebusinesssolutions
 | `setup-worktree`         | `/elite-dev:setup-worktree`         | Set up or clean up a git worktree for a parallel dev session                         |
 | `start-issue`            | `/elite-dev:start-issue`            | Mark a GitHub issue as started: assignee + project board status                      |
 
+## Context usage mod
+
+`elite-dev` also loads a mod that pins the context window usage (`ctx 42% 84k/200k`) under the
+prompt and refreshes it on session start, each prompt, and each finished turn. It needs no setup
+beyond installing the plugin.
+
 ## Prerequisites
 
 Requires the [GitHub CLI](https://cli.github.com/) (`gh`), authenticated (`gh auth login`) — the

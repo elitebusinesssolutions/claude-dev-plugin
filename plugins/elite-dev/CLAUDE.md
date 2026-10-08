@@ -2,7 +2,8 @@
 
 `elite-dev` ships generic dev-workflow skills — git worktrees, GitHub issue tracking, pull
 requests, PR review triage, Azure Key Vault dev secrets, developer machine setup — for any
-TypeScript/JavaScript or .NET repo. No hooks, skills only.
+TypeScript/JavaScript or .NET repo. It also ships one mod, `context-usage` (`hooks/`), which pins the
+context window usage under the prompt; there are no command hooks.
 
 Install it via:
 
@@ -54,13 +55,51 @@ one stack.
 
 ---
 
+## Context usage mod
+
+The `context-usage` mod keeps a `ctx 42% 84k/200k` status line current. It is a Claude Code mod (a
+hooks module that runs inside the engine, with no Node and no npm dependencies), not a command
+hook, so `elite-dev` has no `package.json`.
+
+- `hooks/hooks.json` names the one module in `modules`.
+- `hooks/context-status-line.ts` hooks `session.start`, `prompt.submit`, and `turn.complete` and
+  refreshes the status line on each.
+- `hooks/context-status-format.ts` turns the usage reading into the status text.
+- `hooks/*.test.ts` hold the tests.
+- `tsconfig.json` extends the engine-generated `.claude-plugin/types/tsconfig.json`.
+
+The engine writes `.claude-plugin/types/` (the `claude-code` types) when a session loads the mod
+from this folder, and git ignores it. A fresh clone or worktree shows `claude-code` import errors in
+VS Code until `setup.ps1` or `claude --plugin-dir plugins/elite-dev` has run once; then run
+"TypeScript: Restart TS Server".
+
+Check the mod with:
+
+```bash
+npm test
+npm run validate:plugins
+npm run typecheck
+npm run lint
+```
+
+Run them from the repo root. `npm test` includes `test:mod` (`claude plugin test`), so it needs the
+`claude` CLI; `validate:plugins` needs it too. `typecheck` needs the generated types below.
+`eslint.config.mjs` here lints the mod's TypeScript.
+
+`claude plugin test` runs every `*.test.ts` under the folder it is given, gitignored ones included.
+`test:mod` (`scripts/test-mod.js`) therefore runs it on a temporary copy holding only the files git
+tracks or would track. A committed `*.test.ts` under `skills/` still runs and fails it.
+
+---
+
 ## Testing locally
 
 ```bash
 claude --plugin-dir plugins/elite-dev
 ```
 
-Skills appear as `/elite-dev:<name>`. Reload after a change without restarting: `/reload-plugins`.
+Skills appear as `/elite-dev:<name>`, and the mod loads with them. Reload after a change without
+restarting: `/reload-plugins`.
 
 ---
 

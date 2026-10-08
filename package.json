@@ -5,8 +5,11 @@
     "plugins/elite-ts"
   ],
   "scripts": {
-    "test": "node --test tests/*.test.js && npm test --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present",
+    "test": "node --test tests/*.test.js && npm test --workspaces --if-present && npm run test:mod",
+    "test:mod": "node scripts/test-mod.js",
+    "lint": "eslint scripts tests plugins/elite-dev/hooks &&npm run lint --workspaces --if-present",
+    "typecheck": "tsc -p plugins/elite-dev --noEmit",
+    "validate:plugins": "claude plugin validate . && claude plugin validate plugins/elite-dev && claude plugin validate plugins/elite-ts",
     "format": "npm run format --workspaces --if-present",
     "format:root": "prettier --write .",
     "format:check:root": "prettier --check .",
@@ -15,7 +18,9 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "eslint": "^10.6.0",
-    "prettier": "^3.9.4"
+    "prettier": "^3.9.4",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.71.1"
   },
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24"
