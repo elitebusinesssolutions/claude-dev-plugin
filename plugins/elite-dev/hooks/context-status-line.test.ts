@@ -64,11 +64,18 @@ test("session.start refreshes the context line after the engine starts", async (
   expect(log).toEqual(["session.start", "status:ctx 42% 84k/200k"]);
 });
 
-test("prompt.submit refreshes the context line before the prompt goes on", async ($, on) => {
+// The prompt.submit refresh is not awaited, so its status line lands after the prompt goes on.
+const settle = async () => {
+  for (let i = 0; i < 50; i++) await Promise.resolve();
+};
+
+test("prompt.submit refreshes the context line without holding the prompt", async ($, on) => {
   const log = stubEngine(on);
 
   expect(await $.prompt.submit(promptSubmit)).toEqual({ text: "hello" });
-  expect(log).toEqual(["status:ctx 42% 84k/200k", "prompt.submit"]);
+  await settle();
+  expect(log).toContain("prompt.submit");
+  expect(log).toContain("status:ctx 42% 84k/200k");
 });
 
 test("turn.complete refreshes the context line after the turn", async ($, on) => {
@@ -93,6 +100,7 @@ test("a failed usage read leaves the line alone and the event still completes", 
   });
 
   expect(await $.prompt.submit(promptSubmit)).toEqual({ text: "hello" });
+  await settle();
   expect(log).toEqual(["prompt.submit"]);
 });
 
@@ -100,5 +108,7 @@ test("an engine failure under prompt.submit still refreshes once and is not retr
   const log = stubEngine(on, { failSubmits: 1 });
 
   await expect($.prompt.submit(promptSubmit)).rejects.toThrow();
-  expect(log).toEqual(["status:ctx 42% 84k/200k", "prompt.submit"]);
+  await settle();
+  expect(log.filter((entry) => entry === "prompt.submit")).toHaveLength(1);
+  expect(log.filter((entry) => entry.startsWith("status:"))).toHaveLength(1);
 });

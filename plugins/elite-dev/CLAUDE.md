@@ -63,14 +63,16 @@ hook, so `elite-dev` has no `package.json`.
 
 - `hooks/hooks.json` names the one module in `modules`.
 - `hooks/context-status-line.ts` hooks `session.start`, `prompt.submit`, `session.compact`, and
-  `turn.complete` and refreshes the status line on each.
+  `turn.complete` and refreshes the status line on each. The `prompt.submit` refresh is not awaited,
+  so the usage read never delays a prompt.
 - `hooks/context-status-format.ts` turns the usage reading into the status text.
 - `hooks/*.test.ts` hold the tests.
 - `tsconfig.json` extends the engine-generated `.claude-plugin/types/tsconfig.json`.
 
 The engine writes `.claude-plugin/types/` (the `claude-code` types) when a session loads the mod
 from this folder, and git ignores it. A fresh clone or worktree shows `claude-code` import errors in
-VS Code until `setup.ps1` or `claude --plugin-dir plugins/elite-dev` has run once; then run
+VS Code until `setup.ps1` or `claude --plugin-dir plugins/elite-dev` has run once; `setup.ps1`
+regenerates the types on every run. Then run
 "TypeScript: Restart TS Server".
 
 Before every PR, run this from the repo root:

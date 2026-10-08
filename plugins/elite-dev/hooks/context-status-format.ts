@@ -15,7 +15,7 @@ export const formatContextStatus = (c: {
     c.percent ?? (tokens !== undefined && window > 0 ? (tokens / window) * 100 : undefined);
   const head = percent === undefined ? "ctx" : `ctx ${Math.round(percent)}%`;
 
-  if (window <= 0) return head;
+  if (!(window > 0)) return head;
   if (tokens === undefined) return percent === undefined ? `${head} ${compact(window)}` : head;
 
   return `${head} ${compact(tokens)}/${compact(window)}`;

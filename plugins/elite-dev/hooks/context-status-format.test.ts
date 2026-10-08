@@ -44,6 +44,10 @@ test("shows no numbers when nothing is known", () => {
   expect(formatContextStatus({ tokens: 10, window: 0 })).toBe("ctx");
 });
 
+test("shows no numbers when the window is not a number", () => {
+  expect(formatContextStatus({ tokens: 10, window: NaN })).toBe("ctx");
+});
+
 test("omits tokens when the window size is unknown", () => {
   expect(formatContextStatus({ tokens: 10, window: 0, percent: 3 })).toBe("ctx 3%");
 });

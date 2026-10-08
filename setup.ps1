@@ -310,12 +310,6 @@ function Initialize-ModTypes {
     $modTypes = Join-Path $repoRoot "plugins/elite-dev/.claude-plugin/types/claude-code/index.d.ts"
     $manualStep = "Run claude --plugin-dir plugins/elite-dev once, then restart the TypeScript server in the editor, to generate the elite-dev mod's TypeScript types."
 
-    if (Test-Path $modTypes) {
-        Write-Host "[skipped]   The elite-dev mod's TypeScript types already exist."
-        $skipped.Add("elite-dev mod types")
-        return
-    }
-
     if (-not (Test-Command claude)) {
         $manualSteps.Add($manualStep)
         return
