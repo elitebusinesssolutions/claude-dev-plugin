@@ -324,10 +324,10 @@ function Initialize-ModTypes {
 
     Write-Host "[installing] elite-dev mod types"
     Push-Location $repoRoot
-    try { Test-NativeSuccess { claude --plugin-dir plugins/elite-dev --no-session-persistence -p "Reply with the word ok." } | Out-Null }
+    try { $generated = Test-NativeSuccess { claude --plugin-dir plugins/elite-dev --no-session-persistence -p "Reply with the word ok." } }
     finally { Pop-Location }
 
-    if (Test-Path $modTypes) {
+    if ($generated -and (Test-Path $modTypes)) {
         $installed.Add("elite-dev mod types")
     }
     else {
