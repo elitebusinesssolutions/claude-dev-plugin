@@ -10,6 +10,12 @@ const copyPlugin = require("./copy-plugin");
 
 const pluginDir = "plugins/elite-dev";
 const types = `${pluginDir}/.claude-plugin/types`;
+
+/**
+ * Builds the command that starts a one-shot `claude` session on a plugin folder.
+ * @param {string} dir Plugin folder the session loads.
+ * @returns {string} The shell command.
+ */
 const generate = (dir) =>
   `claude --plugin-dir "${dir}" --no-session-persistence -p "Reply with the word ok."`;
 const checks = [
@@ -20,13 +26,23 @@ const checks = [
   "npm run format:check:root"
 ];
 
+/** A failed pre-PR step, carrying the exit status the script ends with. */
 class CheckFailed extends Error {
+  /**
+   * @param {string} message What failed.
+   * @param {number} [status] Exit status for the script.
+   */
   constructor(message, status = 1) {
     super(message);
     this.status = status;
   }
 }
 
+/**
+ * Runs a shell command with inherited output.
+ * @param {string} command The command line to run.
+ * @throws {CheckFailed} When the command exits non-zero.
+ */
 function run(command) {
   console.log(`\n> ${command}`);
   const { status } = spawnSync(command, { stdio: "inherit", shell: true });
@@ -35,6 +51,11 @@ function run(command) {
   }
 }
 
+/**
+ * Regenerates the mod types on a temporary plugin copy and swaps them in only when the copy wrote
+ * `claude-code/index.d.ts`.
+ * @throws {CheckFailed} When the session fails or writes no types.
+ */
 function regenerateTypes() {
   const copy = copyPlugin(pluginDir, "elite-dev-types-");
   const staged = `${types}.new`;

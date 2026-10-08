@@ -29,6 +29,11 @@ try {
   // routing `f` (traced back to a tool call's file_path) through cmd.exe's
   // metacharacter parsing. Spawning the resolved JS script with node itself
   // needs no shell, and no shell-metacharacter parsing of `f`, on any platform.
+  /**
+   * Finds a package's bin script by walking up from the edited file's directory.
+   * @param {string} name Package name, e.g. `eslint`.
+   * @returns {string | null} Path of the bin script, or null when no install is found.
+   */
   function findBinScript(name) {
     let dir = searchStart;
     for (;;) {

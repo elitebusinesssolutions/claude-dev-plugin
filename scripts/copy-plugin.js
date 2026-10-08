@@ -1,10 +1,15 @@
-// Copies the files git tracks or would track under a plugin folder into a new temporary folder and
-// returns its path. Gitignored files stay out, and the caller removes the folder.
 const { execFileSync } = require("node:child_process");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 
+/**
+ * Copies the files git tracks or would track under a plugin folder into a new temporary folder.
+ * Gitignored files stay out, and the caller removes the folder.
+ * @param {string} pluginDir Plugin folder to copy, relative to the repo root.
+ * @param {string} prefix Name prefix for the temporary folder.
+ * @returns {string} Path of the temporary folder.
+ */
 module.exports = function copyPlugin(pluginDir, prefix) {
   const files = execFileSync("git", ["ls-files", "-co", "--exclude-standard", "-z", pluginDir], {
     encoding: "utf8"

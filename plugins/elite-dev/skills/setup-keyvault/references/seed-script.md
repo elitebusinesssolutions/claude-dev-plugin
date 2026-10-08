@@ -15,11 +15,11 @@ The script creates each vault if it does not exist. Then it copies the existing 
 
 ## 2. Local sources and secret names
 
-| Source                                 | App                                                        | Keys read                             | Vault secret name        |
-| -------------------------------------- | ---------------------------------------------------------- | ------------------------------------- | ------------------------ |
-| `dotnet user-secrets list --json`      | .NET Api, .NET Functions                                   | every key                             | `:` becomes `--`         |
-| `local.settings.json`, `Values` object | .NET Functions                                             | every key, except the skip list below | `:` and `__` become `--` |
-| env file, for example `.env.local`     | any JS/TS app: Next.js, Vue, React, Vite, plain TypeScript | every `KEY=value` line                | `_` becomes `-`          |
+| Source | App | Keys read | Vault secret name |
+| --- | --- | --- | --- |
+| `dotnet user-secrets list --json` | .NET Api, .NET Functions | every key | `:` becomes `--` |
+| `local.settings.json`, `Values` object | .NET Functions | every key, except the skip list below | `:` and `__` become `--` |
+| env file, for example `.env.local` | any JS/TS app: Next.js, Vue, React, Vite, plain TypeScript | every `KEY=value` line | `_` becomes `-` |
 
 These names match the rules in section 5 of [SKILL.md](../SKILL.md). The JS/TS name rule is the same for every framework. Only the loading code in [nextjs.md](nextjs.md) is Next.js only.
 
