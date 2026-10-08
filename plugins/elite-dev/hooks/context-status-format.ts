@@ -1,9 +1,5 @@
-// 999_950 is where one-decimal rounding of the k form reaches 1000k.
-const compact = (n: number): string => {
-  if (n >= 999_950) return `${Math.round(n / 100_000) / 10}M`;
-
-  return n >= 1000 ? `${Math.round(n / 100) / 10}k` : `${n}`;
-};
+const number = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
+const compact = (n: number): string => number.format(n).replace("K", "k");
 
 /**
  * `ctx 42% 84k/200k`. A missing percent is derived from tokens and window. A missing reading is

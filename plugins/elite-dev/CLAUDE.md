@@ -79,9 +79,11 @@ Before every PR, run this from the repo root:
 npm run pre-pr
 ```
 
-`scripts/pre-pr-check.js` deletes `.claude-plugin/types/`, regenerates it with
-`claude --plugin-dir plugins/elite-dev -p "Reply with the word ok."`, then runs `npm test`,
+`scripts/pre-pr-check.js` regenerates `.claude-plugin/types/` with
+`claude --plugin-dir <copy> -p "Reply with the word ok."` run on a temporary copy of the plugin, replaces
+the real `types/` only once the copy produced `claude-code/index.d.ts`, then runs `npm test`,
 `npm run validate:plugins`, `npm run typecheck`, and `npm run lint`, stopping at the first failure.
+A failed generation leaves the existing `types/` in place.
 CI does not run `typecheck` (it has no generated types), so this local run is the only type check.
 Regenerating makes it run against the types of the current `claude` CLI, not a stale copy. The
 `claude -p` run is a real model call, so it needs a signed-in `claude`.

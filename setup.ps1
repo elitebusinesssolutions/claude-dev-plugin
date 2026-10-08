@@ -322,7 +322,11 @@ function Initialize-ModTypes {
     }
 
     # The session that writes the types is a model call, so it needs a signed-in claude.
-    Assert-SignedIn "Claude" { claude auth status } { claude auth login }
+    try { Assert-SignedIn -label "Claude" -check { claude auth status } -login { claude auth login } }
+    catch {
+        $manualSteps.Add($manualStep)
+        return
+    }
 
     Write-Host "[installing] elite-dev mod types"
     Push-Location $repoRoot
