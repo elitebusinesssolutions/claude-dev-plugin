@@ -1,3 +1,6 @@
 node_modules/
 package-lock.json
 plugins/elite-ts/
+plugins/elite-dev/.claude-plugin/types/
+plugins/elite-dev/skills/*-workspace/
+plugins/elite-dev/skills/*/evals/files/

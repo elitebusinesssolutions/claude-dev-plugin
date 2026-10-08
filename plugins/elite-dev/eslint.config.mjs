@@ -1,5 +1,6 @@
 import js from "@eslint/js";
 import { defineConfig } from "eslint/config";
+import jsdoc from "eslint-plugin-jsdoc";
 import tseslint from "typescript-eslint";
 
 export default defineConfig([
@@ -12,7 +13,22 @@ export default defineConfig([
   {
     files: ["hooks/**/*.ts"],
     rules: {
+      curly: ["error", "all"],
       "no-empty": ["error", { allowEmptyCatch: true }]
+    }
+  },
+  {
+    files: ["hooks/**/*.ts"],
+    ignores: ["hooks/**/*.test.ts"],
+    plugins: { jsdoc },
+    rules: {
+      "jsdoc/require-jsdoc": [
+        "error",
+        {
+          publicOnly: false,
+          require: { FunctionDeclaration: true, ArrowFunctionExpression: true }
+        }
+      ]
     }
   }
 ]);

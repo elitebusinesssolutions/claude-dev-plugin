@@ -129,6 +129,18 @@ See the `add-new-plugin` skill for the step-by-step procedure.
 
 ---
 
+## Code style
+
+Style is enforced by tooling, not described here. Before any PR, `npm run pre-pr` must pass: it
+runs lint and the Prettier check, and CI runs the same two. To add a convention, add it to the
+ESLint or Prettier config, not to this file.
+
+Every function in a mod's `hooks/*.ts` (tests excepted) carries JSDoc, exported or not;
+`jsdoc/require-jsdoc` in `plugins/elite-dev/eslint.config.mjs` enforces it. Write JSDoc for any
+other TypeScript you add, since no rule covers it.
+
+---
+
 ## Hooks
 
 `elite-ts` ships a lint/format hook; `elite-dev` ships a `context-usage` mod

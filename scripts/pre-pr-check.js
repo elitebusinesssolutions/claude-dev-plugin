@@ -12,7 +12,13 @@ const pluginDir = "plugins/elite-dev";
 const types = `${pluginDir}/.claude-plugin/types`;
 const generate = (dir) =>
   `claude --plugin-dir "${dir}" --no-session-persistence -p "Reply with the word ok."`;
-const checks = ["npm test", "npm run validate:plugins", "npm run typecheck", "npm run lint"];
+const checks = [
+  "npm test",
+  "npm run validate:plugins",
+  "npm run typecheck",
+  "npm run lint",
+  "npm run format:check:root"
+];
 
 class CheckFailed extends Error {
   constructor(message, status = 1) {
@@ -24,7 +30,9 @@ class CheckFailed extends Error {
 function run(command) {
   console.log(`\n> ${command}`);
   const { status } = spawnSync(command, { stdio: "inherit", shell: true });
-  if (status !== 0) throw new CheckFailed(`pre-pr failed at: ${command}`, status ?? 1);
+  if (status !== 0) {
+    throw new CheckFailed(`pre-pr failed at: ${command}`, status ?? 1);
+  }
 }
 
 function regenerateTypes() {
@@ -54,7 +62,9 @@ try {
   regenerateTypes();
   checks.forEach(run);
 } catch (error) {
-  if (!(error instanceof CheckFailed)) throw error;
+  if (!(error instanceof CheckFailed)) {
+    throw error;
+  }
   console.error(`\n${error.message}`);
   process.exit(error.status);
 }

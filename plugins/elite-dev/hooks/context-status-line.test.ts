@@ -41,7 +41,9 @@ const stubEngine = (on: On, { readUsage = async () => usage, failSubmits = 0 }: 
   });
   on("prompt.submit", async (_$, e) => {
     log.push("prompt.submit");
-    if (submits++ < failSubmits) throw new Error("engine failed");
+    if (submits++ < failSubmits) {
+      throw new Error("engine failed");
+    }
 
     return { text: e.text };
   });
@@ -66,7 +68,9 @@ test("session.start refreshes the context line after the engine starts", async (
 
 // The prompt.submit refresh is not awaited, so its status line lands after the prompt goes on.
 const settle = async () => {
-  for (let i = 0; i < 50; i++) await Promise.resolve();
+  for (let i = 0; i < 50; i++) {
+    await Promise.resolve();
+  }
 };
 
 test("prompt.submit refreshes the context line without holding the prompt", async ($, on) => {
@@ -109,8 +113,9 @@ test("a refresh overtaken by a newer one does not overwrite the newer line", asy
   let releaseFirst = () => {};
   const log = stubEngine(on, {
     readUsage: async () => {
-      if (calls++ > 0)
+      if (calls++ > 0) {
         return { ...usage, context: { tokens: 100000, window: 200000, percent: 50 } };
+      }
       await new Promise<void>((resolve) => {
         releaseFirst = resolve;
       });

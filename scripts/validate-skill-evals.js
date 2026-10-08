@@ -21,11 +21,17 @@ function parseChangedSkillNames(diffText, validPlugins) {
   const pairs = [];
   for (const line of diffText.split("\n")) {
     const match = /^plugins\/([^/]+)\/skills\/([^/]+)\//.exec(line.trim());
-    if (!match) continue;
+    if (!match) {
+      continue;
+    }
     const [, pluginName, skillName] = match;
-    if (!validPlugins.has(pluginName) || skillName.endsWith("-workspace")) continue;
+    if (!validPlugins.has(pluginName) || skillName.endsWith("-workspace")) {
+      continue;
+    }
     const key = `${pluginName}/${skillName}`;
-    if (seen.has(key)) continue;
+    if (seen.has(key)) {
+      continue;
+    }
     seen.add(key);
     pairs.push({ pluginName, skillName });
   }

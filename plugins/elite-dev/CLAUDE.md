@@ -84,7 +84,8 @@ npm run pre-pr
 `scripts/pre-pr-check.js` regenerates `.claude-plugin/types/` with
 `claude --plugin-dir <copy> -p "Reply with the word ok."` run on a temporary copy of the plugin, replaces
 the real `types/` only once the copy produced `claude-code/index.d.ts`, then runs `npm test`,
-`npm run validate:plugins`, `npm run typecheck`, and `npm run lint`, stopping at the first failure.
+`npm run validate:plugins`, `npm run typecheck`, `npm run lint`, and `npm run format:check:root`
+(Prettier), stopping at the first failure. CI runs the same lint and Prettier checks.
 A failed generation leaves the existing `types/` in place.
 CI does not run `typecheck` (it has no generated types), so this local run is the only type check.
 Regenerating makes it run against the types of the current `claude` CLI, not a stale copy. The

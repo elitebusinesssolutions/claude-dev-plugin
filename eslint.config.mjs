@@ -20,6 +20,7 @@ export default defineConfig([
       }
     },
     rules: {
+      curly: ["error", "all"],
       "no-empty": ["error", { allowEmptyCatch: true }]
     }
   }
