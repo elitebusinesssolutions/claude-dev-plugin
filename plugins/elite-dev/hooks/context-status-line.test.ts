@@ -104,6 +104,29 @@ test("a failed usage read leaves the line alone and the event still completes", 
   expect(log).toEqual(["prompt.submit"]);
 });
 
+test("a refresh overtaken by a newer one does not overwrite the newer line", async ($, on) => {
+  let calls = 0;
+  let releaseFirst = () => {};
+  const log = stubEngine(on, {
+    readUsage: async () => {
+      if (calls++ > 0)
+        return { ...usage, context: { tokens: 100000, window: 200000, percent: 50 } };
+      await new Promise<void>((resolve) => {
+        releaseFirst = resolve;
+      });
+
+      return usage;
+    }
+  });
+
+  await $.prompt.submit(promptSubmit);
+  await $.prompt.submit(promptSubmit);
+  await settle();
+  releaseFirst();
+  await settle();
+  expect(log.filter((entry) => entry.startsWith("status:"))).toEqual(["status:ctx 50% 100k/200k"]);
+});
+
 test("an engine failure under prompt.submit still refreshes once and is not retried", async ($, on) => {
   const log = stubEngine(on, { failSubmits: 1 });
 
