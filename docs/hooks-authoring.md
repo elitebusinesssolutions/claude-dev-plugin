@@ -4,8 +4,6 @@ Reference: [Hooks](https://code.claude.com/docs/en/hooks)
 
 One copy of the hook mechanics, shared by every plugin in this repo that ships hooks. A plugin's own `CLAUDE.md` covers only what is specific to that plugin (its own hook list, its own guard conditions) — check it before writing a new hook there.
 
-Everything below describes command hooks. `elite-dev` also ships a mod: its `hooks/hooks.json` holds `modules` instead of `hooks`, and the module runs inside Claude Code. Its tests, type checking, and layout are in [plugins/elite-dev/CLAUDE.md](../plugins/elite-dev/CLAUDE.md#context-usage-mod).
-
 ---
 
 ## `hooks.json` format

@@ -7,8 +7,14 @@ import jsdoc from "eslint-plugin-jsdoc";
 
 export default defineConfig([
   {
-    // Local Claude state and .NET build output are not source.
-    ignores: [".claude/**", "**/bin/**", "**/obj/**"]
+    // Local Claude state, .NET build output, scratch skill workspaces and eval fixtures are not source.
+    ignores: [
+      ".claude/**",
+      "**/bin/**",
+      "**/obj/**",
+      "plugins/elite-dev/skills/*-workspace/**",
+      "plugins/elite-dev/skills/*/evals/**"
+    ]
   },
   // Baseline rules for every linted file.
   js.configs.recommended,

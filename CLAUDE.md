@@ -2,7 +2,7 @@
 
 This repo is a Claude Code plugin marketplace holding two plugins, each in its own subdirectory under `plugins/`:
 
-- **`elite-dev`** — generic dev-workflow skills (git worktrees, GitHub issues, pull requests, Azure Key Vault dev secrets, developer machine setup) for any TypeScript/JavaScript or .NET repo, plus a `context-usage` mod that pins the context window usage under the prompt. See its own [CLAUDE.md](plugins/elite-dev/CLAUDE.md).
+- **`elite-dev`** — generic dev-workflow skills (git worktrees, GitHub issues, pull requests, Azure Key Vault dev secrets, developer machine setup) for any TypeScript/JavaScript or .NET repo. See its own [CLAUDE.md](plugins/elite-dev/CLAUDE.md).
 - **`elite-ts`** — shared lint/format hooks and formatting-setup/verification skills for TypeScript projects. See its own `plugins/elite-ts/CLAUDE.md`.
 
 Install any of them via:
@@ -107,7 +107,7 @@ See the `add-new-plugin` skill for the step-by-step procedure.
 
 ## Code style
 
-Style is enforced by tooling, not described here. Before any PR, `npm run pre-pr` must pass: it runs lint and the Prettier check, and CI runs the same two. To add a convention, add it to the ESLint or Prettier config, not to this file.
+Style is enforced by tooling, not described here. Before any PR, `npm run pre-pr` must pass: it runs the tests, plugin validation, lint, and the Prettier check, and CI runs the same four. To add a convention, add it to the ESLint or Prettier config, not to this file.
 
 Every function in any linted file (tests excepted) and every exported type carries JSDoc, exported or not; `jsdoc/require-jsdoc` in each `eslint.config.mjs` enforces it.
 
@@ -115,7 +115,7 @@ Every function in any linted file (tests excepted) and every exported type carri
 
 ## Hooks
 
-`elite-ts` ships a lint/format hook; `elite-dev` ships a `context-usage` mod (`hooks/context-status-line.ts`, not a command hook; see its own [CLAUDE.md](plugins/elite-dev/CLAUDE.md#context-usage-mod)). See [docs/hooks-authoring.md](docs/hooks-authoring.md) for `hooks.json` format, path resolution, the exit-code contract, matchers, timeouts, and the checklist for adding a new hook.
+`elite-ts` ships a lint/format hook; `elite-dev` ships no hooks. See [docs/hooks-authoring.md](docs/hooks-authoring.md) for `hooks.json` format, path resolution, the exit-code contract, matchers, timeouts, and the checklist for adding a new hook.
 
 ---
 
