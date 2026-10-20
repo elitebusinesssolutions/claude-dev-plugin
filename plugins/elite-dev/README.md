@@ -10,6 +10,7 @@ claude plugin install elite-dev@elitebusinesssolutions
 
 | Skill | Invoke | Purpose |
 | --- | --- | --- |
+| `bump-version` | `/elite-dev:bump-version` | Bump the version in GitHub workflows and Azure pipelines from a release's conventional commits |
 | `create-pr` | `/elite-dev:create-pr` | Open a PR: suggest a review, flag stale docs, apply body conventions and copy labels |
 | `plan-issue` | `/elite-dev:plan-issue` | Turn a GitHub issue into a reuse-checked implementation plan, inside plan mode |
 | `review-fix-pr-comments` | `/elite-dev:review-fix-pr-comments` | Triage and (on approval) fix unresolved PR review comments |

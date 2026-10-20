@@ -15,6 +15,7 @@ For the repo-wide layout, `plugin.json`/`marketplace.json` field rules, `SKILL.m
 
 ## Skills
 
+- `bump-version`
 - `create-pr`
 - `plan-issue`
 - `review-fix-pr-comments`
