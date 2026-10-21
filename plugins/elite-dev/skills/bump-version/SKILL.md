@@ -19,11 +19,14 @@ Run `git fetch origin` so the later steps see current branches and tags.
 
 ## 2. Read the current version
 
-Read the version files from the **base** branch with `git show origin/<base>:<path>`, because the base holds what is already released. Do not rely on a pattern alone to find them. First list every candidate file with its `name:` or `run-name:` line, matched or not:
+Read the version files from the **base** branch with `git show origin/<base>:<path>`, because the base holds what is already released. Do not rely on a pattern alone to find them. First list every candidate file, then each file's `name:` or `run-name:` line, matched or not:
 
 ```bash
+git grep -l -e '' origin/<base> -- 'azure-pipelines*.yml' '.azuredevops/**/*.yml' '.github/workflows/*.yml'
 git grep -n -E '^(name|run-name):' origin/<base> -- 'azure-pipelines*.yml' '.azuredevops/**/*.yml' '.github/workflows/*.yml'
 ```
+
+The first command lists every candidate file. The second prints each file's `name:` or `run-name:` line. Report any file from the first list that has no line in the second as having no `name:` or `run-name:` line. Do not drop it.
 
 Then match the lines by pattern:
 
@@ -90,7 +93,7 @@ Commit only when the developer says to commit. Use the message `chore: bump vers
 ## 10. Verify
 
 - Search the changed files again. Every version match shows the target version (two-segment matches show its major and minor).
-- Run the step 2 listing on the branch. No listed file holds a version-like value that was neither bumped nor reported.
+- Run both step 2 listing commands on the branch. No listed file holds a version-like value that was neither bumped nor reported.
 - `git diff --stat` lists only the version files.
 - `git merge-base --is-ancestor origin/<head> HEAD` succeeds, so the branch builds on the head branch.
 - Tell the developer about anything skipped: files with no match, values that were brought into line, and commits classified by hand.
