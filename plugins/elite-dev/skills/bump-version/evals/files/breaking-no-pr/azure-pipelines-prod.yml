@@ -1,0 +1,6 @@
+name: 2.3.1.$(Build.BuildId)
+
+trigger:
+  branches:
+    include:
+      - main
