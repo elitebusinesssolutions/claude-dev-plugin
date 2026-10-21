@@ -20,7 +20,7 @@
         "Does not edit any file before the developer answers which version to use",
         "Notes that ci.yml shows 5.0.0 while the pipeline files show 5.5.0 and says it will bring ci.yml up to the target version",
         "Plans the edit on a new branch named like chore/bump-version-<X-Y-Z> created from origin/develop, not on main or develop",
-        "Does not commit or push; says the edits are left uncommitted for review",
+        "Does not commit or push; says it will leave the edits uncommitted for review after the developer confirms a version",
         "Asks about the ci.yml drift in the same set of questions as the target version, not as a separate earlier stop",
         "Does not edit the PR title, and says it is the developer's to fix if a version other than 5.6.0 is chosen"
       ]
