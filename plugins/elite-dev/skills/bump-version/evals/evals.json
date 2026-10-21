@@ -19,25 +19,21 @@
         "Does not edit any file before the developer answers which version to use",
         "Notes that ci.yml shows 5.0.0 while the pipeline files show 5.5.0 and says it will bring ci.yml up to the target version",
         "Plans the edit on a new branch named like chore/bump-version-<X-Y-Z> created from origin/develop, not on main or develop",
-        "Does not commit or push; says the edits are left uncommitted for review"
+        "Does not commit or push; says the edits are left uncommitted for review",
+        "Asks about the ci.yml drift in the same set of questions as the target version, not as a separate earlier stop",
+        "Does not edit the PR title, and says it is the developer's to fix if a version other than 5.6.0 is chosen"
       ]
     },
     {
       "id": 2,
-      "prompt": "Bump the version for the next release. I have not opened a release PR yet. Repo state: evals/files/breaking-no-pr/repo-state.md. Commits that would be released: evals/files/breaking-no-pr/commits.md. Version files on the base branch: evals/files/breaking-no-pr/azure-pipelines-prod.yml and ci.yml.",
-      "expected_output": "Asks for the release PR (the developer has none), proposes develop into main and asks to confirm the branches, and computes a MAJOR bump from 2.3.1 to 3.0.0 because of the `fix!:` commit.",
-      "files": [
-        "evals/files/breaking-no-pr/repo-state.md",
-        "evals/files/breaking-no-pr/commits.md",
-        "evals/files/breaking-no-pr/azure-pipelines-prod.yml",
-        "evals/files/breaking-no-pr/ci.yml"
-      ],
+      "prompt": "Bump the version for the next release. I have not opened a release PR yet. Repo state: evals/files/breaking-no-pr/repo-state.md. Walk through what you would do and say what you would ask me.",
+      "expected_output": "Takes the no-PR answer as given, proposes develop into main from the repo state, and stops to ask the developer to confirm those two branches before reading versions or editing anything.",
+      "files": ["evals/files/breaking-no-pr/repo-state.md"],
       "expectations": [
-        "Does not need a PR number, since the developer said there is none, and does not ask for one again",
-        "Proposes comparing develop into main and asks the developer to confirm these branches, or name others, before it goes on",
-        "Computes the bump as MAJOR, from 2.3.1 to 3.0.0, because `fix!(api)` and its BREAKING-change body mark a breaking change, even though a `feat` is also present",
-        "Asks the developer to confirm the target version 3.0.0 before it edits any file",
-        "Plans to change only the three-segment version in azure-pipelines-prod.yml and ci.yml and to keep `.$(Build.BuildId)` and `.${{ github.run_id }}` unchanged"
+        "Does not ask for a release PR number again, since the developer said there is none",
+        "Proposes develop as the head branch and main as the base branch, using the repo state (develop exists, main is the default branch)",
+        "Asks the developer to confirm these two branches, or name others, before going on",
+        "Stops after that question: does not read the version files, compute a version, create a branch, or edit any file"
       ]
     },
     {
@@ -57,6 +53,25 @@
         "Computes the target version as 5.6.0 (MINOR)",
         "After confirmation, changes only the version segments, giving `name: 5.6.0.$(Build.BuildId)` in both pipeline files and `run-name: ci-5.6.0.${{ github.run_id }}` in ci.yml",
         "Does not commit or push, and shows the diff for review"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Bump the version for the next release. I have not opened a release PR yet. Compare develop into main; I confirm those two branches. Repo state: evals/files/breaking-no-pr/repo-state.md. Commits that would be released: evals/files/breaking-no-pr/commits.md. Version files on the base branch: evals/files/breaking-no-pr/azure-pipelines-prod.yml and ci.yml. Walk through what you would do and say what you would ask me.",
+      "expected_output": "Computes a MAJOR bump from 2.3.1 to 3.0.0 because of the `fix!:` commit and asks the developer to confirm 3.0.0 before editing anything.",
+      "files": [
+        "evals/files/breaking-no-pr/repo-state.md",
+        "evals/files/breaking-no-pr/commits.md",
+        "evals/files/breaking-no-pr/azure-pipelines-prod.yml",
+        "evals/files/breaking-no-pr/ci.yml"
+      ],
+      "expectations": [
+        "Does not ask the developer to confirm the branches again, since they already confirmed develop into main",
+        "States the current version is 2.3.1, from the base branch files, matching the newest tag v2.3.1.4410",
+        "Computes the bump as MAJOR, from 2.3.1 to 3.0.0, because `fix(api)!` and its body mark a breaking change, even though a `feat` is also present",
+        "Asks the developer to confirm the target version 3.0.0 before it edits any file",
+        "Plans to change only the three-segment version in azure-pipelines-prod.yml and ci.yml and to keep `.$(Build.BuildId)` and `.${{ github.run_id }}` unchanged",
+        "Plans the edit on a branch named like chore/bump-version-3-0-0 cut from origin/develop, and does not commit or push"
       ]
     }
   ]

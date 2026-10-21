@@ -28,7 +28,7 @@ The fourth segment (`$(Build.BuildId)`, `${{ github.run_id }}`) is assigned by t
 
 List every match as file, line, and value. Then:
 
-- If the values differ from each other, show the list, use the **highest** as the current version, and say that the others will be brought up to the target version. Ask before going on.
+- If the values differ from each other, show the list, use the **highest** as the current version, and say that the others will be brought up to the target version. Do not stop here. Ask the developer to confirm this together with the target version in step 5.
 - Compare the current version with the newest tag: `git tag --list 'v*' --sort=-v:refname | head -1`, with its fourth segment removed. If they differ, ask the developer which one is current. Do not use GitHub Releases for this — they are often not kept up to date.
 - If nothing matches, stop and report that. Do not guess other locations such as `Directory.Build.props` or `package.json`.
 
@@ -60,7 +60,7 @@ Look for a `\d+\.\d+\.\d+` version in the release PR title.
 - Different: show **both**. For the computed version, list the commits that decide the level. For the title's version, quote the title. Ask the developer which one to use, or for another one. Never replace the title's version without asking.
 - Lower than or equal to the current version: say it is invalid and ask for another.
 
-The developer must confirm the final **target version** before any file changes.
+The developer must confirm the final **target version** before any file changes. Ask for it in the same message as any other open question from steps 2 to 4, such as files whose versions differ, so the developer answers once.
 
 ## 6. Create the bump branch
 
@@ -72,7 +72,7 @@ In each match from step 2, replace the three-segment version with the target ver
 
 ## 8. Show the result and stop
 
-Show `git diff`, the target version, the bump level with the commits that decided it, and any commits you classified by reading the diff. Say the edits are uncommitted and ready for review. Do not commit and do not push.
+Show `git diff`, the target version, the bump level with the commits that decided it, and any commits you classified by reading the diff. Say the edits are uncommitted and ready for review. If the release PR title holds a version other than the target, remind the developer to retitle the release PR, since this skill does not edit it. Do not commit and do not push.
 
 ## 9. After the developer approves
 
