@@ -4,7 +4,7 @@ Claude Code plugin marketplace for Elite Business Solutions. Two plugins, each i
 
 | Plugin | What it ships | Install |
 | --- | --- | --- |
-| [elite-dev](plugins/elite-dev) | Generic dev-workflow skills — git worktrees, GitHub issues, pull requests, Azure Key Vault dev secrets, dev machine setup, plus a pinned context-usage line. Any TS/JS or .NET repo. | `claude plugin install elite-dev@elitebusinesssolutions` |
+| [elite-dev](plugins/elite-dev) | Generic dev-workflow skills — git worktrees, GitHub issues, pull requests, Azure Key Vault dev secrets, dev machine setup. Any TS/JS or .NET repo. | `claude plugin install elite-dev@elitebusinesssolutions` |
 | [elite-ts](plugins/elite-ts) | Shared lint/format hooks and formatting-setup/verification skills for TypeScript projects. | `claude plugin install elite-ts@elitebusinesssolutions` |
 
 See each plugin's own README for what its skills and hooks do, and the root [CLAUDE.md](CLAUDE.md) for how this repo is structured and how to contribute.
