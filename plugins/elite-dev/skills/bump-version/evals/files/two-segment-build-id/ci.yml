@@ -1,0 +1,6 @@
+name: ci
+run-name: ci-3.4.0.${{ github.run_id }}
+
+on:
+  push:
+    branches: ["develop", "main"]
