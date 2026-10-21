@@ -74,6 +74,27 @@
         "Plans to change only the three-segment version in azure-pipelines-prod.yml and ci.yml and to keep `.$(Build.BuildId)` and `.${{ github.run_id }}` unchanged",
         "Plans the edit on a branch named like chore/bump-version-3-0-0 cut from origin/develop, and does not commit or push"
       ]
+    },
+    {
+      "id": 5,
+      "prompt": "Bump the version for our release. The release PR is #77. Saved `gh pr view 77` output: evals/files/two-segment-build-id/pr-77.json. The release's commits and newest tag: evals/files/two-segment-build-id/commits.md. The version files on the base branch: evals/files/two-segment-build-id/azure-pipelines.yml and ci.yml. Walk through what you would do and say what you would ask me.",
+      "expected_output": "Finds the version in both files, including the pipeline name 3.4.$(Build.BuildId) whose build id is the patch segment, computes a MINOR bump to 3.5.0, matches the PR title's 3.5, and asks for confirmation before editing anything.",
+      "files": [
+        "evals/files/two-segment-build-id/pr-77.json",
+        "evals/files/two-segment-build-id/commits.md",
+        "evals/files/two-segment-build-id/azure-pipelines.yml",
+        "evals/files/two-segment-build-id/ci.yml"
+      ],
+      "expectations": [
+        "Lists both azure-pipelines.yml (`name: 3.4.$(Build.BuildId)`) and ci.yml (`run-name: ci-3.4.0.${{ github.run_id }}`) as version files, and does not drop azure-pipelines.yml",
+        "States the current version is 3.4.0 (3.4 in the pipeline file)",
+        "Explains that the newest tag v3.4.9100 differs from the current version only in the third segment because the pipeline uses the build id as its patch segment, and does not ask the developer which one is current",
+        "Computes the bump as MINOR, from 3.4.0 to 3.5.0, because of the feat commit",
+        "Treats the PR title's version 3.5 as matching the computed version 3.5.0 and does not ask which version to use",
+        "Plans to change azure-pipelines.yml to `name: 3.5.$(Build.BuildId)` and ci.yml to `run-name: ci-3.5.0.${{ github.run_id }}`",
+        "Asks the developer to confirm the target version 3.5.0 before it edits any file",
+        "Plans the edit on a branch named like chore/bump-version-3-5-0 cut from origin/develop, and does not commit or push"
+      ]
     }
   ]
 }

@@ -1,0 +1,6 @@
+name: 3.4.$(Build.BuildId)
+
+trigger:
+  branches:
+    include:
+      - main
