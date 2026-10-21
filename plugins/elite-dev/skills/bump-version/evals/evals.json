@@ -15,6 +15,7 @@
       "expectations": [
         "States the current version is 5.5.0, taken from the base branch's pipeline files and matching the newest tag v5.5.0.13050",
         "Computes the commit-derived version as 5.5.1 (PATCH), because the commits are fix, docs, and one unprefixed commit that adds no feature",
+        "Lists bd01d85 separately as an unprefixed commit and says its diff adds no feature",
         "Points out that the PR title says 5.6.0 and shows both 5.5.1 and 5.6.0, with the commits behind 5.5.1, then asks the developer which to use",
         "Does not edit any file before the developer answers which version to use",
         "Notes that ci.yml shows 5.0.0 while the pipeline files show 5.5.0 and says it will bring ci.yml up to the target version",
