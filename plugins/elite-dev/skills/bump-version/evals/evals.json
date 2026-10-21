@@ -1,0 +1,79 @@
+{
+  "skill_name": "bump-version",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Bump the version for our release. The release PR is #284. Saved `gh pr view 284` output: evals/files/tricor-release/pr-284.json. The release's commits and newest tag: evals/files/tricor-release/commits.md. The version files on the base branch: evals/files/tricor-release/azure-pipelines-beta.yml, azure-pipelines-prod.yml, and ci.yml. Walk through what you would do and say what you would ask me.",
+      "expected_output": "Reads the current version as 5.5.0, computes a PATCH bump to 5.5.1 from the fix and docs commits, notices the PR title says 5.6.0, shows both and asks which to use before editing anything, and plans a chore/bump-version branch off develop without committing.",
+      "files": [
+        "evals/files/tricor-release/pr-284.json",
+        "evals/files/tricor-release/commits.md",
+        "evals/files/tricor-release/azure-pipelines-beta.yml",
+        "evals/files/tricor-release/azure-pipelines-prod.yml",
+        "evals/files/tricor-release/ci.yml"
+      ],
+      "expectations": [
+        "States the current version is 5.5.0, taken from the base branch's pipeline files and matching the newest tag v5.5.0.13050",
+        "Computes the commit-derived version as 5.5.1 (PATCH), because the commits are fix, docs, and one unprefixed commit that adds no feature",
+        "Lists bd01d85 separately as an unprefixed commit and says its diff adds no feature",
+        "Points out that the PR title says 5.6.0 and shows both 5.5.1 and 5.6.0, with the commits behind 5.5.1, then asks the developer which to use",
+        "Does not edit any file before the developer answers which version to use",
+        "Notes that ci.yml shows 5.0.0 while the pipeline files show 5.5.0 and says it will bring ci.yml up to the target version",
+        "Plans the edit on a new branch named like chore/bump-version-<X-Y-Z> created from origin/develop, not on main or develop",
+        "Does not commit or push; says it will leave the edits uncommitted for review after the developer confirms a version",
+        "Asks about the ci.yml drift in the same set of questions as the target version, not as a separate earlier stop",
+        "Does not edit the PR title, and says it is the developer's to fix if a version other than 5.6.0 is chosen"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Bump the version for the next release. I have not opened a release PR yet. Repo state: evals/files/breaking-no-pr/repo-state.md. Walk through what you would do and say what you would ask me.",
+      "expected_output": "Takes the no-PR answer as given, proposes develop into main from the repo state, and stops to ask the developer to confirm those two branches before reading versions or editing anything.",
+      "files": ["evals/files/breaking-no-pr/repo-state.md"],
+      "expectations": [
+        "Does not ask for a release PR number again, since the developer said there is none",
+        "Proposes develop as the head branch and main as the base branch, using the repo state (develop exists, main is the default branch)",
+        "Asks the developer to confirm these two branches, or name others, before going on",
+        "Stops after that question: does not read the version files, compute a version, create a branch, or edit any file"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Bump the version for release PR #91. Saved `gh pr view 91` output: evals/files/drifted-unprefixed/pr-91.json. Commits and newest tag: evals/files/drifted-unprefixed/commits.md. Version files on the base branch: evals/files/drifted-unprefixed/azure-pipelines-beta.yml, azure-pipelines-prod.yml, and ci.yml. I confirm the target version you propose. After I confirm, make the edits in a scratch copy of those files.",
+      "expected_output": "Flags the drifted ci.yml, uses 5.5.0 as the current version, lists the unprefixed commit separately and classifies it as a feature from its diff, computes 5.6.0, and edits all three files while keeping the suffixes.",
+      "files": [
+        "evals/files/drifted-unprefixed/pr-91.json",
+        "evals/files/drifted-unprefixed/commits.md",
+        "evals/files/drifted-unprefixed/azure-pipelines-beta.yml",
+        "evals/files/drifted-unprefixed/azure-pipelines-prod.yml",
+        "evals/files/drifted-unprefixed/ci.yml"
+      ],
+      "expectations": [
+        "Reports that ci.yml shows 5.0.0 while the other files show 5.5.0, uses the highest value 5.5.0 as the current version, and says ci.yml will be brought up to the target version",
+        "Lists the commit with no Conventional Commits type (d44f3b1) separately instead of treating it as a feat by default, and uses its description of a new gift-card feature to classify it",
+        "Computes the target version as 5.6.0 (MINOR)",
+        "After confirmation, changes only the version segments, giving `name: 5.6.0.$(Build.BuildId)` in both pipeline files and `run-name: ci-5.6.0.${{ github.run_id }}` in ci.yml",
+        "Does not commit or push, and shows the diff for review"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Bump the version for the next release. I have not opened a release PR yet. Compare develop into main; I confirm those two branches. Repo state: evals/files/breaking-no-pr/repo-state.md. Commits that would be released: evals/files/breaking-no-pr/commits.md. Version files on the base branch: evals/files/breaking-no-pr/azure-pipelines-prod.yml and ci.yml. Walk through what you would do and say what you would ask me.",
+      "expected_output": "Computes a MAJOR bump from 2.3.1 to 3.0.0 because of the `fix!:` commit and asks the developer to confirm 3.0.0 before editing anything.",
+      "files": [
+        "evals/files/breaking-no-pr/repo-state.md",
+        "evals/files/breaking-no-pr/commits.md",
+        "evals/files/breaking-no-pr/azure-pipelines-prod.yml",
+        "evals/files/breaking-no-pr/ci.yml"
+      ],
+      "expectations": [
+        "Does not ask the developer to confirm the branches again, since they already confirmed develop into main",
+        "States the current version is 2.3.1, from the base branch files, matching the newest tag v2.3.1.4410",
+        "Computes the bump as MAJOR, from 2.3.1 to 3.0.0, because `fix(api)!` and its body mark a breaking change, even though a `feat` is also present",
+        "Asks the developer to confirm the target version 3.0.0 before it edits any file",
+        "Plans to change only the three-segment version in azure-pipelines-prod.yml and ci.yml and to keep `.$(Build.BuildId)` and `.${{ github.run_id }}` unchanged",
+        "Plans the edit on a branch named like chore/bump-version-3-0-0 cut from origin/develop, and does not commit or push"
+      ]
+    }
+  ]
+}
